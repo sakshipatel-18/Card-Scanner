@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardScan — Business Card Reader</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0a0f;
+    --surface:  #111118;
+    --card:     #16161f;
+    --border:   #2a2a3a;
+    --accent:   #6c63ff;
+    --accent2:  #ff6584;
+    --gold:     #ffd700;
+    --text:     #e8e8f0;
+    --muted:    #6b6b80;
+    --success:  #00d97e;
+    --error:    #ff4d6d;
+    --radius:   16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background grid ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Glowing orbs ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 400px; height: 400px; background: rgba(108,99,255,0.12); top: -100px; right: -100px; }
+  .orb-2 { width: 300px; height: 300px; background: rgba(255,101,132,0.08); bottom: 100px; left: -80px; }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeDown 0.6s ease;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #fff 40%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Step indicator ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .step {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    transition: background 0.3s;
+  }
+  .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step.done   .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+
+  .step-divider { width: 28px; height: 1px; background: var(--border); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Name input ── */
+  .input-wrap { position: relative; }
+
+  .input-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 14px 14px 44px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+  }
+  input[type="text"]::placeholder { color: var(--muted); }
+
+  /* ── Drop zone ── */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .drop-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(108,99,255,0), rgba(108,99,255,0));
+    transition: background 0.3s;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.05);
+  }
+  .drop-zone:hover::before {
+    background: linear-gradient(135deg, rgba(108,99,255,0.05), rgba(255,101,132,0.03));
+  }
+
+  .drop-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+  .drop-main { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+  .drop-sub  { font-size: 13px; color: var(--muted); }
+
+  .or-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0;
+    color: var(--muted); font-size: 13px;
+  }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #8b7fff);
+    color: #fff;
+    width: 100%;
+    font-size: 16px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1));
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    width: 100%;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Preview ── */
+  #preview-wrap { display: none; margin-bottom: 16px; }
+  #preview-wrap img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    max-height: 240px;
+    object-fit: contain;
+    background: var(--surface);
+  }
+  .preview-info {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--surface);
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .preview-name { color: var(--text); font-weight: 500; }
+  .remove-btn {
+    background: none; border: none; color: var(--error);
+    cursor: pointer; font-size: 18px; padding: 0;
+    transition: transform 0.2s;
+  }
+  .remove-btn:hover { transform: scale(1.2); }
+
+  /* ── Progress ── */
+  .progress-wrap { display: none; text-align: center; padding: 20px 0; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  .progress-text { color: var(--muted); font-size: 14px; }
+  .progress-steps {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 16px;
+    text-align: left;
+  }
+  .p-step {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.3s;
+  }
+  .p-step.active { color: var(--accent); }
+  .p-step.done   { color: var(--success); }
+
+  /* ── Results ── */
+  #results { display: none; }
+
+  .result-banner {
+    background: linear-gradient(135deg, rgba(0,217,126,0.12), rgba(0,217,126,0.05));
+    border: 1px solid rgba(0,217,126,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  .result-banner.error {
+    background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.05));
+    border-color: rgba(255,77,109,0.3);
+    color: var(--error);
+  }
+
+  .fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .field { grid-column: span 1; }
+  .field.wide { grid-column: span 2; }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .field-value {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text);
+    min-height: 40px;
+    word-break: break-word;
+    transition: border-color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .field-value:empty::after { content: '—'; color: var(--muted); }
+  .field-value:hover { border-color: var(--accent); cursor: default; }
+
+  .sheet-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .sheet-badge.saved { background: rgba(0,217,126,0.12); color: var(--success); border: 1px solid rgba(0,217,126,0.3); }
+  .sheet-badge.error { background: rgba(255,77,109,0.12); color: var(--error); border: 1px solid rgba(255,77,109,0.3); }
+
+  /* ── Footer note ── */
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 32px;
+    line-height: 1.6;
+  }
+
+  /* ── Hidden file input ── */
+  #fileInput { display: none; }
+
+  /* ── Animations ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse    { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+  .animate-pulse { animation: pulse 1.5s ease infinite; }
+
+  /* ── Responsive ── */
+  @media (max-width: 480px) {
+    .fields-grid { grid-template-columns: 1fr; }
+    .field.wide  { grid-column: span 1; }
+    .card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🪪</div>
+      <span class="logo-text">CardScan</span>
+    </div>
+    <p>Scan any business card · Instantly save to Google Sheets</p>
+  </header>
+
+  <!-- Steps -->
+  <div class="steps" id="steps">
+    <div class="step active" id="step1"><div class="step-num">1</div> Your Name</div>
+    <div class="step-divider"></div>
+    <div class="step" id="step2"><div class="step-num">2</div> Upload Card</div>
+    <div class="step-divider"></div>
+    <div class="step" id="step3"><div class="step-num">3</div> Results</div>
+  </div>
+
+  <!-- Step 1: Name -->
+  <div class="card" id="nameSection" style="animation-delay:0.1s">
+    <div class="card-title">Your Identity</div>
+    <div class="input-wrap">
+      <span class="input-icon">👤</span>
+      <input type="text" id="scannerName" placeholder="Enter your full name before scanning..." />
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-top:8px;">This gets recorded in the sheet so the team knows who scanned each card.</p>
+  </div>
+
+  <!-- Step 2: Upload -->
+  <div class="card" id="uploadSection" style="animation-delay:0.2s">
+    <div class="card-title">Business Card</div>
+
+    <!-- Preview -->
+    <div id="preview-wrap">
+      <img id="preview-img" src="" alt="Card preview" />
+      <div class="preview-info">
+        <span class="preview-name" id="preview-filename"></span>
+        <button class="remove-btn" onclick="removeImage()" title="Remove">✕</button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <span class="drop-icon">📷</span>
+      <div class="drop-main">Click to upload or drag & drop</div>
+      <div class="drop-sub">JPG, PNG, WEBP · Max 10MB</div>
+    </div>
+
+    <div class="or-divider">or</div>
+
+    <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">
+      📁 Browse Files
+    </button>
+    <input type="file" id="fileInput" accept="image/*" capture="environment" />
+  </div>
+
+  <!-- Scan button -->
+  <div id="scanBtnWrap" style="animation-delay:0.3s">
+    <button class="btn btn-primary" id="scanBtn" onclick="startScan()" disabled>
+      <span>🔍</span> <span id="scanBtnText">Scan Card</span>
+    </button>
+  </div>
+
+  <!-- Progress -->
+  <div class="card" id="progressSection" style="display:none; animation-delay:0s">
+    <div class="progress-wrap" style="display:block">
+      <div class="spinner"></div>
+      <div class="progress-steps">
+        <div class="p-step active animate-pulse" id="ps1">⚡ Uploading image...</div>
+        <div class="p-step" id="ps2">🤖 Claude AI reading the card...</div>
+        <div class="p-step" id="ps3">📊 Saving to Google Sheets...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <div id="sheetBadge" class="sheet-badge"></div>
+
+    <div class="card" style="animation-delay:0s">
+      <div class="card-title">Extracted Information</div>
+
+      <div class="fields-grid">
+        <div class="field wide">
+          <div class="field-label">🏢 Brand / Company</div>
+          <div class="field-value" id="r-brandName"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">👤 Person Name</div>
+          <div class="field-value" id="r-personName"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">💼 Designation</div>
+          <div class="field-value" id="r-designation"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">🏬 Department</div>
+          <div class="field-value" id="r-department"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">📞 Phone</div>
+          <div class="field-value" id="r-phone"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">📱 Alternate Phone</div>
+          <div class="field-value" id="r-alternatePhone"></div>
+        </div>
+        <div class="field wide">
+          <div class="field-label">✉️ Email</div>
+          <div class="field-value" id="r-email"></div>
+        </div>
+        <div class="field wide">
+          <div class="field-label">🌐 Website</div>
+          <div class="field-value" id="r-website"></div>
+        </div>
+        <div class="field wide">
+          <div class="field-label">📍 Address</div>
+          <div class="field-value" id="r-address"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">🏙️ City</div>
+          <div class="field-value" id="r-city"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">📌 State</div>
+          <div class="field-value" id="r-state"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">🌍 Country</div>
+          <div class="field-value" id="r-country"></div>
+        </div>
+        <div class="field">
+          <div class="field-label"># Pincode</div>
+          <div class="field-value" id="r-pincode"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">💼 LinkedIn</div>
+          <div class="field-value" id="r-linkedin"></div>
+        </div>
+        <div class="field">
+          <div class="field-label">🐦 Twitter / X</div>
+          <div class="field-value" id="r-twitter"></div>
+        </div>
+        <div class="field wide">
+          <div class="field-label">ℹ️ Other Info</div>
+          <div class="field-value" id="r-otherInfo"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="resetScanner()" style="margin-top:4px">
+      🔄 Scan Another Card
+    </button>
+  </div>
+
+  <p class="footer-note">Powered by Claude AI · Data saved to your team's Google Sheet</p>
+
+</div>
+
+<script>
+let selectedFile = null;
+
+// ── File input ────────────────────────────────────────────────────────────────
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) handleFile(file);
+});
+
+// ── Drag & drop ───────────────────────────────────────────────────────────────
+const dropZone = document.getElementById('dropZone');
+['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
+dropZone.addEventListener('drop', e => {
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleFile(file);
+});
+
+// ── Handle file ───────────────────────────────────────────────────────────────
+function handleFile(file) {
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-filename').textContent = file.name;
+    document.getElementById('preview-wrap').style.display = 'block';
+    dropZone.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  updateScanBtn();
+}
+
+function removeImage() {
+  selectedFile = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  dropZone.style.display = 'block';
+  document.getElementById('fileInput').value = '';
+  updateScanBtn();
+}
+
+// ── Name input listener ───────────────────────────────────────────────────────
+document.getElementById('scannerName').addEventListener('input', updateScanBtn);
+
+function updateScanBtn() {
+  const hasFile = !!selectedFile;
+  const hasName = document.getElementById('scannerName').value.trim().length > 0;
+  document.getElementById('scanBtn').disabled = !(hasFile && hasName);
+}
+
+// ── Progress helpers ──────────────────────────────────────────────────────────
+function setProgressStep(step) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`ps${i}`);
+    el.classList.remove('active','done','animate-pulse');
+    if (i < step)  el.classList.add('done');
+    if (i === step) el.classList.add('active','animate-pulse');
+  }
+}
+
+// ── Start scan ────────────────────────────────────────────────────────────────
+async function startScan() {
+  const scannerName = document.getElementById('scannerName').value.trim();
+  if (!selectedFile || !scannerName) return;
+
+  // Update steps
+  setStep(2);
+
+  // Show progress, hide others
+  document.getElementById('nameSection').style.display    = 'none';
+  document.getElementById('uploadSection').style.display  = 'none';
+  document.getElementById('scanBtnWrap').style.display    = 'none';
+  document.getElementById('progressSection').style.display = 'block';
+  document.getElementById('results').style.display        = 'none';
+
+  setProgressStep(1);
+
+  try {
+    const formData = new FormData();
+    formData.append('card', selectedFile);
+    formData.append('scannerName', scannerName);
+
+    setProgressStep(2);
+
+    const response = await fetch('/api/scan', { method: 'POST', body: formData });
+    const result   = await response.json();
+
+    setProgressStep(3);
+    await delay(600);
+
+    if (!response.ok || !result.success) throw new Error(result.error || 'Scan failed');
+
+    showResults(result);
+
+  } catch (err) {
+    document.getElementById('progressSection').style.display = 'none';
+    document.getElementById('results').style.display         = 'block';
+    document.getElementById('sheetBadge').className          = 'sheet-badge error';
+    document.getElementById('sheetBadge').innerHTML          = `❌ Error: ${err.message}`;
+    setStep(3);
+  }
+}
+
+// ── Show results ─────────────────────────────────────────────────────────────
+function showResults(result) {
+  const { cardData, sheetSuccess, sheetMessage } = result;
+
+  // Populate fields
+  const fields = ['brandName','personName','designation','department','email','phone',
+                  'alternatePhone','website','address','city','state','country',
+                  'pincode','linkedin','twitter','otherInfo'];
+  fields.forEach(f => {
+    const el = document.getElementById(`r-${f}`);
+    if (el) el.textContent = cardData[f] || '';
+  });
+
+  // Sheet badge
+  const badge = document.getElementById('sheetBadge');
+  if (sheetSuccess) {
+    badge.className = 'sheet-badge saved';
+    badge.innerHTML = `✅ ${sheetMessage}`;
+  } else {
+    badge.className = 'sheet-badge error';
+    badge.innerHTML = `⚠️ ${sheetMessage}`;
+  }
+
+  document.getElementById('progressSection').style.display = 'none';
+  document.getElementById('results').style.display         = 'block';
+  setStep(3);
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetScanner() {
+  selectedFile = null;
+  document.getElementById('preview-wrap').style.display   = 'none';
+  dropZone.style.display                                   = 'block';
+  document.getElementById('fileInput').value               = '';
+  document.getElementById('nameSection').style.display    = 'block';
+  document.getElementById('uploadSection').style.display  = 'block';
+  document.getElementById('scanBtnWrap').style.display    = 'block';
+  document.getElementById('progressSection').style.display = 'none';
+  document.getElementById('results').style.display        = 'none';
+  updateScanBtn();
+  setStep(1);
+}
+
+// ── Step indicator ────────────────────────────────────────────────────────────
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`step${i}`);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+}
+
+// ── Util ──────────────────────────────────────────────────────────────────────
+const delay = ms => new Promise(r => setTimeout(r, ms));
+</script>
+</body>
+</html>
