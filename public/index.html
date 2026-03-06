@@ -243,14 +243,26 @@
       </div>
     </div>
 
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('filePicker').click()">
       <span class="drop-icon">📷</span>
       <div class="drop-main">Click to upload or drag & drop</div>
       <div class="drop-sub">JPG, PNG, WEBP · Max 10MB</div>
     </div>
-    <div class="or-divider">or</div>
-    <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">📁 Browse Files</button>
-    <input type="file" id="fileInput" accept="image/*" capture="environment" />
+    <div class="or-divider">or choose</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+      <button class="btn btn-outline" onclick="document.getElementById('filePicker').click()">
+        📁 Gallery / Files
+      </button>
+      <button class="btn btn-outline" onclick="document.getElementById('cameraInput').click()">
+        📸 Take Photo
+      </button>
+    </div>
+    <!-- Gallery/Files picker — no capture, works on both desktop and mobile -->
+    <input type="file" id="filePicker"   accept="image/*" />
+    <!-- Camera only — for taking a fresh photo on mobile -->
+    <input type="file" id="cameraInput"  accept="image/*" capture="environment" />
+    <!-- Legacy hidden input kept for drop zone compatibility -->
+    <input type="file" id="fileInput"    accept="image/*" style="display:none" />
   </div>
 
   <!-- Scan Button -->
@@ -310,9 +322,9 @@
 let currentUser  = null;
 let selectedFile = null;
 
-// ── On load: restore saved identity from sessionStorage ───────────────────────
+// ── On load: restore saved identity from localStorage (persists after browser close) ──
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = sessionStorage.getItem('cardScanUser');
+  const saved = localStorage.getItem('cardScanUser');
   if (saved) {
     const user = JSON.parse(saved);
     applyUser(user, false);
@@ -334,7 +346,7 @@ function saveIdentity() {
   const email = document.getElementById('inputEmail').value.trim();
   if (!name || !email) return;
   const user = { name, email };
-  sessionStorage.setItem('cardScanUser', JSON.stringify(user));
+  localStorage.setItem('cardScanUser', JSON.stringify(user));
   applyUser(user, true);
 }
 
@@ -354,7 +366,7 @@ function applyUser(user, animate) {
 
 function changeIdentity() {
   currentUser = null;
-  sessionStorage.removeItem('cardScanUser');
+  localStorage.removeItem('cardScanUser');
   document.getElementById('identityForm').style.display = 'block';
   document.getElementById('userPill').classList.remove('show');
   document.getElementById('detailsSection').style.display = 'none';
@@ -365,6 +377,15 @@ function changeIdentity() {
 }
 
 // ── File handling ─────────────────────────────────────────────────────────────
+// filePicker = gallery/files (no capture) — works on desktop + mobile
+document.getElementById('filePicker').addEventListener('change', e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+// cameraInput = take fresh photo on mobile
+document.getElementById('cameraInput').addEventListener('change', e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+// legacy drop zone
 document.getElementById('fileInput').addEventListener('change', e => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
 });
@@ -394,7 +415,9 @@ function removeImage() {
   selectedFile = null;
   document.getElementById('preview-wrap').style.display = 'none';
   dropZone.style.display = 'block';
-  document.getElementById('fileInput').value = '';
+  document.getElementById('fileInput').value   = '';
+  document.getElementById('filePicker').value  = '';
+  document.getElementById('cameraInput').value = '';
   updateScanBtn();
 }
 
@@ -482,6 +505,8 @@ function resetForNextScan() {
   document.getElementById('preview-wrap').style.display = 'none';
   dropZone.style.display = 'block';
   document.getElementById('fileInput').value       = '';
+  document.getElementById('filePicker').value      = '';
+  document.getElementById('cameraInput').value     = '';
   document.getElementById('inputPOS').value        = '';
   document.getElementById('inputStoreCount').value = '';
   document.getElementById('inputComments').value   = '';
