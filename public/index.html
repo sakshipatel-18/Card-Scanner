@@ -322,9 +322,22 @@
 let currentUser  = null;
 let selectedFile = null;
 
-// ── On load: restore saved identity from localStorage (persists after browser close) ──
+// ── Cookie helpers (reliable on mobile, in-app browsers, Safari) ─────────────
+function setCookie(name, val, days) {
+  const exp = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(val)};expires=${exp};path=/;SameSite=Lax`;
+}
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
+function deleteCookie(name) {
+  document.cookie = `${name}=;expires=Thu,01 Jan 1970 00:00:00 GMT;path=/`;
+}
+
+// ── On load: restore saved identity from cookie (lasts 365 days) ─────────────
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('cardScanUser');
+  const saved = getCookie('cardScanUser');
   if (saved) {
     const user = JSON.parse(saved);
     applyUser(user, false);
@@ -346,7 +359,7 @@ function saveIdentity() {
   const email = document.getElementById('inputEmail').value.trim();
   if (!name || !email) return;
   const user = { name, email };
-  localStorage.setItem('cardScanUser', JSON.stringify(user));
+  setCookie('cardScanUser', JSON.stringify(user), 365); // remember for 1 year
   applyUser(user, true);
 }
 
@@ -366,7 +379,7 @@ function applyUser(user, animate) {
 
 function changeIdentity() {
   currentUser = null;
-  localStorage.removeItem('cardScanUser');
+  deleteCookie('cardScanUser');
   document.getElementById('identityForm').style.display = 'block';
   document.getElementById('userPill').classList.remove('show');
   document.getElementById('detailsSection').style.display = 'none';
