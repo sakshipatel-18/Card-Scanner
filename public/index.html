@@ -5,269 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CardScan — Business Card Reader</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
-    --bg:       #0a0a0f;
-    --surface:  #111118;
-    --card:     #16161f;
-    --border:   #2a2a3a;
-    --accent:   #6c63ff;
-    --accent2:  #ff6584;
-    --text:     #e8e8f0;
-    --muted:    #6b6b80;
-    --success:  #00d97e;
-    --error:    #ff4d6d;
-    --radius:   16px;
+    --bg:      #0a0a0f;
+    --surface: #111118;
+    --card:    #16161f;
+    --border:  #2a2a3a;
+    --accent:  #6c63ff;
+    --accent2: #ff6584;
+    --text:    #e8e8f0;
+    --muted:   #6b6b80;
+    --success: #00d97e;
+    --error:   #ff4d6d;
+    --radius:  16px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
   body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none; z-index: 0;
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
-
   .orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
   .orb-1 { width: 400px; height: 400px; background: rgba(108,99,255,0.12); top: -100px; right: -100px; }
   .orb-2 { width: 300px; height: 300px; background: rgba(255,101,132,0.08); bottom: 100px; left: -80px; }
 
   .container { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 32px 20px 60px; }
 
-  /* ── Header ── */
-  header { text-align: center; margin-bottom: 40px; animation: fadeDown 0.6s ease; }
-  .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-  .logo-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px;
-  }
-  .logo-text {
-    font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px;
-    background: linear-gradient(135deg, #fff 40%, var(--accent));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  header p { color: var(--muted); font-size: 14px; letter-spacing: 0.5px; }
+  /* Header */
+  header { text-align: center; margin-bottom: 36px; animation: fadeDown 0.6s ease; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; background: linear-gradient(135deg, #fff 40%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  header p { color: var(--muted); font-size: 14px; }
 
-  /* ── Steps ── */
-  .steps {
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px; margin-bottom: 32px; animation: fadeUp 0.6s ease 0.1s both;
-  }
+  /* Steps */
+  .steps { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 28px; animation: fadeUp 0.5s ease 0.1s both; flex-wrap: wrap; }
   .step { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--muted); transition: color 0.3s; }
   .step.active { color: var(--accent); }
   .step.done   { color: var(--success); }
-  .step-num {
-    width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid currentColor;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-family: 'JetBrains Mono', monospace; transition: background 0.3s;
-  }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 11px; }
   .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
   .step.done   .step-num { background: var(--success); border-color: var(--success); color: #fff; }
-  .step-divider { width: 28px; height: 1px; background: var(--border); }
+  .step-divider { width: 24px; height: 1px; background: var(--border); }
 
-  /* ── Card ── */
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
-    animation: fadeUp 0.5s ease both;
-  }
-  .card-title {
-    font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
-  }
+  /* Card */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; animation: fadeUp 0.5s ease both; }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* ── Google Login ── */
-  .google-login-wrap {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 16px; padding: 8px 0;
-  }
-  .google-btn {
-    display: flex; align-items: center; gap: 12px;
-    background: #fff; color: #3c4043;
-    border: 1px solid #dadce0; border-radius: 10px;
-    padding: 12px 24px; font-size: 15px; font-weight: 500;
-    cursor: pointer; transition: all 0.2s; width: 100%;
-    justify-content: center; font-family: 'DM Sans', sans-serif;
-  }
-  .google-btn:hover { background: #f8f9fa; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-  .google-btn img { width: 20px; height: 20px; }
+  /* Inputs */
+  .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .field-group.single { grid-template-columns: 1fr; }
+  .input-wrap { position: relative; }
+  .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+  .input-icon.top { top: 15px; transform: none; }
 
-  /* ── User profile (after login) ── */
-  .user-profile {
-    display: none;
-    background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(108,99,255,0.05));
-    border: 1px solid rgba(108,99,255,0.3);
-    border-radius: 12px; padding: 14px 18px;
-    align-items: center; gap: 12px;
-  }
-  .user-profile.show { display: flex; }
-  .user-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    border: 2px solid var(--accent); object-fit: cover;
-  }
-  .user-avatar-placeholder {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 600; color: #fff; flex-shrink: 0;
-  }
-  .user-info { flex: 1; }
-  .user-name  { font-size: 15px; font-weight: 600; color: var(--text); }
-  .user-email { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .logout-btn {
-    background: none; border: 1px solid var(--border); color: var(--muted);
-    border-radius: 8px; padding: 6px 12px; font-size: 12px;
-    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-  }
-  .logout-btn:hover { border-color: var(--error); color: var(--error); }
-
-  /* ── Inputs ── */
-  .input-wrap { position: relative; margin-bottom: 12px; }
-  .input-wrap:last-child { margin-bottom: 0; }
-  .input-icon {
-    position: absolute; left: 14px; top: 50%;
-    transform: translateY(-50%); font-size: 16px; pointer-events: none;
-  }
-  .input-icon.top { top: 16px; transform: none; }
-
-  input[type="text"], input[type="number"], textarea, select {
-    width: 100%;
-    padding: 14px 14px 14px 44px;
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  textarea {
+    width: 100%; padding: 13px 13px 13px 42px;
     background: var(--surface); border: 1.5px solid var(--border);
     border-radius: 10px; color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size: 15px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
     outline: none; transition: border-color 0.3s, box-shadow 0.3s;
   }
-  input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
-    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+  input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  textarea { padding-top: 13px; resize: vertical; min-height: 85px; line-height: 1.5; }
+
+  /* User pill (after identity saved) */
+  .user-pill {
+    display: none; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(108,99,255,0.05));
+    border: 1px solid rgba(108,99,255,0.25);
+    border-radius: 12px; padding: 12px 16px;
   }
-  input[type="text"]::placeholder,
-  input[type="number"]::placeholder,
-  textarea::placeholder { color: var(--muted); }
+  .user-pill.show { display: flex; }
+  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .user-details { flex: 1; }
+  .user-name  { font-size: 14px; font-weight: 600; }
+  .user-email { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .change-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .change-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  textarea { padding-top: 14px; resize: vertical; min-height: 90px; line-height: 1.5; }
-
-  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-
-  /* ── Drop zone ── */
-  .drop-zone {
-    border: 2px dashed var(--border); border-radius: 12px;
-    padding: 40px 20px; text-align: center; cursor: pointer;
-    transition: all 0.3s; position: relative; overflow: hidden;
-  }
+  /* Drop zone */
+  .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.3s; }
   .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(108,99,255,0.05); }
-  .drop-icon { font-size: 40px; margin-bottom: 12px; display: block; }
-  .drop-main { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
-  .drop-sub  { font-size: 13px; color: var(--muted); }
+  .drop-icon { font-size: 36px; margin-bottom: 10px; display: block; }
+  .drop-main { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .drop-sub  { font-size: 12px; color: var(--muted); }
 
-  .or-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 16px 0; color: var(--muted); font-size: 13px;
-  }
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: var(--muted); font-size: 13px; }
   .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px 24px; border-radius: 10px;
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-    cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), #8b7fff);
-    color: #fff; width: 100%; font-size: 16px; padding: 16px;
-    position: relative; overflow: hidden;
-  }
-  .btn-primary::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1));
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-  .btn-outline {
-    background: transparent; border: 1.5px solid var(--border);
-    color: var(--text); width: 100%;
-  }
+  /* Preview */
+  #preview-wrap { display: none; margin-bottom: 14px; }
+  #preview-wrap img { width: 100%; border-radius: 10px; border: 1px solid var(--border); max-height: 220px; object-fit: contain; background: var(--surface); }
+  .preview-info { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface); border-radius: 8px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+  .remove-btn { background: none; border: none; color: var(--error); cursor: pointer; font-size: 18px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; width: 100%; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #8b7fff); color: #fff; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
   .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Preview ── */
-  #preview-wrap { display: none; margin-bottom: 16px; }
-  #preview-wrap img {
-    width: 100%; border-radius: 10px; border: 1px solid var(--border);
-    max-height: 240px; object-fit: contain; background: var(--surface);
-  }
-  .preview-info {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px; background: var(--surface); border-radius: 8px;
-    margin-top: 10px; font-size: 13px; color: var(--muted);
-  }
-  .preview-name { color: var(--text); font-weight: 500; }
-  .remove-btn { background: none; border: none; color: var(--error); cursor: pointer; font-size: 18px; padding: 0; transition: transform 0.2s; }
-  .remove-btn:hover { transform: scale(1.2); }
-
-  /* ── Progress ── */
-  .progress-wrap { display: none; text-align: center; padding: 20px 0; }
-  .spinner {
-    width: 48px; height: 48px; border: 3px solid var(--border);
-    border-top-color: var(--accent); border-radius: 50%;
-    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
-  }
-  .progress-steps { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; text-align: left; }
+  /* Progress */
+  .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  .progress-steps { display: flex; flex-direction: column; gap: 8px; }
   .p-step { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
   .p-step.active { color: var(--accent); }
   .p-step.done   { color: var(--success); }
+  .pulse { animation: pulse 1.2s ease infinite; }
 
-  /* ── Results ── */
-  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  /* Results */
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .field { grid-column: span 1; }
   .field.wide { grid-column: span 2; }
-  .field-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-  .field-value {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; font-size: 14px;
-    color: var(--text); min-height: 40px; word-break: break-word;
-  }
+  .field-label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .field-value { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13px; min-height: 38px; word-break: break-word; }
   .field-value:empty::after { content: '—'; color: var(--muted); }
 
-  .sheet-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 20px; font-size: 12px;
-    font-weight: 600; margin-bottom: 20px;
-  }
-  .sheet-badge.saved { background: rgba(0,217,126,0.12); color: var(--success); border: 1px solid rgba(0,217,126,0.3); }
-  .sheet-badge.error { background: rgba(255,77,109,0.12); color: var(--error); border: 1px solid rgba(255,77,109,0.3); }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+  .badge.ok  { background: rgba(0,217,126,0.12); color: var(--success); border: 1px solid rgba(0,217,126,0.3); }
+  .badge.err { background: rgba(255,77,109,0.12); color: var(--error);   border: 1px solid rgba(255,77,109,0.3); }
 
-  .footer-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 32px; line-height: 1.6; }
-
+  .footer-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 28px; }
   #fileInput { display: none; }
   #results { display: none; }
 
-  @keyframes spin      { to { transform: rotate(360deg); } }
-  @keyframes fadeDown  { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeUp    { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: translateY(0); } }
-  @keyframes animate-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .animate-pulse { animation: animate-pulse 1.5s ease infinite; }
+  @keyframes spin     { to { transform: rotate(360deg); } }
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  @media (max-width: 480px) {
-    .fields-grid, .input-row { grid-template-columns: 1fr; }
+  @media(max-width:480px) {
+    .fields-grid, .field-group { grid-template-columns:1fr; }
     .field.wide { grid-column: span 1; }
-    .card { padding: 20px; }
   }
 </style>
 </head>
@@ -287,66 +165,84 @@
   </header>
 
   <!-- Steps -->
-  <div class="steps" id="steps">
-    <div class="step active" id="step1"><div class="step-num">1</div> Sign In</div>
+  <div class="steps">
+    <div class="step active" id="step1"><div class="step-num">1</div> Identity</div>
     <div class="step-divider"></div>
     <div class="step" id="step2"><div class="step-num">2</div> Details</div>
     <div class="step-divider"></div>
-    <div class="step" id="step3"><div class="step-num">3</div> Upload Card</div>
+    <div class="step" id="step3"><div class="step-num">3</div> Upload</div>
     <div class="step-divider"></div>
     <div class="step" id="step4"><div class="step-num">4</div> Results</div>
   </div>
 
-  <!-- Step 1: Google Login -->
-  <div class="card" id="loginSection" style="animation-delay:0.1s">
-    <div class="card-title">Sign In</div>
-    <div class="google-login-wrap">
-      <p style="color:var(--muted); font-size:13px; text-align:center;">Sign in with your Google account — your email will be automatically recorded when you scan a card.</p>
-      <button class="google-btn" onclick="signInWithGoogle()">
-        <img src="https://www.google.com/favicon.ico" alt="Google" />
-        Continue with Google
+  <!-- SECTION 1: Identity -->
+  <div class="card" id="identitySection">
+    <div class="card-title">Your Identity</div>
+
+    <!-- Input form (hidden after save) -->
+    <div id="identityForm">
+      <div class="field-group">
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="inputName" placeholder="Your full name" />
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="inputEmail" placeholder="Your email address" />
+        </div>
+      </div>
+      <button class="btn btn-primary" id="saveIdentityBtn" onclick="saveIdentity()" disabled style="margin-top:4px">
+        Continue →
       </button>
+      <p style="font-size:12px; color:var(--muted); margin-top:10px; text-align:center;">
+        Saved once — no need to re-enter every time you scan
+      </p>
     </div>
-    <!-- Shown after login -->
-    <div class="user-profile" id="userProfile" style="margin-top:16px">
-      <div class="user-avatar-placeholder" id="userInitial"></div>
-      <div class="user-info">
-        <div class="user-name" id="userName"></div>
-        <div class="user-email" id="userEmail"></div>
+
+    <!-- Pill shown after saving -->
+    <div class="user-pill" id="userPill">
+      <div class="user-avatar" id="userInitial"></div>
+      <div class="user-details">
+        <div class="user-name"  id="pillName"></div>
+        <div class="user-email" id="pillEmail"></div>
       </div>
-      <button class="logout-btn" onclick="signOut()">Sign out</button>
+      <button class="change-btn" onclick="changeIdentity()">Change</button>
     </div>
   </div>
 
-  <!-- Step 2: Extra Details -->
-  <div class="card" id="detailsSection" style="display:none; animation-delay:0.15s">
+  <!-- SECTION 2: Scan Details -->
+  <div class="card" id="detailsSection" style="display:none">
     <div class="card-title">Scan Details</div>
-    <div class="input-row">
-      <div class="input-wrap" style="margin-bottom:0">
+    <div class="field-group">
+      <div class="input-wrap">
         <span class="input-icon">🏪</span>
-        <input type="text" id="posInput" placeholder="POS (Point of Sale)" />
+        <input type="text" id="inputPOS" placeholder="POS / Outlet Name" />
       </div>
-      <div class="input-wrap" style="margin-bottom:0">
+      <div class="input-wrap">
         <span class="input-icon">🔢</span>
-        <input type="number" id="storeCountInput" placeholder="Store Count" min="0" />
+        <input type="number" id="inputStoreCount" placeholder="Store / Outlet Count" min="0" />
       </div>
     </div>
-    <div class="input-wrap" style="margin-top:12px">
-      <span class="input-icon top">💬</span>
-      <textarea id="commentsInput" placeholder="Additional comments..."></textarea>
+    <div class="field-group single">
+      <div class="input-wrap">
+        <span class="input-icon top">💬</span>
+        <textarea id="inputComments" placeholder="Additional comments (optional)..."></textarea>
+      </div>
     </div>
   </div>
 
-  <!-- Step 3: Upload -->
-  <div class="card" id="uploadSection" style="display:none; animation-delay:0.2s">
+  <!-- SECTION 3: Upload Card -->
+  <div class="card" id="uploadSection" style="display:none">
     <div class="card-title">Business Card</div>
+
     <div id="preview-wrap">
       <img id="preview-img" src="" alt="Card preview" />
       <div class="preview-info">
-        <span class="preview-name" id="preview-filename"></span>
-        <button class="remove-btn" onclick="removeImage()" title="Remove">✕</button>
+        <span id="preview-filename" style="color:var(--text); font-weight:500"></span>
+        <button class="remove-btn" onclick="removeImage()">✕</button>
       </div>
     </div>
+
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <span class="drop-icon">📷</span>
       <div class="drop-main">Click to upload or drag & drop</div>
@@ -357,29 +253,27 @@
     <input type="file" id="fileInput" accept="image/*" capture="environment" />
   </div>
 
-  <!-- Scan button -->
-  <div id="scanBtnWrap" style="display:none">
+  <!-- Scan Button -->
+  <div id="scanBtnWrap" style="display:none; margin-bottom:16px">
     <button class="btn btn-primary" id="scanBtn" onclick="startScan()" disabled>
-      <span>🔍</span> <span>Scan Card</span>
+      🔍 Scan Card
     </button>
   </div>
 
   <!-- Progress -->
-  <div class="card" id="progressSection" style="display:none">
-    <div class="progress-wrap" style="display:block">
-      <div class="spinner"></div>
-      <div class="progress-steps">
-        <div class="p-step active animate-pulse" id="ps1">⚡ Uploading image...</div>
-        <div class="p-step" id="ps2">🤖 Claude AI reading the card...</div>
-        <div class="p-step" id="ps3">📊 Saving to Google Sheets...</div>
-      </div>
+  <div class="card" id="progressSection" style="display:none; text-align:center; padding:32px 24px">
+    <div class="spinner"></div>
+    <div class="progress-steps">
+      <div class="p-step" id="ps1">⚡ Uploading image...</div>
+      <div class="p-step" id="ps2">🤖 Claude AI reading the card...</div>
+      <div class="p-step" id="ps3">📊 Saving to Google Sheets...</div>
     </div>
   </div>
 
   <!-- Results -->
   <div id="results">
-    <div id="sheetBadge" class="sheet-badge"></div>
-    <div class="card" style="animation-delay:0s">
+    <div id="badge" class="badge"></div>
+    <div class="card">
       <div class="card-title">Extracted Information</div>
       <div class="fields-grid">
         <div class="field wide"><div class="field-label">🏢 Brand / Company</div><div class="field-value" id="r-brandName"></div></div>
@@ -398,12 +292,14 @@
         <div class="field"><div class="field-label">💼 LinkedIn</div><div class="field-value" id="r-linkedin"></div></div>
         <div class="field"><div class="field-label">🐦 Twitter / X</div><div class="field-value" id="r-twitter"></div></div>
         <div class="field wide"><div class="field-label">ℹ️ Other Info</div><div class="field-value" id="r-otherInfo"></div></div>
+        <!-- New fields -->
         <div class="field"><div class="field-label">🏪 POS</div><div class="field-value" id="r-pos"></div></div>
         <div class="field"><div class="field-label">🔢 Store Count</div><div class="field-value" id="r-storeCount"></div></div>
         <div class="field wide"><div class="field-label">💬 Comments</div><div class="field-value" id="r-comments"></div></div>
+        <div class="field wide"><div class="field-label">👤 Scanned By</div><div class="field-value" id="r-scannedBy"></div></div>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="resetScanner()" style="margin-top:4px">🔄 Scan Another Card</button>
+    <button class="btn btn-primary" onclick="resetForNextScan()" style="margin-top:4px">🔄 Scan Another Card</button>
   </div>
 
   <p class="footer-note">Powered by Claude AI · Data saved to your team's Google Sheet</p>
@@ -411,48 +307,44 @@
 
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
+let currentUser  = null;
 let selectedFile = null;
-let currentUser  = null; // { name, email, picture }
 
-// ── Google Sign-In ────────────────────────────────────────────────────────────
-const GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
-
-function signInWithGoogle() {
-  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
-    // Fallback: manual entry if client ID not set
-    const name  = prompt('Enter your name:');
-    const email = prompt('Enter your email:');
-    if (name && email) setUser({ name, email, picture: '' });
-    return;
+// ── On load: restore saved identity from sessionStorage ───────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('cardScanUser');
+  if (saved) {
+    const user = JSON.parse(saved);
+    applyUser(user, false);
   }
-  google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-    callback: async (response) => {
-      if (response.access_token) {
-        const res  = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${response.access_token}` }
-        });
-        const data = await res.json();
-        setUser({ name: data.name, email: data.email, picture: data.picture });
-      }
-    }
-  }).requestAccessToken();
+  // Listeners
+  document.getElementById('inputName').addEventListener('input', checkIdentityForm);
+  document.getElementById('inputEmail').addEventListener('input', checkIdentityForm);
+});
+
+// ── Identity ──────────────────────────────────────────────────────────────────
+function checkIdentityForm() {
+  const name  = document.getElementById('inputName').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  document.getElementById('saveIdentityBtn').disabled = !(name && email);
 }
 
-function setUser(user) {
+function saveIdentity() {
+  const name  = document.getElementById('inputName').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  if (!name || !email) return;
+  const user = { name, email };
+  sessionStorage.setItem('cardScanUser', JSON.stringify(user));
+  applyUser(user, true);
+}
+
+function applyUser(user, animate) {
   currentUser = user;
-  document.getElementById('userName').textContent  = user.name;
-  document.getElementById('userEmail').textContent = user.email;
+  document.getElementById('pillName').textContent   = user.name;
+  document.getElementById('pillEmail').textContent  = user.email;
   document.getElementById('userInitial').textContent = user.name.charAt(0).toUpperCase();
-  if (user.picture) {
-    const img = document.createElement('img');
-    img.src = user.picture; img.className = 'user-avatar';
-    document.getElementById('userInitial').replaceWith(img);
-  }
-  document.getElementById('userProfile').classList.add('show');
-  document.querySelector('.google-btn').style.display = 'none';
-  // Show next sections
+  document.getElementById('identityForm').style.display = 'none';
+  document.getElementById('userPill').classList.add('show');
   document.getElementById('detailsSection').style.display = 'block';
   document.getElementById('uploadSection').style.display  = 'block';
   document.getElementById('scanBtnWrap').style.display    = 'block';
@@ -460,10 +352,11 @@ function setUser(user) {
   updateScanBtn();
 }
 
-function signOut() {
+function changeIdentity() {
   currentUser = null;
-  document.getElementById('userProfile').classList.remove('show');
-  document.querySelector('.google-btn').style.display = 'flex';
+  sessionStorage.removeItem('cardScanUser');
+  document.getElementById('identityForm').style.display = 'block';
+  document.getElementById('userPill').classList.remove('show');
   document.getElementById('detailsSection').style.display = 'none';
   document.getElementById('uploadSection').style.display  = 'none';
   document.getElementById('scanBtnWrap').style.display    = 'none';
@@ -471,18 +364,17 @@ function signOut() {
   setStep(1);
 }
 
-// ── File input ────────────────────────────────────────────────────────────────
+// ── File handling ─────────────────────────────────────────────────────────────
 document.getElementById('fileInput').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (file) handleFile(file);
+  if (e.target.files[0]) handleFile(e.target.files[0]);
 });
 
 const dropZone = document.getElementById('dropZone');
-['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
-['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
-dropZone.addEventListener('drop', e => {
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) handleFile(file);
+['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); }));
+dropZone.addEventListener('drop', ev => {
+  const f = ev.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) handleFile(f);
 });
 
 function handleFile(file) {
@@ -511,107 +403,108 @@ function updateScanBtn() {
 }
 
 // ── Progress ──────────────────────────────────────────────────────────────────
-function setProgressStep(step) {
+function setProgressStep(n) {
   for (let i = 1; i <= 3; i++) {
     const el = document.getElementById(`ps${i}`);
-    el.classList.remove('active','done','animate-pulse');
-    if (i < step)  el.classList.add('done');
-    if (i === step) el.classList.add('active','animate-pulse');
+    el.classList.remove('active','done','pulse');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active','pulse');
   }
 }
 
-// ── Start scan ────────────────────────────────────────────────────────────────
+// ── Scan ──────────────────────────────────────────────────────────────────────
 async function startScan() {
   if (!selectedFile || !currentUser) return;
 
-  setStep(3);
-  document.getElementById('loginSection').style.display   = 'none';
-  document.getElementById('detailsSection').style.display = 'none';
-  document.getElementById('uploadSection').style.display  = 'none';
-  document.getElementById('scanBtnWrap').style.display    = 'none';
+  // Hide everything, show progress
+  ['identitySection','detailsSection','uploadSection','scanBtnWrap','results']
+    .forEach(id => document.getElementById(id).style.display = 'none');
   document.getElementById('progressSection').style.display = 'block';
-  document.getElementById('results').style.display        = 'none';
-
+  setStep(3);
   setProgressStep(1);
 
   try {
     const formData = new FormData();
-    formData.append('card', selectedFile);
+    formData.append('card',         selectedFile);
     formData.append('scannerName',  currentUser.name);
     formData.append('scannerEmail', currentUser.email);
-    formData.append('pos',          document.getElementById('posInput').value.trim());
-    formData.append('storeCount',   document.getElementById('storeCountInput').value.trim());
-    formData.append('comments',     document.getElementById('commentsInput').value.trim());
+    formData.append('pos',          document.getElementById('inputPOS').value.trim());
+    formData.append('storeCount',   document.getElementById('inputStoreCount').value.trim());
+    formData.append('comments',     document.getElementById('inputComments').value.trim());
 
     setProgressStep(2);
-    const response = await fetch('/api/scan', { method: 'POST', body: formData });
-    const result   = await response.json();
+    const res    = await fetch('/api/scan', { method: 'POST', body: formData });
+    const result = await res.json();
     setProgressStep(3);
-    await delay(600);
+    await sleep(500);
 
-    if (!response.ok || !result.success) throw new Error(result.error || 'Scan failed');
+    if (!res.ok || !result.success) throw new Error(result.error || 'Scan failed');
     showResults(result);
 
   } catch (err) {
     document.getElementById('progressSection').style.display = 'none';
-    document.getElementById('results').style.display         = 'block';
-    document.getElementById('sheetBadge').className          = 'sheet-badge error';
-    document.getElementById('sheetBadge').innerHTML          = `❌ Error: ${err.message}`;
+    const badge = document.getElementById('badge');
+    badge.className = 'badge err';
+    badge.innerHTML = `❌ ${err.message}`;
+    document.getElementById('results').style.display = 'block';
     setStep(4);
   }
 }
 
-// ── Show results ─────────────────────────────────────────────────────────────
+// ── Results ───────────────────────────────────────────────────────────────────
 function showResults(result) {
   const { cardData, sheetSuccess, sheetMessage } = result;
-  const fields = ['brandName','personName','designation','department','email','phone',
-                  'alternatePhone','website','address','city','state','country',
-                  'pincode','linkedin','twitter','otherInfo'];
-  fields.forEach(f => {
+
+  ['brandName','personName','designation','department','email','phone',
+   'alternatePhone','website','address','city','state','country',
+   'pincode','linkedin','twitter','otherInfo'].forEach(f => {
     const el = document.getElementById(`r-${f}`);
     if (el) el.textContent = cardData[f] || '';
   });
+
   document.getElementById('r-pos').textContent        = cardData.pos        || '';
   document.getElementById('r-storeCount').textContent = cardData.storeCount || '';
   document.getElementById('r-comments').textContent   = cardData.comments   || '';
+  document.getElementById('r-scannedBy').textContent  = `${currentUser.name} (${currentUser.email})`;
 
-  const badge = document.getElementById('sheetBadge');
-  badge.className = sheetSuccess ? 'sheet-badge saved' : 'sheet-badge error';
+  const badge = document.getElementById('badge');
+  badge.className = sheetSuccess ? 'badge ok' : 'badge err';
   badge.innerHTML = sheetSuccess ? `✅ ${sheetMessage}` : `⚠️ ${sheetMessage}`;
 
   document.getElementById('progressSection').style.display = 'none';
-  document.getElementById('results').style.display         = 'block';
+  document.getElementById('results').style.display = 'block';
   setStep(4);
 }
 
-// ── Reset ─────────────────────────────────────────────────────────────────────
-function resetScanner() {
+// ── Reset for next scan (keeps identity, clears card + details) ───────────────
+function resetForNextScan() {
   selectedFile = null;
-  document.getElementById('preview-wrap').style.display    = 'none';
-  dropZone.style.display                                    = 'block';
-  document.getElementById('fileInput').value                = '';
-  document.getElementById('posInput').value                 = '';
-  document.getElementById('storeCountInput').value          = '';
-  document.getElementById('commentsInput').value            = '';
-  document.getElementById('loginSection').style.display    = 'block';
-  document.getElementById('detailsSection').style.display  = currentUser ? 'block' : 'none';
-  document.getElementById('uploadSection').style.display   = currentUser ? 'block' : 'none';
-  document.getElementById('scanBtnWrap').style.display     = currentUser ? 'block' : 'none';
-  document.getElementById('progressSection').style.display = 'none';
-  document.getElementById('results').style.display         = 'none';
+  document.getElementById('preview-wrap').style.display = 'none';
+  dropZone.style.display = 'block';
+  document.getElementById('fileInput').value       = '';
+  document.getElementById('inputPOS').value        = '';
+  document.getElementById('inputStoreCount').value = '';
+  document.getElementById('inputComments').value   = '';
+  document.getElementById('results').style.display          = 'none';
+  document.getElementById('progressSection').style.display  = 'none';
+  document.getElementById('identitySection').style.display  = 'block';
+  document.getElementById('detailsSection').style.display   = 'block';
+  document.getElementById('uploadSection').style.display    = 'block';
+  document.getElementById('scanBtnWrap').style.display      = 'block';
   updateScanBtn();
-  setStep(currentUser ? 2 : 1);
+  setStep(2); // stays at step 2 since identity is remembered
 }
 
-// ── Step indicator ────────────────────────────────────────────────────────────
+// ── Steps ─────────────────────────────────────────────────────────────────────
 function setStep(n) {
   for (let i = 1; i <= 4; i++) {
     const el = document.getElementById(`step${i}`);
+    if (!el) return;
     el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
   }
 }
 
-const delay = ms => new Promise(r => setTimeout(r, ms));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 </script>
 </body>
 </html>
