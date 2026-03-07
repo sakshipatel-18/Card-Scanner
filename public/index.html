@@ -3,330 +3,400 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CardScan — Business Card Reader</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>CardScan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#f0f9f9;--surface:#ffffff;--card:#ffffff;--border:#b2e0e0;
-    --accent:#0d9488;--accent2:#0891b2;--accentlt:#ccfbf1;
-    --text:#0f2e2e;--muted:#5f9ea0;--success:#059669;--error:#e11d48;--radius:14px;
-  }
+  :root{--bg:#f0f9f9;--card:#fff;--border:#b2e0e0;--accent:#0d9488;--accent2:#0891b2;--accentlt:#ccfbf1;--text:#0f2e2e;--muted:#5f9ea0;--success:#059669;--error:#e11d48;--radius:14px;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:radial-gradient(circle at 80% 10%,rgba(13,148,136,.08) 0%,transparent 50%),
-    radial-gradient(circle at 10% 90%,rgba(8,145,178,.07) 0%,transparent 50%);}
-  .container{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:28px 18px 60px;}
-  header{text-align:center;margin-bottom:32px;animation:fadeDown .5s ease;}
-  .logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:8px;}
-  .logo-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(13,148,136,.3);}
-  .logo-text{font-size:28px;font-weight:700;letter-spacing:1px;color:var(--accent);}
-  header p{color:var(--muted);font-size:14px;}
-  .steps{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap;animation:fadeUp .5s ease .1s both;}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 80% 10%,rgba(13,148,136,.08),transparent 50%),radial-gradient(circle at 10% 90%,rgba(8,145,178,.07),transparent 50%);}
+  .wrap{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:24px 16px 60px;}
+  header{text-align:center;margin-bottom:28px;}
+  .logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(13,148,136,.3);}
+  .logo-text{font-size:26px;font-weight:700;color:var(--accent);}
+  header p{color:var(--muted);font-size:13px;}
+  .steps{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
   .step{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);transition:color .3s;}
   .step.active{color:var(--accent);}.step.done{color:var(--success);}
   .step-num{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;}
   .step.active .step-num{background:var(--accent);border-color:var(--accent);color:#fff;}
   .step.done .step-num{background:var(--success);border-color:var(--success);color:#fff;}
-  .step-divider{width:20px;height:1.5px;background:var(--border);}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:0 2px 12px rgba(13,148,136,.07);animation:fadeUp .4s ease both;}
-  .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .step-div{width:20px;height:1.5px;background:var(--border);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(13,148,136,.07);}
+  .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
   .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
-  .input-wrap{position:relative;margin-bottom:11px;}
-  .input-wrap:last-child{margin-bottom:0;}
-  .input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;}
-  .input-icon.top{top:14px;transform:none;}
-  input[type=text],input[type=email],input[type=number],textarea{width:100%;padding:12px 12px 12px 40px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .25s,box-shadow .25s;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .iw{position:relative;margin-bottom:10px;}
+  .iw:last-child{margin-bottom:0;}
+  .ii{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+  .ii.top{top:13px;transform:none;}
+  input[type=text],input[type=email],input[type=number],textarea{width:100%;padding:11px 11px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
   input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
   input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7;}
-  textarea{padding-top:12px;resize:vertical;min-height:80px;line-height:1.5;}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px;}
-  .user-pill{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#e6faf8,#f0fdfc);border:1.5px solid rgba(13,148,136,.25);border-radius:11px;padding:12px 16px;}
-  .user-pill.show{display:flex;}
-  .user-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0;}
-  .user-info{flex:1;}.user-name{font-size:14px;font-weight:600;color:var(--text);}
-  .user-email{font-size:12px;color:var(--muted);margin-top:1px;}
-  .change-btn{background:none;border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
-  .change-btn:hover{border-color:var(--error);color:var(--error);}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;width:100%;}
-  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px rgba(13,148,136,.25);}
-  .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,148,136,.35);}
-  .btn-primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
-  .btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--accent);font-weight:600;}
-  .btn-outline:hover{border-color:var(--accent);background:var(--accentlt);}
-  .btn-sm{padding:9px 14px;font-size:13px;}
-  .drop-zone{border:2px dashed var(--border);border-radius:11px;padding:34px 20px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);}
-  .drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:var(--accentlt);}
-  .drop-icon{font-size:34px;margin-bottom:8px;display:block;}
-  .drop-main{font-size:15px;font-weight:600;margin-bottom:3px;color:var(--text);}
-  .drop-sub{font-size:12px;color:var(--muted);}
-  .or-divider{display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--muted);font-size:12px;font-weight:500;}
-  .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-  #preview-wrap{display:none;margin-bottom:12px;}
-  #preview-wrap img{width:100%;border-radius:9px;border:1.5px solid var(--border);max-height:210px;object-fit:contain;background:var(--bg);}
-  .preview-info{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:var(--bg);border-radius:7px;margin-top:7px;font-size:13px;}
-  .preview-fname{color:var(--text);font-weight:500;}
-  .remove-btn{background:none;border:none;color:var(--error);cursor:pointer;font-size:17px;line-height:1;}
-  #progressSection{text-align:center;padding:30px 22px;}
-  .scan-animation{position:relative;width:80px;height:80px;margin:0 auto 20px;}
-  .scan-card-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--accentlt),#e0f2fe);border:2px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:34px;}
-  .scan-line{position:absolute;left:0;right:0;height:2.5px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanline 1.6s ease-in-out infinite;box-shadow:0 0 8px rgba(13,148,136,.6);top:10px;}
-  @keyframes scanline{0%{top:10px;opacity:0;}15%{opacity:1;}85%{opacity:1;}100%{top:68px;opacity:0;}}
-  .progress-steps{display:flex;flex-direction:column;gap:7px;text-align:left;max-width:280px;margin:0 auto;}
-  .p-step{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;font-weight:500;}
-  .p-step.active{color:var(--accent);}.p-step.done{color:var(--success);}
+  textarea{padding-top:11px;resize:vertical;min-height:75px;line-height:1.5;}
+  .pill{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#e6faf8,#f0fdfc);border:1.5px solid rgba(13,148,136,.25);border-radius:11px;padding:11px 14px;}
+  .pill.show{display:flex;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+  .uinfo{flex:1;}.uname{font-size:14px;font-weight:600;}.uemail{font-size:12px;color:var(--muted);}
+  .chg{background:none;border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+  .chg:hover{border-color:var(--error);color:var(--error);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;width:100%;}
+  .btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px rgba(13,148,136,.25);}
+  .btn-p:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,148,136,.35);}
+  .btn-p:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+  .btn-o{background:#fff;border:1.5px solid var(--border);color:var(--accent);font-weight:600;}
+  .btn-o:hover{border-color:var(--accent);background:var(--accentlt);}
+  .btn-sm{padding:9px 13px;font-size:13px;}
+  .dz{border:2px dashed var(--border);border-radius:11px;padding:30px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);}
+  .dz:hover,.dz.over{border-color:var(--accent);background:var(--accentlt);}
+  .dz-icon{font-size:32px;margin-bottom:7px;display:block;}
+  .dz-main{font-size:14px;font-weight:600;margin-bottom:2px;}.dz-sub{font-size:12px;color:var(--muted);}
+  .or{display:flex;align-items:center;gap:10px;margin:11px 0;color:var(--muted);font-size:12px;font-weight:500;}
+  .or::before,.or::after{content:'';flex:1;height:1px;background:var(--border);}
+  #prevWrap{display:none;margin-bottom:11px;}
+  #prevWrap img{width:100%;border-radius:9px;border:1.5px solid var(--border);max-height:200px;object-fit:contain;background:var(--bg);}
+  .prev-info{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:7px;margin-top:6px;font-size:13px;}
+  .rm{background:none;border:none;color:var(--error);cursor:pointer;font-size:17px;}
+  #progressSection{text-align:center;padding:28px 20px;}
+  .scan-anim{position:relative;width:76px;height:76px;margin:0 auto 18px;}
+  .scan-icon{width:76px;height:76px;background:linear-gradient(135deg,var(--accentlt),#e0f2fe);border:2px solid var(--border);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+  .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanline 1.6s ease-in-out infinite;box-shadow:0 0 8px rgba(13,148,136,.6);}
+  @keyframes scanline{0%{top:8px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:66px;opacity:0}}
+  .psteps{display:flex;flex-direction:column;gap:7px;text-align:left;max-width:260px;margin:0 auto;}
+  .ps{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px;font-weight:500;}
+  .ps.active{color:var(--accent);}.ps.done{color:var(--success);}
   .pulse{animation:pulse 1.2s ease infinite;}
-  .fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-  .field{grid-column:span 1;}.field.wide{grid-column:span 2;}
-  .field-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-  .field-value{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:13px;min-height:36px;word-break:break-word;color:var(--text);}
-  .field-value:empty::after{content:'—';color:#b2e0e0;}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:14px;}
-  .badge.ok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
-  .badge.err{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
-  .info-note{font-size:12px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px;}
-  .footer-note{text-align:center;font-size:12px;color:var(--muted);margin-top:24px;}
-  input[type=file]{display:none;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .f{grid-column:span 1;}.fw{grid-column:span 2;}
+  .fl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+  .fv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;min-height:34px;word-break:break-word;}
+  .fv:empty::after{content:'—';color:#b2e0e0;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:13px;}
+  .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
+  .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
+  .note{font-size:12px;color:var(--muted);margin-top:7px;display:flex;align-items:center;gap:5px;}
+  .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
   #results{display:none;}
-  @keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
-  @media(max-width:480px){.fields-grid,.field-row{grid-template-columns:1fr;}.field.wide{grid-column:span 1;}.card{padding:16px;}}
+  input[type=file]{display:none;}
+  @media(max-width:480px){.fgrid,.row2{grid-template-columns:1fr;}.fw{grid-column:span 1;}.card{padding:15px;}}
 </style>
 </head>
 <body>
-<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:#f59e0b;color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;font-family:Outfit,sans-serif;">
-  📶 You're offline — scanning needs internet. The app is ready when you reconnect.
-</div>
-<div class="container">
+<div class="wrap">
   <header>
     <div class="logo"><div class="logo-icon">🪪</div><span class="logo-text">CardScan</span></div>
-    <p>Scan any business card · Instantly save to Google Sheets</p>
+    <p>Scan business cards · Save to Google Sheets instantly</p>
   </header>
+
   <div class="steps">
     <div class="step active" id="step1"><div class="step-num">1</div> Identity</div>
-    <div class="step-divider"></div>
+    <div class="step-div"></div>
     <div class="step" id="step2"><div class="step-num">2</div> Details</div>
-    <div class="step-divider"></div>
+    <div class="step-div"></div>
     <div class="step" id="step3"><div class="step-num">3</div> Upload</div>
-    <div class="step-divider"></div>
+    <div class="step-div"></div>
     <div class="step" id="step4"><div class="step-num">4</div> Results</div>
   </div>
-  <!-- Identity -->
-  <div class="card" id="identitySection">
+
+  <!-- IDENTITY -->
+  <div class="card" id="secIdentity">
     <div class="card-title">Your Identity</div>
-    <div id="identityForm">
-      <div class="field-row">
-        <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">👤</span><input type="text" id="inputName" placeholder="Your full name"/></div>
-        <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">✉️</span><input type="email" id="inputEmail" placeholder="Your email address"/></div>
+    <div id="idForm">
+      <div class="row2">
+        <div class="iw" style="margin-bottom:0"><span class="ii">👤</span><input type="text" id="inName" placeholder="Your full name"/></div>
+        <div class="iw" style="margin-bottom:0"><span class="ii">✉️</span><input type="email" id="inEmail" placeholder="Your email"/></div>
       </div>
-      <button class="btn btn-primary" id="continueBtn" onclick="saveIdentity()" disabled style="margin-top:11px">Continue →</button>
-      <p class="info-note">ℹ️ Remembered on this device — no need to re-enter next time</p>
+      <button class="btn btn-p" id="btnContinue" onclick="saveIdentity()" disabled style="margin-top:10px">Continue →</button>
+      <p class="note">ℹ️ Remembered on this device — no need to re-enter next time</p>
     </div>
-    <div class="user-pill" id="userPill">
-      <div class="user-avatar" id="userInitial"></div>
-      <div class="user-info"><div class="user-name" id="pillName"></div><div class="user-email" id="pillEmail"></div></div>
-      <button class="change-btn" onclick="changeIdentity()">Change</button>
+    <div class="pill" id="userPill">
+      <div class="avatar" id="userInitial"></div>
+      <div class="uinfo"><div class="uname" id="pillName"></div><div class="uemail" id="pillEmail"></div></div>
+      <button class="chg" onclick="changeIdentity()">Change</button>
     </div>
   </div>
-  <!-- Details -->
-  <div class="card" id="detailsSection" style="display:none">
+
+  <!-- SCAN DETAILS -->
+  <div class="card" id="secDetails" style="display:none">
     <div class="card-title">Scan Details</div>
-    <div class="field-row">
-      <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">🏪</span><input type="text" id="inputPOS" placeholder="POS / Outlet Name"/></div>
-      <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">🔢</span><input type="number" id="inputStoreCount" placeholder="Store Count" min="0"/></div>
+    <div class="row2">
+      <div class="iw" style="margin-bottom:0"><span class="ii">🏪</span><input type="text" id="inPOS" placeholder="POS"/></div>
+      <div class="iw" style="margin-bottom:0"><span class="ii">🏬</span><input type="text" id="inOutlet" placeholder="Outlet Name"/></div>
     </div>
-    <div class="field-row" style="margin-top:11px">
-      <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">👤</span><input type="text" id="inputPersonName" placeholder="Person Name (manual)"/></div>
-      <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">📞</span><input type="text" id="inputPhoneNumber" placeholder="Phone Number (manual)"/></div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw" style="margin-bottom:0"><span class="ii">👤</span><input type="text" id="inManualPerson" placeholder="Person Name (manual)"/></div>
+      <div class="iw" style="margin-bottom:0"><span class="ii">📞</span><input type="text" id="inManualPhone" placeholder="Phone (manual)"/></div>
     </div>
-    <div class="input-wrap" style="margin-top:11px;margin-bottom:0"><span class="input-icon top">💬</span><textarea id="inputComments" placeholder="Additional comments (optional)..."></textarea></div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw" style="margin-bottom:0"><span class="ii">🔢</span><input type="number" id="inStoreCount" placeholder="Store Count" min="0"/></div>
+      <div class="iw" style="margin-bottom:0"></div>
+    </div>
+    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="inComments" placeholder="Comments (optional)..."></textarea></div>
   </div>
-  <!-- Upload -->
-  <div class="card" id="uploadSection" style="display:none">
-    <div class="card-title">Business Card</div>
-    <div id="preview-wrap">
-      <img id="preview-img" src="" alt="preview"/>
-      <div class="preview-info"><span class="preview-fname" id="preview-filename"></span><button class="remove-btn" onclick="removeImage()">✕</button></div>
+
+  <!-- UPLOAD -->
+  <div class="card" id="secUpload" style="display:none">
+    <div class="card-title">Business Card <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional if entering manually above)</span></div>
+    <div id="prevWrap">
+      <img id="prevImg" src="" alt=""/>
+      <div class="prev-info"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">✕</button></div>
     </div>
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('filePicker').click()">
-      <span class="drop-icon">📷</span>
-      <div class="drop-main">Click to upload or drag & drop</div>
-      <div class="drop-sub">JPG, PNG, WEBP · Max 10MB</div>
+    <div class="dz" id="dz" onclick="document.getElementById('fp').click()">
+      <span class="dz-icon">📷</span>
+      <div class="dz-main">Click to upload or drag & drop</div>
+      <div class="dz-sub">JPG, PNG, WEBP · Max 10MB</div>
     </div>
-    <div class="or-divider">or choose</div>
+    <div class="or">or</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <button class="btn btn-outline btn-sm" onclick="document.getElementById('filePicker').click()">📁 Gallery / Files</button>
-      <button class="btn btn-outline btn-sm" onclick="document.getElementById('cameraInput').click()">📸 Take Photo</button>
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('fp').click()">📁 Gallery</button>
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('cam').click()">📸 Camera</button>
     </div>
-    <input type="file" id="filePicker" accept="image/*"/>
-    <input type="file" id="cameraInput" accept="image/*" capture="environment"/>
+    <input type="file" id="fp" accept="image/*"/>
+    <input type="file" id="cam" accept="image/*" capture="environment"/>
   </div>
-  <!-- Scan button -->
-  <div id="scanBtnWrap" style="display:none;margin-bottom:14px">
-    <button class="btn btn-primary" id="scanBtn" onclick="startScan()" disabled>🔍 Scan Card</button>
+
+  <!-- SCAN BUTTON -->
+  <div id="secBtn" style="display:none;margin-bottom:12px">
+    <button class="btn btn-p" id="scanBtn" onclick="doScan()" disabled>🔍 Scan Card</button>
   </div>
-  <!-- Progress -->
-  <div class="card" id="progressSection" style="display:none">
-    <div class="scan-animation"><div class="scan-card-icon">🪪</div><div class="scan-line"></div></div>
-    <div class="progress-steps">
-      <div class="p-step" id="ps1">⚡ Uploading image...</div>
-      <div class="p-step" id="ps2" id="ps2">🔍 Reading your card...</div>
-      <div class="p-step" id="ps3">📊 Saving to Google Sheets...</div>
+
+  <!-- PROGRESS -->
+  <div class="card" id="secProgress" style="display:none">
+    <div class="scan-anim"><div class="scan-icon">🪪</div><div class="scan-line"></div></div>
+    <div class="psteps">
+      <div class="ps" id="ps1">⚡ Uploading...</div>
+      <div class="ps" id="ps2">🔍 Reading your card...</div>
+      <div class="ps" id="ps3">📊 Saving to Google Sheets...</div>
     </div>
   </div>
-  <!-- Results -->
+
+  <!-- RESULTS -->
   <div id="results">
     <div id="badge" class="badge"></div>
     <div class="card">
       <div class="card-title">Extracted Information</div>
-      <div class="fields-grid">
-        <div class="field wide"><div class="field-label">🏢 Brand / Company</div><div class="field-value" id="r-brandName"></div></div>
-        <div class="field"><div class="field-label">👤 Person Name</div><div class="field-value" id="r-personName"></div></div>
-        <div class="field"><div class="field-label">💼 Designation</div><div class="field-value" id="r-designation"></div></div>
-        <div class="field"><div class="field-label">🏬 Department</div><div class="field-value" id="r-department"></div></div>
-        <div class="field"><div class="field-label">📞 Phone</div><div class="field-value" id="r-phone"></div></div>
-        <div class="field"><div class="field-label">📱 Alt Phone</div><div class="field-value" id="r-alternatePhone"></div></div>
-        <div class="field wide"><div class="field-label">✉️ Email</div><div class="field-value" id="r-email"></div></div>
-        <div class="field wide"><div class="field-label">🌐 Website</div><div class="field-value" id="r-website"></div></div>
-        <div class="field wide"><div class="field-label">📍 Address</div><div class="field-value" id="r-address"></div></div>
-        <div class="field"><div class="field-label">🏙️ City</div><div class="field-value" id="r-city"></div></div>
-        <div class="field"><div class="field-label">📌 State</div><div class="field-value" id="r-state"></div></div>
-        <div class="field"><div class="field-label">🌍 Country</div><div class="field-value" id="r-country"></div></div>
-        <div class="field"><div class="field-label"># Pincode</div><div class="field-value" id="r-pincode"></div></div>
-        <div class="field"><div class="field-label">💼 LinkedIn</div><div class="field-value" id="r-linkedin"></div></div>
-        <div class="field"><div class="field-label">🐦 Twitter</div><div class="field-value" id="r-twitter"></div></div>
-        <div class="field wide"><div class="field-label">ℹ️ Other Info</div><div class="field-value" id="r-otherInfo"></div></div>
-        <div class="field"><div class="field-label">🏪 POS</div><div class="field-value" id="r-pos"></div></div>
-        <div class="field"><div class="field-label">🔢 Store Count</div><div class="field-value" id="r-storeCount"></div></div>
-        <div class="field wide"><div class="field-label">💬 Comments</div><div class="field-value" id="r-comments"></div></div>
-        <div class="field wide"><div class="field-label">👤 Scanned By</div><div class="field-value" id="r-scannedBy"></div></div>
+      <div class="fgrid">
+        <div class="f fw"><div class="fl">🏢 Brand / Company</div><div class="fv" id="r-brandName"></div></div>
+        <div class="f"><div class="fl">👤 Person Name</div><div class="fv" id="r-personName"></div></div>
+        <div class="f"><div class="fl">💼 Designation</div><div class="fv" id="r-designation"></div></div>
+        <div class="f"><div class="fl">🏬 Department</div><div class="fv" id="r-department"></div></div>
+        <div class="f"><div class="fl">📞 Phone</div><div class="fv" id="r-phone"></div></div>
+        <div class="f"><div class="fl">📱 Alt Phone</div><div class="fv" id="r-alternatePhone"></div></div>
+        <div class="f fw"><div class="fl">✉️ Email</div><div class="fv" id="r-email"></div></div>
+        <div class="f fw"><div class="fl">🌐 Website</div><div class="fv" id="r-website"></div></div>
+        <div class="f fw"><div class="fl">📍 Address</div><div class="fv" id="r-address"></div></div>
+        <div class="f"><div class="fl">🏙️ City</div><div class="fv" id="r-city"></div></div>
+        <div class="f"><div class="fl">📌 State</div><div class="fv" id="r-state"></div></div>
+        <div class="f"><div class="fl">🌍 Country</div><div class="fv" id="r-country"></div></div>
+        <div class="f"><div class="fl"># Pincode</div><div class="fv" id="r-pincode"></div></div>
+        <div class="f"><div class="fl">💼 LinkedIn</div><div class="fv" id="r-linkedin"></div></div>
+        <div class="f"><div class="fl">🐦 Twitter</div><div class="fv" id="r-twitter"></div></div>
+        <div class="f fw"><div class="fl">ℹ️ Other Info</div><div class="fv" id="r-otherInfo"></div></div>
+        <div class="f"><div class="fl">🏪 POS</div><div class="fv" id="r-pos"></div></div>
+        <div class="f"><div class="fl">🏬 Outlet Name</div><div class="fv" id="r-outletName"></div></div>
+        <div class="f"><div class="fl">🔢 Store Count</div><div class="fv" id="r-storeCount"></div></div>
+        <div class="f"><div class="fl">👤 Manual Person</div><div class="fv" id="r-manualPersonName"></div></div>
+        <div class="f"><div class="fl">📞 Manual Phone</div><div class="fv" id="r-manualPhone"></div></div>
+        <div class="f fw"><div class="fl">💬 Comments</div><div class="fv" id="r-comments"></div></div>
+        <div class="f fw"><div class="fl">👤 Scanned By</div><div class="fv" id="r-scannedBy"></div></div>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="resetForNextScan()" style="margin-top:4px">🔄 Scan Another Card</button>
+    <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 Scan Another Card</button>
   </div>
-  <p class="footer-note">CardScan · Data saved to your team's Google Sheet</p>
+
+  <p class="footer">CardScan · Saved to your team's Google Sheet</p>
 </div>
+
 <script>
-let currentUser=null,selectedFile=null;
-window.addEventListener('online',  () => document.getElementById('offlineBanner').style.display='none');
-window.addEventListener('offline', () => document.getElementById('offlineBanner').style.display='block');
-window.addEventListener('DOMContentLoaded',()=>{
-  if (!navigator.onLine) document.getElementById('offlineBanner').style.display='block';
-  try{const s=localStorage.getItem('cardScanUser');if(s)applyUser(JSON.parse(s));}catch(e){localStorage.removeItem('cardScanUser');}
-  document.getElementById('inputName').addEventListener('input',checkForm);
-  document.getElementById('inputEmail').addEventListener('input',checkForm);
-  ['inputName','inputEmail'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')saveIdentity();}));
-  document.getElementById('inputPersonName').addEventListener('input', updateScanBtn);
-  document.getElementById('inputPhoneNumber').addEventListener('input', updateScanBtn);
-  document.getElementById('filePicker').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
-  document.getElementById('cameraInput').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
-  const dz=document.getElementById('dropZone');
-  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('dragover');}));
-  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('dragover');}));
-  dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f?.type.startsWith('image/'))handleFile(f);});
+let user = null, file = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Restore saved identity
+  try {
+    const s = localStorage.getItem('cardScanUser');
+    if (s) applyUser(JSON.parse(s));
+  } catch(e) { localStorage.removeItem('cardScanUser'); }
+
+  // Identity inputs
+  document.getElementById('inName').addEventListener('input',  checkId);
+  document.getElementById('inEmail').addEventListener('input', checkId);
+  document.getElementById('inName').addEventListener('keydown',  e => { if(e.key==='Enter') saveIdentity(); });
+  document.getElementById('inEmail').addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); });
+
+  // Manual fields — update button when typed
+  document.getElementById('inManualPerson').addEventListener('input', updateBtn);
+  document.getElementById('inManualPhone').addEventListener('input',  updateBtn);
+
+  // File inputs
+  document.getElementById('fp').addEventListener('change',  e => { if(e.target.files[0]) setFile(e.target.files[0]); });
+  document.getElementById('cam').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
+
+  // Drag and drop
+  const dz = document.getElementById('dz');
+  ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
+  dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) setFile(f); });
 });
-function checkForm(){const ok=document.getElementById('inputName').value.trim()&&document.getElementById('inputEmail').value.trim();document.getElementById('continueBtn').disabled=!ok;}
-function saveIdentity(){
-  const name=document.getElementById('inputName').value.trim(),email=document.getElementById('inputEmail').value.trim();
-  if(!name||!email)return;
-  const user={name,email};
-  try{localStorage.setItem('cardScanUser',JSON.stringify(user));}catch(e){}
-  applyUser(user);
+
+function checkId() {
+  document.getElementById('btnContinue').disabled =
+    !(document.getElementById('inName').value.trim() && document.getElementById('inEmail').value.trim());
 }
-function applyUser(user){
-  currentUser=user;
-  document.getElementById('pillName').textContent=user.name;
-  document.getElementById('pillEmail').textContent=user.email;
-  document.getElementById('userInitial').textContent=user.name.charAt(0).toUpperCase();
-  document.getElementById('identityForm').style.display='none';
+
+function saveIdentity() {
+  const name  = document.getElementById('inName').value.trim();
+  const email = document.getElementById('inEmail').value.trim();
+  if (!name || !email) return;
+  try { localStorage.setItem('cardScanUser', JSON.stringify({name, email})); } catch(e){}
+  applyUser({name, email});
+}
+
+function applyUser(u) {
+  user = u;
+  document.getElementById('pillName').textContent    = u.name;
+  document.getElementById('pillEmail').textContent   = u.email;
+  document.getElementById('userInitial').textContent = u.name.charAt(0).toUpperCase();
+  document.getElementById('idForm').style.display    = 'none';
   document.getElementById('userPill').classList.add('show');
-  document.getElementById('detailsSection').style.display='block';
-  document.getElementById('uploadSection').style.display='block';
-  document.getElementById('scanBtnWrap').style.display='block';
-  setStep(2);updateScanBtn();
+  document.getElementById('secDetails').style.display = 'block';
+  document.getElementById('secUpload').style.display  = 'block';
+  document.getElementById('secBtn').style.display     = 'block';
+  setStep(2); updateBtn();
 }
-function changeIdentity(){
-  currentUser=null;
-  try{localStorage.removeItem('cardScanUser');}catch(e){}
-  document.getElementById('identityForm').style.display='block';
+
+function changeIdentity() {
+  user = null;
+  try { localStorage.removeItem('cardScanUser'); } catch(e){}
+  document.getElementById('idForm').style.display = 'block';
   document.getElementById('userPill').classList.remove('show');
-  document.getElementById('detailsSection').style.display='none';
-  document.getElementById('uploadSection').style.display='none';
-  document.getElementById('scanBtnWrap').style.display='none';
-  removeImage();setStep(1);
+  document.getElementById('secDetails').style.display = 'none';
+  document.getElementById('secUpload').style.display  = 'none';
+  document.getElementById('secBtn').style.display     = 'none';
+  removeImg(); setStep(1);
 }
-function handleFile(file){
-  selectedFile=file;
-  const r=new FileReader();
-  r.onload=e=>{document.getElementById('preview-img').src=e.target.result;document.getElementById('preview-filename').textContent=file.name;document.getElementById('preview-wrap').style.display='block';document.getElementById('dropZone').style.display='none';};
-  r.readAsDataURL(file);updateScanBtn();
+
+function setFile(f) {
+  file = f;
+  const r = new FileReader();
+  r.onload = e => {
+    document.getElementById('prevImg').src = e.target.result;
+    document.getElementById('prevName').textContent = f.name;
+    document.getElementById('prevWrap').style.display = 'block';
+    document.getElementById('dz').style.display = 'none';
+  };
+  r.readAsDataURL(f);
+  updateBtn();
 }
-function removeImage(){
-  selectedFile=null;
-  document.getElementById('preview-wrap').style.display='none';
-  document.getElementById('dropZone').style.display='block';
-  ['filePicker','cameraInput'].forEach(id=>document.getElementById(id).value='');
-  updateScanBtn();
+
+function removeImg() {
+  file = null;
+  document.getElementById('prevWrap').style.display = 'none';
+  document.getElementById('dz').style.display = 'block';
+  document.getElementById('fp').value  = '';
+  document.getElementById('cam').value = '';
+  updateBtn();
 }
-function updateScanBtn(){
-  const hasFile   = !!selectedFile;
-  const hasManual = document.getElementById('inputPersonName').value.trim() || document.getElementById('inputPhoneNumber').value.trim();
-  document.getElementById('scanBtn').disabled = !(currentUser && (hasFile || hasManual));
-  document.getElementById('scanBtn').textContent = hasFile ? '🔍 Scan Card' : '💾 Save Manual Entry';
+
+function updateBtn() {
+  const hasFile   = !!file;
+  const hasManual = document.getElementById('inManualPerson').value.trim() ||
+                    document.getElementById('inManualPhone').value.trim();
+  const ok = !!(user && (hasFile || hasManual));
+  document.getElementById('scanBtn').disabled    = !ok;
+  document.getElementById('scanBtn').textContent = hasFile ? '🔍 Scan Card' : '💾 Save Entry';
 }
-function setProgressStep(n){
-  for(let i=1;i<=3;i++){const el=document.getElementById('ps'+i);el.classList.remove('active','done','pulse');if(i<n)el.classList.add('done');if(i===n)el.classList.add('active','pulse');}
-}
-async function startScan(){
-  if(!selectedFile||!currentUser)return;
-  ['identitySection','detailsSection','uploadSection','scanBtnWrap','results'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('progressSection').style.display='block';
-  setStep(3);setProgressStep(1);
-  try{
-    const fd=new FormData();
-    if(selectedFile) fd.append('card', selectedFile);
-    fd.append('scannerName',currentUser.name);
-    fd.append('scannerEmail',currentUser.email);
-    fd.append('pos',document.getElementById('inputPOS').value.trim());
-    fd.append('storeCount',document.getElementById('inputStoreCount').value.trim());
-    fd.append('comments',document.getElementById('inputComments').value.trim());
-    if(!selectedFile) fd.append('manualOnly', 'true');
-    setProgressStep(2);
-    const res=await fetch('/api/scan',{method:'POST',body:fd});
-    const result=await res.json();
-    setProgressStep(3);await sleep(500);
-    if(!res.ok||!result.success)throw new Error(result.error||'Scan failed');
-    showResults(result);
-  }catch(err){
-    document.getElementById('progressSection').style.display='none';
-    const b=document.getElementById('badge');b.className='badge err';b.innerHTML='❌ '+err.message;
-    document.getElementById('results').style.display='block';setStep(4);
+
+function setPS(n) {
+  for(let i=1;i<=3;i++){
+    const el=document.getElementById('ps'+i);
+    el.classList.remove('active','done','pulse');
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active','pulse');
   }
 }
-function showResults(result){
-  const{cardData,sheetSuccess,sheetMessage}=result;
-  ['brandName','personName','designation','department','email','phone','alternatePhone','website','address','city','state','country','pincode','linkedin','twitter','otherInfo','pos','storeCount','comments'].forEach(f=>{const el=document.getElementById('r-'+f);if(el)el.textContent=cardData[f]||'';});
-  document.getElementById('r-scannedBy').textContent=currentUser.name+' ('+currentUser.email+')';
-  const b=document.getElementById('badge');
-  b.className=sheetSuccess?'badge ok':'badge err';
-  b.innerHTML=sheetSuccess?'✅ '+sheetMessage:'⚠️ '+sheetMessage;
-  document.getElementById('progressSection').style.display='none';
-  document.getElementById('results').style.display='block';setStep(4);
+
+async function doScan() {
+  if (!user) return;
+  const hasFile   = !!file;
+  const hasManual = document.getElementById('inManualPerson').value.trim() ||
+                    document.getElementById('inManualPhone').value.trim();
+  if (!hasFile && !hasManual) return;
+
+  ['secIdentity','secDetails','secUpload','secBtn','results'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('secProgress').style.display = 'block';
+  setStep(3); setPS(1);
+
+  try {
+    const fd = new FormData();
+    if (file) fd.append('card', file);
+    fd.append('scannerName',      user.name);
+    fd.append('scannerEmail',     user.email);
+    fd.append('pos',              document.getElementById('inPOS').value.trim());
+    fd.append('outletName',       document.getElementById('inOutlet').value.trim());
+    fd.append('storeCount',       document.getElementById('inStoreCount').value.trim());
+    fd.append('manualPersonName', document.getElementById('inManualPerson').value.trim());
+    fd.append('manualPhone',      document.getElementById('inManualPhone').value.trim());
+    fd.append('comments',         document.getElementById('inComments').value.trim());
+    if (!file) fd.append('manualOnly', 'true');
+
+    setPS(2);
+    const res    = await fetch('/api/scan', { method: 'POST', body: fd });
+    const result = await res.json();
+    setPS(3);
+    await new Promise(r => setTimeout(r, 500));
+
+    if (!res.ok || !result.success) throw new Error(result.error || 'Scan failed');
+    showResults(result);
+  } catch(err) {
+    document.getElementById('secProgress').style.display = 'none';
+    const b = document.getElementById('badge');
+    b.className = 'badge berr'; b.innerHTML = '❌ ' + err.message;
+    document.getElementById('results').style.display = 'block';
+    setStep(4);
+  }
 }
-function resetForNextScan(){
-  removeImage();
-  ['inputPOS','inputStoreCount','inputComments','inputPersonName','inputPhoneNumber'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('results').style.display='none';
-  document.getElementById('progressSection').style.display='none';
-  document.getElementById('identitySection').style.display='block';
-  document.getElementById('detailsSection').style.display='block';
-  document.getElementById('uploadSection').style.display='block';
-  document.getElementById('scanBtnWrap').style.display='block';
-  updateScanBtn();setStep(2);
+
+function showResults(result) {
+  const d = result.cardData;
+  ['brandName','personName','designation','department','email','phone','alternatePhone',
+   'website','address','city','state','country','pincode','linkedin','twitter','otherInfo',
+   'pos','outletName','storeCount','manualPersonName','manualPhone','comments'].forEach(f => {
+    const el = document.getElementById('r-'+f);
+    if (el) el.textContent = d[f] || '';
+  });
+  document.getElementById('r-scannedBy').textContent = user.name + ' (' + user.email + ')';
+  const b = document.getElementById('badge');
+  b.className = result.sheetSuccess ? 'badge bok' : 'badge berr';
+  b.innerHTML = result.sheetSuccess ? '✅ ' + result.sheetMessage : '⚠️ ' + result.sheetMessage;
+  document.getElementById('secProgress').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  setStep(4);
 }
-function setStep(n){for(let i=1;i<=4;i++){const el=document.getElementById('step'+i);if(el)el.className='step'+(i<n?' done':i===n?' active':'');}}
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function reset() {
+  removeImg();
+  ['inPOS','inOutlet','inStoreCount','inManualPerson','inManualPhone','inComments'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('results').style.display       = 'none';
+  document.getElementById('secProgress').style.display   = 'none';
+  document.getElementById('secIdentity').style.display   = 'block';
+  document.getElementById('secDetails').style.display    = 'block';
+  document.getElementById('secUpload').style.display     = 'block';
+  document.getElementById('secBtn').style.display        = 'block';
+  updateBtn(); setStep(2);
+}
+
+function setStep(n) {
+  for(let i=1;i<=4;i++){
+    const el = document.getElementById('step'+i);
+    if(el) el.className = 'step' + (i<n?' done':i===n?' active':'');
+  }
+}
 </script>
 </body>
 </html>
