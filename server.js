@@ -17,10 +17,7 @@ app.use(express.json());
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const upload = multer({
-  dest: 'uploads/',
-  limits: { fileSize: 10 * 1024 * 1024 }
-});
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 10 * 1024 * 1024 } });
 
 app.post('/api/scan', upload.single('card'), async (req, res) => {
   const scannerName       = req.body.scannerName       || 'Unknown';
@@ -33,12 +30,18 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
   const manualDesignation = req.body.manualDesignation || '';
   const comments          = req.body.comments          || '';
   const manualOnly        = req.body.manualOnly === 'true';
+  const extractOnly       = req.body.extractOnly === 'true'; // just OCR, don't save
+  const saveOnly          = req.body.saveOnly   === 'true'; // skip OCR, just save
+  const editedCard        = req.body.editedCard ? JSON.parse(req.body.editedCard) : null;
 
   try {
     let cardData = {};
 
-    if (manualOnly || !req.file) {
-      // ── Manual entry — no image ──────────────────────────────────────────
+    if (saveOnly && editedCard) {
+      // ── Save mode: use edited data from review screen ──────────────────
+      cardData = editedCard;
+    } else if (manualOnly || !req.file) {
+      // ── Manual entry ───────────────────────────────────────────────────
       cardData = {
         brandName: '', personName: manualPersonName, designation: manualDesignation,
         department: '', email: '', phone: manualPhone, alternatePhone: '',
@@ -46,7 +49,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
         pincode: '', linkedin: '', twitter: '', otherInfo: ''
       };
     } else {
-      // ── Card scan — Claude OCR ────────────────────────────────────────────
+      // ── Claude OCR ─────────────────────────────────────────────────────
       const base64Image = fs.readFileSync(req.file.path).toString('base64');
       const mimeType    = req.file.mimetype;
 
@@ -60,30 +63,12 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
             content: [
               { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64Image } },
               { type: 'text', text: `Extract ALL info from this business card as JSON only (no markdown):
-{
-  "brandName": "",
-  "personName": "",
-  "designation": "",
-  "department": "",
-  "email": "",
-  "phone": "",
-  "alternatePhone": "",
-  "website": "",
-  "address": "",
-  "city": "",
-  "state": "",
-  "country": "",
-  "pincode": "",
-  "linkedin": "",
-  "twitter": "",
-  "otherInfo": ""
-}` }
+{"brandName":"","personName":"","designation":"","department":"","email":"","phone":"","alternatePhone":"","website":"","address":"","city":"","state":"","country":"","pincode":"","linkedin":"","twitter":"","otherInfo":""}` }
             ]
           }]
         },
         { headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' } }
       );
-
       cardData = JSON.parse(claudeRes.data.content[0].text.trim().replace(/```json|```/g, '').trim());
     }
 
@@ -95,6 +80,12 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
     cardData.manualPhone       = manualPhone;
     cardData.manualDesignation = manualDesignation;
     cardData.comments          = comments;
+
+    // ── If extractOnly: return data for review, don't save ────────────────
+    if (extractOnly) {
+      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.json({ success: true, cardData, sheetSuccess: false, sheetMessage: '' });
+    }
 
     // ── Save to Sheet + Drive ─────────────────────────────────────────────
     let sheetSuccess = false, sheetMessage = '', driveUrl = '';
@@ -109,7 +100,6 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
           scannerFolder: scannerName
         };
 
-        // Attach image for Drive if scanned
         if (req.file && fs.existsSync(req.file.path)) {
           const safePerson      = (cardData.personName || 'Unknown').replace(/[^a-zA-Z0-9]/g, '_');
           const safeScanner     = scannerName.replace(/[^a-zA-Z0-9]/g, '_');
