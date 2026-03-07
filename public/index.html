@@ -142,6 +142,10 @@
       <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">🏪</span><input type="text" id="inputPOS" placeholder="POS / Outlet Name"/></div>
       <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">🔢</span><input type="number" id="inputStoreCount" placeholder="Store Count" min="0"/></div>
     </div>
+    <div class="field-row" style="margin-top:11px">
+      <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">👤</span><input type="text" id="inputPersonName" placeholder="Person Name (manual)"/></div>
+      <div class="input-wrap" style="margin-bottom:0"><span class="input-icon">📞</span><input type="text" id="inputPhoneNumber" placeholder="Phone Number (manual)"/></div>
+    </div>
     <div class="input-wrap" style="margin-top:11px;margin-bottom:0"><span class="input-icon top">💬</span><textarea id="inputComments" placeholder="Additional comments (optional)..."></textarea></div>
   </div>
   <!-- Upload -->
@@ -310,7 +314,7 @@ function showResults(result){
 }
 function resetForNextScan(){
   removeImage();
-  ['inputPOS','inputStoreCount','inputComments'].forEach(id=>document.getElementById(id).value='');
+  ['inputPOS','inputStoreCount','inputComments','inputPersonName','inputPhoneNumber'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('results').style.display='none';
   document.getElementById('progressSection').style.display='none';
   document.getElementById('identitySection').style.display='block';

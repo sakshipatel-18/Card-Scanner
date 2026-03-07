@@ -28,7 +28,9 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
   const scannerEmail = req.body.scannerEmail || '';
   const pos          = req.body.pos          || '';
   const storeCount   = req.body.storeCount   || '';
-  const comments     = req.body.comments     || '';
+  const comments          = req.body.comments          || '';
+  const manualPersonName  = req.body.manualPersonName  || '';
+  const manualPhone       = req.body.manualPhone       || '';
 
   if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
@@ -72,7 +74,9 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
     );
 
     const cardData = JSON.parse(claudeResponse.data.content[0].text.trim().replace(/```json|```/g, '').trim());
-    cardData.pos        = pos;
+    cardData.pos              = pos;
+    cardData.manualPersonName = manualPersonName;
+    cardData.manualPhone      = manualPhone;
     cardData.storeCount = storeCount;
     cardData.comments   = comments;
 
@@ -92,6 +96,8 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
           scannedBy:     scannerName,
           scannedEmail:  scannerEmail,
           scannedAt:     new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+          manualPersonName: manualPersonName,
+          manualPhone:      manualPhone,
           // Drive photo fields
           imageBase64:   base64Image,
           imageMime:     mimeType,
