@@ -106,13 +106,20 @@
   .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
   .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
 
-  /* SQL Counter pill */
-  .sql-bar{display:none;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border:1.5px solid #6ee7b7;border-radius:12px;padding:10px 16px;margin-bottom:12px;}
+  /* SQL/NSQL Counter bar */
+  .sql-bar{display:none;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(13,148,136,.07);}
   .sql-bar.show{display:flex;}
-  .sql-count{font-size:22px;font-weight:700;color:var(--success);}
-  .sql-label{font-size:12px;color:var(--success);font-weight:500;margin-top:1px;}
-  .sql-left{display:flex;flex-direction:column;}
-  .sql-right{font-size:26px;}
+  .sql-pill{flex:1;display:flex;align-items:center;gap:10px;border-radius:10px;padding:8px 12px;}
+  .sql-pill.sql-side{background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border:1px solid #6ee7b7;}
+  .sql-pill.nsql-side{background:linear-gradient(135deg,#fefce8,#fffbeb);border:1px solid #fcd34d;}
+  .sql-pill-num{font-size:22px;font-weight:700;}
+  .sql-pill.sql-side .sql-pill-num{color:var(--success);}
+  .sql-pill.nsql-side .sql-pill-num{color:#d97706;}
+  .sql-pill-info{display:flex;flex-direction:column;}
+  .sql-pill-label{font-size:11px;font-weight:700;letter-spacing:.5px;}
+  .sql-pill.sql-side .sql-pill-label{color:var(--success);}
+  .sql-pill.nsql-side .sql-pill-label{color:#d97706;}
+  .sql-pill-sub{font-size:10px;color:var(--muted);}
 
   /* SQL / NSQL popup overlay */
   .lead-popup{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
@@ -301,13 +308,22 @@
     <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 New Entry</button>
   </div>
 
-  <!-- SQL Counter Bar -->
+  <!-- SQL / NSQL Counter Bar -->
   <div class="sql-bar" id="sqlBar">
-    <div class="sql-left">
-      <span class="sql-count" id="sqlCount">0</span>
-      <span class="sql-label">SQL Leads Today 🎯</span>
+    <div class="sql-pill sql-side">
+      <span class="sql-pill-num" id="sqlCount">0</span>
+      <div class="sql-pill-info">
+        <span class="sql-pill-label">🎯 SQL</span>
+        <span class="sql-pill-sub">Today's leads</span>
+      </div>
     </div>
-    <span class="sql-right">🏆</span>
+    <div class="sql-pill nsql-side">
+      <span class="sql-pill-num" id="nsqlCount">0</span>
+      <div class="sql-pill-info">
+        <span class="sql-pill-label">📋 NSQL</span>
+        <span class="sql-pill-sub">Today's entries</span>
+      </div>
+    </div>
   </div>
 
   <p class="footer">CardScan · Saved to your team's Google Sheet</p>
@@ -686,7 +702,9 @@ function getTodayKey() {
 function getSQLCount() {
   try { return parseInt(localStorage.getItem(getTodayKey()) || '0'); } catch(e) { return 0; }
 }
-
+function getNSQLCount() {
+  try { return parseInt(localStorage.getItem(getTodayKey() + '_nsql') || '0'); } catch(e) { return 0; }
+}
 function incrementSQL() {
   try {
     const count = getSQLCount() + 1;
@@ -694,12 +712,17 @@ function incrementSQL() {
     return count;
   } catch(e) { return 1; }
 }
-
+function incrementNSQL() {
+  try {
+    const count = getNSQLCount() + 1;
+    localStorage.setItem(getTodayKey() + '_nsql', count);
+    return count;
+  } catch(e) { return 1; }
+}
 function updateSQLBar() {
-  const count = getSQLCount();
-  const bar   = document.getElementById('sqlBar');
-  document.getElementById('sqlCount').textContent = count;
-  if (user) bar.classList.add('show');
+  document.getElementById('sqlCount').textContent  = getSQLCount();
+  document.getElementById('nsqlCount').textContent = getNSQLCount();
+  if (user) document.getElementById('sqlBar').classList.add('show');
 }
 
 function showLeadPopup(pos) {
@@ -720,12 +743,16 @@ function showLeadPopup(pos) {
     badge.className   = 'lead-count sql';
     document.getElementById('leadBox') && (document.getElementById('leadBox').style.borderTop = '4px solid var(--success)');
   } else {
+    const nsqlCount   = incrementNSQL();
+    updateSQLBar();
     emoji.textContent = ['😊','👍','💬','🤝','📇','🌱'][Math.floor(Math.random()*6)];
     title.textContent = 'Entry Saved!';
     title.style.color = 'var(--accent)';
     sub.textContent   = NSQL_MOTIVATIONAL[Math.floor(Math.random() * NSQL_MOTIVATIONAL.length)];
     const sqlToday    = getSQLCount();
-    badge.textContent = sqlToday > 0 ? `🎯 ${sqlToday} SQL lead${sqlToday>1?'s':''} so far today!` : '💪 Keep going — your first SQL is coming!';
+    badge.textContent = sqlToday > 0
+      ? `📋 ${nsqlCount} NSQL · 🎯 ${sqlToday} SQL today!`
+      : `📋 ${nsqlCount} NSQL so far — keep going for that SQL! 💪`;
     badge.className   = 'lead-count nsql';
   }
 
