@@ -23,15 +23,16 @@ const upload = multer({
 });
 
 app.post('/api/scan', upload.single('card'), async (req, res) => {
-  const scannerName      = req.body.scannerName      || 'Unknown';
-  const scannerEmail     = req.body.scannerEmail     || '';
-  const pos              = req.body.pos              || '';
-  const outletName       = req.body.outletName       || '';
-  const storeCount       = req.body.storeCount       || '';
-  const manualPersonName = req.body.manualPersonName || '';
-  const manualPhone      = req.body.manualPhone      || '';
-  const comments         = req.body.comments         || '';
-  const manualOnly       = req.body.manualOnly === 'true';
+  const scannerName       = req.body.scannerName       || 'Unknown';
+  const scannerEmail      = req.body.scannerEmail      || '';
+  const pos               = req.body.pos               || '';
+  const outletName        = req.body.outletName        || '';
+  const storeCount        = req.body.storeCount        || '';
+  const manualPersonName  = req.body.manualPersonName  || '';
+  const manualPhone       = req.body.manualPhone       || '';
+  const manualDesignation = req.body.manualDesignation || '';
+  const comments          = req.body.comments          || '';
+  const manualOnly        = req.body.manualOnly === 'true';
 
   try {
     let cardData = {};
@@ -39,7 +40,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
     if (manualOnly || !req.file) {
       // ── Manual entry — no image ──────────────────────────────────────────
       cardData = {
-        brandName: '', personName: manualPersonName, designation: '',
+        brandName: '', personName: manualPersonName, designation: manualDesignation,
         department: '', email: '', phone: manualPhone, alternatePhone: '',
         website: '', address: '', city: '', state: '', country: '',
         pincode: '', linkedin: '', twitter: '', otherInfo: ''
@@ -84,17 +85,16 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
       );
 
       cardData = JSON.parse(claudeRes.data.content[0].text.trim().replace(/```json|```/g, '').trim());
-      // keep file alive for Drive upload below
     }
 
     // Attach scan detail fields
-    cardData.pos              = pos;
-    cardData.outletName       = outletName;
-    cardData.storeCount       = storeCount;
+    cardData.pos               = pos;
+    cardData.outletName        = outletName;
+    cardData.storeCount        = storeCount;
     cardData.manualPersonName  = manualPersonName;
     cardData.manualPhone       = manualPhone;
     cardData.manualDesignation = manualDesignation;
-    cardData.comments         = comments;
+    cardData.comments          = comments;
 
     // ── Save to Sheet + Drive ─────────────────────────────────────────────
     let sheetSuccess = false, sheetMessage = '', driveUrl = '';
@@ -103,18 +103,18 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
       try {
         const payload = {
           ...cardData,
-          scannedBy:    scannerName,
-          scannedEmail: scannerEmail,
-          scannedAt:    new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+          scannedBy:     scannerName,
+          scannedEmail:  scannerEmail,
+          scannedAt:     new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
           scannerFolder: scannerName
         };
 
         // Attach image for Drive if scanned
         if (req.file && fs.existsSync(req.file.path)) {
-          payload.imageBase64   = fs.readFileSync(req.file.path).toString('base64');
-          payload.imageMime     = req.file.mimetype;
           const safePerson      = (cardData.personName || 'Unknown').replace(/[^a-zA-Z0-9]/g, '_');
           const safeScanner     = scannerName.replace(/[^a-zA-Z0-9]/g, '_');
+          payload.imageBase64   = fs.readFileSync(req.file.path).toString('base64');
+          payload.imageMime     = req.file.mimetype;
           payload.imageFileName = `${safePerson}_${safeScanner}_${new Date().toISOString().slice(0,10)}.jpg`;
         }
 
