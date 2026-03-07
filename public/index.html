@@ -288,6 +288,8 @@
       <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
       <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
+      <div class="eg1"><div class="el">🏪 POS</div><input type="text" id="e-pos" placeholder="POS"/></div>
+      <div class="eg1"><div class="el">🔢 Store Count</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0"/></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
@@ -341,7 +343,7 @@
 let user = null, file = null, mode = null, scannedCardData = null;
 
 const CARD_FIELDS = ['brandName','personName','designation','department','email','phone',
-  'alternatePhone','website','address','city','state','country','pincode'];
+  'alternatePhone','website','address','city','state','country','pincode','pos','storeCount'];
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -523,6 +525,11 @@ function showReview(cardData) {
     const el = document.getElementById('e-'+f);
     if(el) el.value = cardData[f] || '';
   });
+  // Pre-fill POS and Store Count from the scan detail fields
+  const posEl   = document.getElementById('e-pos');
+  const scEl    = document.getElementById('e-storeCount');
+  if (posEl && !posEl.value)  posEl.value   = document.getElementById('s-pos').value.trim();
+  if (scEl  && !scEl.value)   scEl.value    = document.getElementById('s-outlets').value.trim();
   if (file) {
     const r = new FileReader();
     r.onload = e => {
@@ -561,8 +568,9 @@ async function submitScan() {
     if(file) fd.append('card', file);
     fd.append('scannerName',  user.name);
     fd.append('scannerEmail', user.email);
-    fd.append('pos',          document.getElementById('s-pos').value.trim());
-    fd.append('outletName',   document.getElementById('s-outlets').value.trim());
+    fd.append('pos',          document.getElementById('e-pos')?.value.trim() || document.getElementById('s-pos').value.trim());
+    fd.append('outletName',   document.getElementById('e-storeCount')?.value.trim() || document.getElementById('s-outlets').value.trim());
+    fd.append('storeCount',   document.getElementById('e-storeCount')?.value.trim() || document.getElementById('s-outlets').value.trim());
     fd.append('comments',     document.getElementById('s-comments').value.trim());
     fd.append('saveOnly',     'true');
     fd.append('editedCard',   JSON.stringify(editedCard));

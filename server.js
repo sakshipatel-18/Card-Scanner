@@ -81,9 +81,9 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
     }
 
     // Attach scan detail fields
-    cardData.pos        = pos;
+    cardData.pos        = pos || cardData.pos || '';
     cardData.outletName = outletName;
-    cardData.storeCount = storeCount || req.body.storeCount || '';
+    cardData.storeCount = storeCount || cardData.storeCount || '';
     cardData.comments   = comments;
 
     // ── If extractOnly: return for review, don't save ─────────────────
