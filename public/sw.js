@@ -1,5 +1,5 @@
 // CardScan Service Worker — caches app shell for instant loading
-const CACHE = 'cardscan-v1';
+const CACHE = 'cardscan-v2';
 
 // Files to cache for offline shell
 const SHELL = [
