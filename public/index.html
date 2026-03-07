@@ -11,34 +11,19 @@
   body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
   body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 80% 10%,rgba(13,148,136,.08),transparent 50%),radial-gradient(circle at 10% 90%,rgba(8,145,178,.07),transparent 50%);}
   .wrap{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:24px 16px 60px;}
+
   header{text-align:center;margin-bottom:24px;}
   .logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px;}
   .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(13,148,136,.3);}
   .logo-text{font-size:26px;font-weight:700;color:var(--accent);}
   header p{color:var(--muted);font-size:13px;}
 
-  .steps{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
-  .step{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);transition:color .3s;}
-  .step.active{color:var(--accent);}.step.done{color:var(--success);}
-  .step-num{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;}
-  .step.active .step-num{background:var(--accent);border-color:var(--accent);color:#fff;}
-  .step.done .step-num{background:var(--success);border-color:var(--success);color:#fff;}
-  .step-div{width:20px;height:1.5px;background:var(--border);}
-
+  /* Card */
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(13,148,136,.07);}
   .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
   .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-  .iw{position:relative;margin-bottom:10px;}
-  .iw:last-child{margin-bottom:0;}
-  .ii{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
-  .ii.top{top:13px;transform:none;}
-  input[type=text],input[type=email],input[type=number],textarea{width:100%;padding:11px 11px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
-  input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
-  input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7;}
-  textarea{padding-top:11px;resize:vertical;min-height:75px;line-height:1.5;}
-
+  /* Identity pill */
   .pill{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#e6faf8,#f0fdfc);border:1.5px solid rgba(13,148,136,.25);border-radius:11px;padding:11px 14px;}
   .pill.show{display:flex;}
   .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
@@ -46,6 +31,27 @@
   .chg{background:none;border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
   .chg:hover{border-color:var(--error);color:var(--error);}
 
+  /* Mode selector */
+  .mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .mode-tab{padding:16px 12px;border-radius:12px;border:2px solid var(--border);background:#fff;cursor:pointer;text-align:center;transition:all .25s;font-family:'Outfit',sans-serif;}
+  .mode-tab:hover{border-color:var(--accent);background:var(--accentlt);}
+  .mode-tab.active{border-color:var(--accent);background:linear-gradient(135deg,#e6faf8,#f0fdfc);}
+  .mode-tab .mt-icon{font-size:28px;margin-bottom:6px;}
+  .mode-tab .mt-title{font-size:14px;font-weight:700;color:var(--text);}
+  .mode-tab .mt-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* Inputs */
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .iw{position:relative;margin-bottom:10px;}
+  .iw:last-child,.iw.nomb{margin-bottom:0;}
+  .ii{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+  .ii.top{top:13px;transform:none;}
+  input[type=text],input[type=email],input[type=number],textarea{width:100%;padding:11px 11px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
+  input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
+  input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7;}
+  textarea{padding-top:11px;resize:vertical;min-height:75px;line-height:1.5;}
+
+  /* Buttons */
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;width:100%;}
   .btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px rgba(13,148,136,.25);}
   .btn-p:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,148,136,.35);}
@@ -53,23 +59,25 @@
   .btn-o{background:#fff;border:1.5px solid var(--border);color:var(--accent);font-weight:600;}
   .btn-o:hover{border-color:var(--accent);background:var(--accentlt);}
   .btn-sm{padding:9px 13px;font-size:13px;}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
 
-  .dz{border:2px dashed var(--border);border-radius:11px;padding:30px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);}
+  /* Upload / Drop zone */
+  .dz{border:2px dashed var(--border);border-radius:11px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);}
   .dz:hover,.dz.over{border-color:var(--accent);background:var(--accentlt);}
-  .dz-icon{font-size:32px;margin-bottom:7px;display:block;}
-  .dz-main{font-size:14px;font-weight:600;margin-bottom:2px;}.dz-sub{font-size:12px;color:var(--muted);}
-  .or{display:flex;align-items:center;gap:10px;margin:11px 0;color:var(--muted);font-size:12px;font-weight:500;}
+  .dz-icon{font-size:30px;margin-bottom:6px;display:block;}
+  .dz-main{font-size:14px;font-weight:600;margin-bottom:2px;}
+  .dz-sub{font-size:12px;color:var(--muted);}
+  .or{display:flex;align-items:center;gap:10px;margin:10px 0;color:var(--muted);font-size:12px;font-weight:500;}
   .or::before,.or::after{content:'';flex:1;height:1px;background:var(--border);}
-
-  #prevWrap{display:none;margin-bottom:11px;}
+  #prevWrap{display:none;margin-bottom:10px;}
   #prevWrap img{width:100%;border-radius:9px;border:1.5px solid var(--border);max-height:200px;object-fit:contain;background:var(--bg);}
-  .prev-info{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:7px;margin-top:6px;font-size:13px;}
+  .prev-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:7px;margin-top:6px;font-size:13px;}
   .rm{background:none;border:none;color:var(--error);cursor:pointer;font-size:17px;}
 
   /* Progress */
-  #secProgress{text-align:center;padding:28px 20px;}
+  .prog-wrap{text-align:center;padding:28px 20px;}
   .scan-anim{position:relative;width:76px;height:76px;margin:0 auto 18px;}
-  .scan-icon{width:76px;height:76px;background:linear-gradient(135deg,var(--accentlt),#e0f2fe);border:2px solid var(--border);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+  .scan-icon-box{width:76px;height:76px;background:linear-gradient(135deg,var(--accentlt),#e0f2fe);border:2px solid var(--border);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;}
   .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanline 1.6s ease-in-out infinite;box-shadow:0 0 8px rgba(13,148,136,.6);}
   @keyframes scanline{0%{top:8px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:66px;opacity:0}}
   .psteps{display:flex;flex-direction:column;gap:7px;text-align:left;max-width:260px;margin:0 auto;}
@@ -78,62 +86,47 @@
   .pulse{animation:pulse 1.2s ease infinite;}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  /* Review section */
-  .review-img{width:100%;border-radius:10px;border:1.5px solid var(--border);max-height:180px;object-fit:contain;background:var(--bg);margin-bottom:14px;display:none;}
-  .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  /* Review edit grid */
+  .review-photo{width:100%;border-radius:10px;border:1.5px solid var(--border);max-height:160px;object-fit:contain;background:var(--bg);margin-bottom:10px;display:none;}
+  .eg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
   .eg1{grid-column:span 1;}.eg2{grid-column:span 2;}
   .el{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-  .edit-grid input,.edit-grid textarea{padding:9px 11px;font-size:13px;border-radius:7px;background:var(--bg);border:1.5px solid var(--border);width:100%;color:var(--text);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s;}
-  .edit-grid input:focus,.edit-grid textarea:focus{border-color:var(--accent);background:#fff;}
-  .edit-grid textarea{min-height:60px;resize:vertical;padding-top:9px;}
-  .edit-change-img{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);cursor:pointer;border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;background:#fff;font-family:'Outfit',sans-serif;font-weight:500;margin-bottom:12px;transition:all .2s;}
-  .edit-change-img:hover{border-color:var(--accent);background:var(--accentlt);}
-  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .eg input,.eg textarea{padding:9px 11px;font-size:13px;border-radius:7px;background:var(--bg);border:1.5px solid var(--border);width:100%;color:var(--text);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s;}
+  .eg input:focus,.eg textarea:focus{border-color:var(--accent);background:#fff;}
+  .eg textarea{min-height:60px;resize:vertical;padding-top:9px;}
 
   /* Results */
-  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .f{grid-column:span 1;}.fw{grid-column:span 2;}
-  .fl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-  .fv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;min-height:34px;word-break:break-word;}
-  .fv:empty::after{content:'—';color:#b2e0e0;}
+  .rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .r1{grid-column:span 1;}.r2{grid-column:span 2;}
+  .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+  .rv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;min-height:34px;word-break:break-word;}
+  .rv:empty::after{content:'—';color:#b2e0e0;}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:13px;}
   .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
   .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
   .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
-  #results{display:none;}
   input[type=file]{display:none;}
-  @media(max-width:480px){.fgrid,.row2,.edit-grid,.btn-row{grid-template-columns:1fr;}.fw,.eg2{grid-column:span 1;}.card{padding:15px;}}
+  @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <header>
     <div class="logo"><div class="logo-icon">🪪</div><span class="logo-text">CardScan</span></div>
     <p>Scan business cards · Save to Google Sheets instantly</p>
   </header>
 
-  <div class="steps">
-    <div class="step active" id="step1"><div class="step-num">1</div> Identity</div>
-    <div class="step-div"></div>
-    <div class="step" id="step2"><div class="step-num">2</div> Details</div>
-    <div class="step-div"></div>
-    <div class="step" id="step3"><div class="step-num">3</div> Upload</div>
-    <div class="step-div"></div>
-    <div class="step" id="step4"><div class="step-num">4</div> Review</div>
-    <div class="step-div"></div>
-    <div class="step" id="step5"><div class="step-num">5</div> Done</div>
-  </div>
-
-  <!-- IDENTITY -->
+  <!-- ── IDENTITY ── -->
   <div class="card" id="secIdentity">
     <div class="card-title">Your Identity</div>
     <div id="idForm">
       <div class="row2">
-        <div class="iw" style="margin-bottom:0"><span class="ii">👤</span><input type="text" id="inName" placeholder="Your full name"/></div>
-        <div class="iw" style="margin-bottom:0"><span class="ii">✉️</span><input type="email" id="inEmail" placeholder="Your email"/></div>
+        <div class="iw nomb"><span class="ii">👤</span><input type="text" id="inName" placeholder="Your full name"/></div>
+        <div class="iw nomb"><span class="ii">✉️</span><input type="email" id="inEmail" placeholder="Your email"/></div>
       </div>
       <button class="btn btn-p" id="btnContinue" onclick="saveIdentity()" disabled style="margin-top:10px">Continue →</button>
-      <p style="font-size:12px;color:var(--muted);margin-top:7px;display:flex;align-items:center;gap:5px;">ℹ️ Remembered on this device</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:7px;">ℹ️ Remembered on this device — no need to re-enter</p>
     </div>
     <div class="pill" id="userPill">
       <div class="avatar" id="userInitial"></div>
@@ -142,30 +135,61 @@
     </div>
   </div>
 
-  <!-- SCAN DETAILS -->
-  <div class="card" id="secDetails" style="display:none">
-    <div class="card-title">Scan Details</div>
-    <div class="row2">
-      <div class="iw" style="margin-bottom:0"><span class="ii">🏪</span><input type="text" id="inPOS" placeholder="POS"/></div>
-      <div class="iw" style="margin-bottom:0"><span class="ii">🏬</span><input type="text" id="inOutlet" placeholder="Outlet Name"/></div>
+  <!-- ── MODE SELECTOR ── -->
+  <div id="secMode" style="display:none">
+    <div class="mode-tabs">
+      <div class="mode-tab" id="tabManual" onclick="setMode('manual')">
+        <div class="mt-icon">✏️</div>
+        <div class="mt-title">Enter Manually</div>
+        <div class="mt-sub">Type details directly</div>
+      </div>
+      <div class="mode-tab" id="tabScan" onclick="setMode('scan')">
+        <div class="mt-icon">📷</div>
+        <div class="mt-title">Scan a Card</div>
+        <div class="mt-sub">Capture & auto-extract</div>
+      </div>
     </div>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw" style="margin-bottom:0"><span class="ii">👤</span><input type="text" id="inManualPerson" placeholder="Person Name (manual)"/></div>
-      <div class="iw" style="margin-bottom:0"><span class="ii">📞</span><input type="text" id="inManualPhone" placeholder="Phone (manual)"/></div>
-    </div>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw" style="margin-bottom:0"><span class="ii">🔢</span><input type="number" id="inStoreCount" placeholder="Store Count" min="0"/></div>
-      <div class="iw" style="margin-bottom:0"><span class="ii">💼</span><input type="text" id="inDesignation" placeholder="Designation (manual)"/></div>
-    </div>
-    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="inComments" placeholder="Comments (optional)..."></textarea></div>
   </div>
 
-  <!-- UPLOAD -->
+  <!-- ── MANUAL ENTRY FORM ── -->
+  <div class="card" id="secManual" style="display:none">
+    <div class="card-title">Manual Entry</div>
+    <div class="row2">
+      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" placeholder="Person Name *"/></div>
+      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" placeholder="Phone Number *"/></div>
+    </div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" placeholder="Brand Name"/></div>
+      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" placeholder="Designation"/></div>
+    </div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" placeholder="POS"/></div>
+      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" placeholder="City"/></div>
+    </div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" placeholder="Store Count" min="0"/></div>
+      <div class="iw nomb"></div>
+    </div>
+    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
+    <button class="btn btn-p" onclick="submitManual()" style="margin-top:12px">📤 Submit Entry</button>
+  </div>
+
+  <!-- ── SCAN FORM ── -->
+  <div class="card" id="secScanForm" style="display:none">
+    <div class="card-title">Scan Details</div>
+    <div class="row2">
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="s-pos" placeholder="POS Name"/></div>
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="s-outlets" placeholder="Number of Outlets" min="0"/></div>
+    </div>
+    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="s-comments" placeholder="Additional comments (optional)..."></textarea></div>
+  </div>
+
+  <!-- Upload -->
   <div class="card" id="secUpload" style="display:none">
-    <div class="card-title">Business Card <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional for manual entry)</span></div>
+    <div class="card-title">Upload Business Card</div>
     <div id="prevWrap">
       <img id="prevImg" src="" alt=""/>
-      <div class="prev-info"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">✕</button></div>
+      <div class="prev-bar"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">✕</button></div>
     </div>
     <div class="dz" id="dz" onclick="document.getElementById('fp').click()">
       <span class="dz-icon">📷</span>
@@ -179,35 +203,38 @@
     </div>
     <input type="file" id="fp" accept="image/*"/>
     <input type="file" id="cam" accept="image/*" capture="environment"/>
+    <button class="btn btn-p" id="scanBtn" onclick="doScan()" disabled style="margin-top:12px">🔍 Scan Card</button>
   </div>
 
-  <!-- SCAN BUTTON -->
-  <div id="secBtn" style="display:none;margin-bottom:12px">
-    <button class="btn btn-p" id="scanBtn" onclick="doScan()" disabled>🔍 Scan Card</button>
-  </div>
-
-  <!-- PROGRESS -->
+  <!-- ── PROGRESS ── -->
   <div class="card" id="secProgress" style="display:none">
-    <div class="scan-anim"><div class="scan-icon">🪪</div><div class="scan-line"></div></div>
-    <div class="psteps">
-      <div class="ps" id="ps1">⚡ Uploading...</div>
-      <div class="ps" id="ps2">🔍 Reading your card...</div>
-      <div class="ps" id="ps3">📊 Preparing data...</div>
+    <div class="prog-wrap">
+      <div class="scan-anim"><div class="scan-icon-box">🪪</div><div class="scan-line"></div></div>
+      <div class="psteps">
+        <div class="ps" id="ps1">⚡ Uploading image...</div>
+        <div class="ps" id="ps2">🔍 Reading your card...</div>
+        <div class="ps" id="ps3">📊 Preparing data...</div>
+      </div>
     </div>
   </div>
 
-  <!-- REVIEW & EDIT -->
+  <!-- ── SAVING PROGRESS ── -->
+  <div class="card" id="secSaving" style="display:none">
+    <div class="prog-wrap">
+      <div class="scan-anim"><div class="scan-icon-box">📊</div><div class="scan-line"></div></div>
+      <div class="psteps">
+        <div class="ps active pulse">📊 Saving to Google Sheets...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REVIEW & EDIT ── -->
   <div class="card" id="secReview" style="display:none">
-    <div class="card-title">Review & Edit Details</div>
-
-    <!-- Card image preview with change option -->
-    <img id="reviewImg" class="review-img" src="" alt="Card preview"/>
-    <button class="edit-change-img" id="changeImgBtn" onclick="document.getElementById('fp2').click()" style="display:none">
-      🔄 Change Photo
-    </button>
+    <div class="card-title">Review & Edit</div>
+    <img id="reviewPhoto" class="review-photo" src="" alt="Card"/>
+    <button class="btn btn-o btn-sm" id="changePhotoBtn" onclick="document.getElementById('fp2').click()" style="display:none;width:auto;margin-bottom:12px;">🔄 Change Photo</button>
     <input type="file" id="fp2" accept="image/*"/>
-
-    <div class="edit-grid">
+    <div class="eg">
       <div class="eg2"><div class="el">🏢 Brand / Company</div><input type="text" id="e-brandName" placeholder="Brand Name"/></div>
       <div class="eg1"><div class="el">👤 Person Name</div><input type="text" id="e-personName" placeholder="Person Name"/></div>
       <div class="eg1"><div class="el">💼 Designation</div><input type="text" id="e-designation" placeholder="Designation"/></div>
@@ -225,103 +252,65 @@
       <div class="eg1"><div class="el">🐦 Twitter</div><input type="text" id="e-twitter" placeholder="Twitter"/></div>
       <div class="eg2"><div class="el">ℹ️ Other Info</div><textarea id="e-otherInfo" placeholder="Other Info"></textarea></div>
     </div>
-
     <div class="btn-row">
-      <button class="btn btn-o" onclick="goBackToScan()">← Re-scan</button>
-      <button class="btn btn-p" onclick="submitEntry()">✅ Submit</button>
+      <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
+      <button class="btn btn-p" onclick="submitScan()">✅ Submit</button>
     </div>
   </div>
 
-  <!-- SAVING PROGRESS -->
-  <div class="card" id="secSaving" style="display:none;text-align:center;padding:28px 20px;">
-    <div class="scan-anim"><div class="scan-icon">📊</div><div class="scan-line"></div></div>
-    <div class="psteps">
-      <div class="ps active pulse" id="ps4">📊 Saving to Google Sheets & Drive...</div>
-    </div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results">
+  <!-- ── RESULTS ── -->
+  <div id="secResults" style="display:none">
     <div id="badge" class="badge"></div>
     <div class="card">
-      <div class="card-title">Saved Information</div>
-      <div class="fgrid">
-        <div class="f fw"><div class="fl">🏢 Brand</div><div class="fv" id="r-brandName"></div></div>
-        <div class="f"><div class="fl">👤 Person</div><div class="fv" id="r-personName"></div></div>
-        <div class="f"><div class="fl">💼 Designation</div><div class="fv" id="r-designation"></div></div>
-        <div class="f"><div class="fl">📞 Phone</div><div class="fv" id="r-phone"></div></div>
-        <div class="f"><div class="fl">✉️ Email</div><div class="fv" id="r-email"></div></div>
-        <div class="f"><div class="fl">🌐 Website</div><div class="fv" id="r-website"></div></div>
-        <div class="f"><div class="fl">🏙️ City</div><div class="fv" id="r-city"></div></div>
-        <div class="f"><div class="fl">📌 State</div><div class="fv" id="r-state"></div></div>
-        <div class="f"><div class="fl">🏪 POS</div><div class="fv" id="r-pos"></div></div>
-        <div class="f"><div class="fl">🏬 Outlet</div><div class="fv" id="r-outletName"></div></div>
-        <div class="f"><div class="fl">🔢 Store Count</div><div class="fv" id="r-storeCount"></div></div>
-        <div class="f"><div class="fl">💼 Manual Designation</div><div class="fv" id="r-manualDesignation"></div></div>
-        <div class="f"><div class="fl">👤 Manual Person</div><div class="fv" id="r-manualPersonName"></div></div>
-        <div class="f"><div class="fl">📞 Manual Phone</div><div class="fv" id="r-manualPhone"></div></div>
-        <div class="f fw"><div class="fl">💬 Comments</div><div class="fv" id="r-comments"></div></div>
-        <div class="f fw"><div class="fl">👤 Scanned By</div><div class="fv" id="r-scannedBy"></div></div>
-      </div>
+      <div class="card-title">Saved Successfully</div>
+      <div class="rg" id="resultsGrid"></div>
     </div>
-    <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 Scan Another Card</button>
+    <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 New Entry</button>
   </div>
 
   <p class="footer">CardScan · Saved to your team's Google Sheet</p>
 </div>
 
 <script>
-let user = null, file = null, scannedData = null;
+let user = null, file = null, mode = null, scannedCardData = null;
 
 const CARD_FIELDS = ['brandName','personName','designation','department','email','phone',
   'alternatePhone','website','address','city','state','country','pincode','linkedin','twitter','otherInfo'];
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e) {}
-
+  try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
   document.getElementById('inName').addEventListener('input',  checkId);
   document.getElementById('inEmail').addEventListener('input', checkId);
-  document.getElementById('inName').addEventListener('keydown',  e => { if(e.key==='Enter') saveIdentity(); });
-  document.getElementById('inEmail').addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); });
-  document.getElementById('inManualPerson').addEventListener('input', updateBtn);
-  document.getElementById('inManualPhone').addEventListener('input',  updateBtn);
-
+  ['inName','inEmail'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); }));
   document.getElementById('fp').addEventListener('change',  e => { if(e.target.files[0]) setFile(e.target.files[0]); });
   document.getElementById('cam').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
-
-  // Change photo from review screen
   document.getElementById('fp2').addEventListener('change', e => {
-    if (e.target.files[0]) {
+    if(e.target.files[0]) {
       setFile(e.target.files[0]);
-      // Update the review screen image preview too
-      const reader = new FileReader();
-      reader.onload = ev => {
-        document.getElementById('reviewImg').src = ev.target.result;
-        document.getElementById('reviewImg').style.display = 'block';
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      const r = new FileReader();
+      r.onload = ev => { document.getElementById('reviewPhoto').src = ev.target.result; };
+      r.readAsDataURL(e.target.files[0]);
     }
   });
-
   const dz = document.getElementById('dz');
   ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
   ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
   dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) setFile(f); });
 });
 
+// ── Identity ──────────────────────────────────────────────────────────────────
 function checkId() {
   document.getElementById('btnContinue').disabled =
     !(document.getElementById('inName').value.trim() && document.getElementById('inEmail').value.trim());
 }
-
 function saveIdentity() {
   const name = document.getElementById('inName').value.trim();
   const email = document.getElementById('inEmail').value.trim();
-  if (!name || !email) return;
-  try { localStorage.setItem('cardScanUser', JSON.stringify({name, email})); } catch(e){}
-  applyUser({name, email});
+  if(!name||!email) return;
+  try { localStorage.setItem('cardScanUser', JSON.stringify({name,email})); } catch(e){}
+  applyUser({name,email});
 }
-
 function applyUser(u) {
   user = u;
   document.getElementById('pillName').textContent    = u.name;
@@ -329,237 +318,228 @@ function applyUser(u) {
   document.getElementById('userInitial').textContent = u.name.charAt(0).toUpperCase();
   document.getElementById('idForm').style.display    = 'none';
   document.getElementById('userPill').classList.add('show');
-  document.getElementById('secDetails').style.display = 'block';
-  document.getElementById('secUpload').style.display  = 'block';
-  document.getElementById('secBtn').style.display     = 'block';
-  setStep(2); updateBtn();
+  document.getElementById('secMode').style.display   = 'block';
 }
-
 function changeIdentity() {
   user = null;
   try { localStorage.removeItem('cardScanUser'); } catch(e){}
   document.getElementById('idForm').style.display = 'block';
   document.getElementById('userPill').classList.remove('show');
-  document.getElementById('secDetails').style.display = 'none';
+  document.getElementById('secMode').style.display    = 'none';
+  document.getElementById('secManual').style.display  = 'none';
+  document.getElementById('secScanForm').style.display = 'none';
   document.getElementById('secUpload').style.display  = 'none';
-  document.getElementById('secBtn').style.display     = 'none';
-  removeImg(); setStep(1);
+  removeImg();
 }
 
+// ── Mode selector ─────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('tabManual').classList.toggle('active', m==='manual');
+  document.getElementById('tabScan').classList.toggle('active',   m==='scan');
+  document.getElementById('secManual').style.display   = m==='manual' ? 'block' : 'none';
+  document.getElementById('secScanForm').style.display = m==='scan'   ? 'block' : 'none';
+  document.getElementById('secUpload').style.display   = m==='scan'   ? 'block' : 'none';
+}
+
+// ── File handling ─────────────────────────────────────────────────────────────
 function setFile(f) {
   file = f;
-  const reader = new FileReader();
-  reader.onload = e => {
+  const r = new FileReader();
+  r.onload = e => {
     document.getElementById('prevImg').src = e.target.result;
     document.getElementById('prevName').textContent = f.name;
     document.getElementById('prevWrap').style.display = 'block';
     document.getElementById('dz').style.display = 'none';
   };
-  reader.readAsDataURL(f);
-  updateBtn();
+  r.readAsDataURL(f);
+  document.getElementById('scanBtn').disabled = false;
 }
-
 function removeImg() {
   file = null;
   document.getElementById('prevWrap').style.display = 'none';
   document.getElementById('dz').style.display = 'block';
-  document.getElementById('fp').value  = '';
-  document.getElementById('cam').value = '';
-  updateBtn();
+  document.getElementById('fp').value = document.getElementById('cam').value = '';
+  document.getElementById('scanBtn').disabled = true;
 }
 
-function updateBtn() {
-  const hasFile   = !!file;
-  const hasManual = document.getElementById('inManualPerson').value.trim() ||
-                    document.getElementById('inManualPhone').value.trim();
-  const ok = !!(user && (hasFile || hasManual));
-  document.getElementById('scanBtn').disabled    = !ok;
-  document.getElementById('scanBtn').textContent = hasFile ? '🔍 Scan Card' : '💾 Enter Manually';
+// ── MANUAL SUBMIT ─────────────────────────────────────────────────────────────
+async function submitManual() {
+  const personName = document.getElementById('m-personName').value.trim();
+  const phone      = document.getElementById('m-phone').value.trim();
+  if (!personName && !phone) return alert('Please enter at least Person Name or Phone Number.');
+
+  hideAll(); document.getElementById('secSaving').style.display = 'block';
+
+  const payload = {
+    brandName:   document.getElementById('m-brandName').value.trim(),
+    personName,
+    designation: document.getElementById('m-designation').value.trim(),
+    phone,
+    city:        document.getElementById('m-city').value.trim(),
+    pos:         document.getElementById('m-pos').value.trim(),
+    storeCount:  document.getElementById('m-storeCount').value.trim(),
+    comments:    document.getElementById('m-comments').value.trim(),
+    manualOnly:  'true',
+    scannerName:  user.name,
+    scannerEmail: user.email
+  };
+
+  try {
+    const fd = new FormData();
+    Object.entries(payload).forEach(([k,v]) => fd.append(k,v));
+    const res    = await fetch('/api/scan', { method:'POST', body:fd });
+    const result = await res.json();
+    if(!res.ok || !result.success) throw new Error(result.error || 'Save failed');
+    showResults(result, payload);
+  } catch(err) {
+    document.getElementById('secSaving').style.display = 'none';
+    showError(err.message);
+  }
+}
+
+// ── SCAN: extract only ────────────────────────────────────────────────────────
+async function doScan() {
+  if (!file) return;
+  hideAll(); document.getElementById('secProgress').style.display = 'block';
+  setPS(1);
+
+  try {
+    const fd = new FormData();
+    fd.append('card',         file);
+    fd.append('scannerName',  user.name);
+    fd.append('scannerEmail', user.email);
+    fd.append('extractOnly',  'true');
+    setPS(2);
+    const res    = await fetch('/api/scan', { method:'POST', body:fd });
+    const result = await res.json();
+    setPS(3);
+    await new Promise(r => setTimeout(r,400));
+    if(!res.ok || !result.success) throw new Error(result.error || 'Scan failed');
+    scannedCardData = result.cardData;
+    showReview(result.cardData);
+  } catch(err) {
+    document.getElementById('secProgress').style.display = 'none';
+    showError(err.message);
+  }
+}
+
+// ── Show review screen ────────────────────────────────────────────────────────
+function showReview(cardData) {
+  CARD_FIELDS.forEach(f => {
+    const el = document.getElementById('e-'+f);
+    if(el) el.value = cardData[f] || '';
+  });
+  if (file) {
+    const r = new FileReader();
+    r.onload = e => {
+      document.getElementById('reviewPhoto').src = e.target.result;
+      document.getElementById('reviewPhoto').style.display = 'block';
+      document.getElementById('changePhotoBtn').style.display = 'inline-flex';
+    };
+    r.readAsDataURL(file);
+  }
+  document.getElementById('secProgress').style.display = 'none';
+  document.getElementById('secReview').style.display   = 'block';
+}
+
+// ── Re-scan ───────────────────────────────────────────────────────────────────
+function goRescan() {
+  scannedCardData = null;
+  document.getElementById('secReview').style.display   = 'none';
+  document.getElementById('secMode').style.display     = 'block';
+  document.getElementById('secScanForm').style.display = 'block';
+  document.getElementById('secUpload').style.display   = 'block';
+  removeImg();
+}
+
+// ── SCAN SUBMIT: save with edited data ────────────────────────────────────────
+async function submitScan() {
+  const editedCard = {};
+  CARD_FIELDS.forEach(f => {
+    const el = document.getElementById('e-'+f);
+    editedCard[f] = el ? el.value.trim() : '';
+  });
+
+  hideAll(); document.getElementById('secSaving').style.display = 'block';
+
+  try {
+    const fd = new FormData();
+    if(file) fd.append('card', file);
+    fd.append('scannerName',  user.name);
+    fd.append('scannerEmail', user.email);
+    fd.append('pos',          document.getElementById('s-pos').value.trim());
+    fd.append('outletName',   document.getElementById('s-outlets').value.trim());
+    fd.append('comments',     document.getElementById('s-comments').value.trim());
+    fd.append('saveOnly',     'true');
+    fd.append('editedCard',   JSON.stringify(editedCard));
+
+    const res    = await fetch('/api/scan', { method:'POST', body:fd });
+    const result = await res.json();
+    if(!res.ok || !result.success) throw new Error(result.error || 'Save failed');
+    showResults(result, editedCard);
+  } catch(err) {
+    document.getElementById('secSaving').style.display = 'none';
+    showError(err.message);
+  }
+}
+
+// ── Show results ──────────────────────────────────────────────────────────────
+function showResults(result, localData) {
+  const d = { ...result.cardData, ...localData };
+  const rows = [
+    ['👤 Person Name', d.personName], ['🏢 Brand', d.brandName],
+    ['💼 Designation', d.designation], ['📞 Phone', d.phone],
+    ['✉️ Email', d.email], ['🏙️ City', d.city || d.address],
+    ['🌐 Website', d.website], ['🏪 POS', d.pos || result.cardData?.pos],
+    ['🏬 Outlets', d.outletName || result.cardData?.outletName],
+    ['🔢 Store Count', d.storeCount || result.cardData?.storeCount],
+    ['💬 Comments', d.comments || result.cardData?.comments],
+    ['👤 Scanned By', user.name + ' (' + user.email + ')']
+  ];
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = rows.filter(([,v]) => v).map(([l,v]) =>
+    `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`
+  ).join('');
+  const b = document.getElementById('badge');
+  b.className = result.sheetSuccess ? 'badge bok' : 'badge berr';
+  b.innerHTML = result.sheetSuccess ? '✅ ' + result.sheetMessage : '⚠️ ' + result.sheetMessage;
+  document.getElementById('secSaving').style.display  = 'none';
+  document.getElementById('secResults').style.display = 'block';
+}
+
+function showError(msg) {
+  const b = document.getElementById('badge');
+  b.className = 'badge berr'; b.innerHTML = '❌ ' + msg;
+  document.getElementById('secResults').style.display = 'block';
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function reset() {
+  scannedCardData = null; mode = null;
+  removeImg();
+  ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments',
+   's-pos','s-outlets','s-comments'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('tabManual').classList.remove('active');
+  document.getElementById('tabScan').classList.remove('active');
+  document.getElementById('reviewPhoto').style.display    = 'none';
+  document.getElementById('changePhotoBtn').style.display = 'none';
+  hideAll();
+  document.getElementById('secIdentity').style.display = 'block';
+  document.getElementById('secMode').style.display     = user ? 'block' : 'none';
+}
+
+function hideAll() {
+  ['secManual','secScanForm','secUpload','secProgress','secSaving','secReview','secResults']
+    .forEach(id => document.getElementById(id).style.display = 'none');
 }
 
 function setPS(n) {
   for(let i=1;i<=3;i++){
-    const el = document.getElementById('ps'+i);
+    const el=document.getElementById('ps'+i);
     el.classList.remove('active','done','pulse');
     if(i<n) el.classList.add('done');
     if(i===n) el.classList.add('active','pulse');
-  }
-}
-
-// ── STEP 1: Scan / extract data, show review screen ──────────────────────────
-async function doScan() {
-  if (!user) return;
-  const hasFile   = !!file;
-  const hasManual = document.getElementById('inManualPerson').value.trim() ||
-                    document.getElementById('inManualPhone').value.trim();
-  if (!hasFile && !hasManual) return;
-
-  ['secIdentity','secDetails','secUpload','secBtn','results'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
-  document.getElementById('secProgress').style.display = 'block';
-  setStep(3); setPS(1);
-
-  try {
-    const fd = new FormData();
-    if (file) fd.append('card', file);
-    fd.append('scannerName',      user.name);
-    fd.append('scannerEmail',     user.email);
-    fd.append('pos',              document.getElementById('inPOS').value.trim());
-    fd.append('outletName',       document.getElementById('inOutlet').value.trim());
-    fd.append('storeCount',       document.getElementById('inStoreCount').value.trim());
-    fd.append('manualPersonName', document.getElementById('inManualPerson').value.trim());
-    fd.append('manualPhone',      document.getElementById('inManualPhone').value.trim());
-    fd.append('manualDesignation',document.getElementById('inDesignation').value.trim());
-    fd.append('comments',         document.getElementById('inComments').value.trim());
-    fd.append('manualOnly',       file ? 'false' : 'true');
-    fd.append('extractOnly',      'true'); // just extract, don't save yet
-
-    setPS(2);
-    const res    = await fetch('/api/scan', { method: 'POST', body: fd });
-    const result = await res.json();
-    setPS(3);
-    await new Promise(r => setTimeout(r, 400));
-
-    if (!res.ok || !result.success) throw new Error(result.error || 'Scan failed');
-
-    // Store scanned data for submit step
-    scannedData = result;
-    showReview(result.cardData);
-
-  } catch(err) {
-    document.getElementById('secProgress').style.display = 'none';
-    const b = document.getElementById('badge');
-    b.className = 'badge berr'; b.innerHTML = '❌ ' + err.message;
-    document.getElementById('results').style.display = 'block';
-    setStep(5);
-  }
-}
-
-// ── Show the review/edit screen ───────────────────────────────────────────────
-function showReview(cardData) {
-  // Fill all editable fields
-  CARD_FIELDS.forEach(f => {
-    const el = document.getElementById('e-' + f);
-    if (el) el.value = cardData[f] || '';
-  });
-
-  // Show card image preview if available
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('reviewImg').src = e.target.result;
-      document.getElementById('reviewImg').style.display = 'block';
-      document.getElementById('changeImgBtn').style.display = 'inline-flex';
-    };
-    reader.readAsDataURL(file);
-  }
-
-  document.getElementById('secProgress').style.display = 'none';
-  document.getElementById('secReview').style.display   = 'block';
-  setStep(4);
-}
-
-// ── Go back and re-scan ───────────────────────────────────────────────────────
-function goBackToScan() {
-  scannedData = null;
-  document.getElementById('secReview').style.display   = 'none';
-  document.getElementById('secIdentity').style.display = 'block';
-  document.getElementById('secDetails').style.display  = 'block';
-  document.getElementById('secUpload').style.display   = 'block';
-  document.getElementById('secBtn').style.display      = 'block';
-  setStep(2);
-}
-
-// ── STEP 2: Submit with edited data ──────────────────────────────────────────
-async function submitEntry() {
-  if (!scannedData) return;
-
-  // Read edited values from review form
-  const editedCard = {};
-  CARD_FIELDS.forEach(f => {
-    const el = document.getElementById('e-' + f);
-    editedCard[f] = el ? el.value.trim() : (scannedData.cardData[f] || '');
-  });
-
-  document.getElementById('secReview').style.display = 'none';
-  document.getElementById('secSaving').style.display = 'block';
-
-  try {
-    const fd = new FormData();
-    if (file) fd.append('card', file);
-    fd.append('scannerName',       user.name);
-    fd.append('scannerEmail',      user.email);
-    fd.append('pos',               document.getElementById('inPOS').value.trim());
-    fd.append('outletName',        document.getElementById('inOutlet').value.trim());
-    fd.append('storeCount',        document.getElementById('inStoreCount').value.trim());
-    fd.append('manualPersonName',  document.getElementById('inManualPerson').value.trim());
-    fd.append('manualPhone',       document.getElementById('inManualPhone').value.trim());
-    fd.append('manualDesignation', document.getElementById('inDesignation').value.trim());
-    fd.append('comments',          document.getElementById('inComments').value.trim());
-    fd.append('manualOnly',        file ? 'false' : 'true');
-    fd.append('saveOnly',          'true');           // skip Claude, just save
-    fd.append('editedCard',        JSON.stringify(editedCard)); // send edited data
-
-    const res    = await fetch('/api/scan', { method: 'POST', body: fd });
-    const result = await res.json();
-
-    if (!res.ok || !result.success) throw new Error(result.error || 'Save failed');
-    showResults(result, editedCard);
-
-  } catch(err) {
-    document.getElementById('secSaving').style.display = 'none';
-    const b = document.getElementById('badge');
-    b.className = 'badge berr'; b.innerHTML = '❌ ' + err.message;
-    document.getElementById('results').style.display = 'block';
-    setStep(5);
-  }
-}
-
-function showResults(result, editedCard) {
-  const d = editedCard || result.cardData;
-  ['brandName','personName','designation','phone','email','website','city','state',
-   'pos','outletName','storeCount','manualDesignation','manualPersonName','manualPhone','comments'].forEach(f => {
-    const el = document.getElementById('r-' + f);
-    if (el) el.textContent = (result.cardData[f] !== undefined ? result.cardData[f] : d[f]) || '';
-  });
-  // Override with edited values for card fields
-  CARD_FIELDS.forEach(f => {
-    const el = document.getElementById('r-' + f);
-    if (el && d[f] !== undefined) el.textContent = d[f] || '';
-  });
-  document.getElementById('r-scannedBy').textContent = user.name + ' (' + user.email + ')';
-  const b = document.getElementById('badge');
-  b.className = result.sheetSuccess ? 'badge bok' : 'badge berr';
-  b.innerHTML = result.sheetSuccess ? '✅ ' + result.sheetMessage : '⚠️ ' + result.sheetMessage;
-  document.getElementById('secSaving').style.display = 'none';
-  document.getElementById('results').style.display   = 'block';
-  setStep(5);
-}
-
-function reset() {
-  removeImg();
-  scannedData = null;
-  ['inPOS','inOutlet','inStoreCount','inManualPerson','inManualPhone','inDesignation','inComments'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('reviewImg').style.display    = 'none';
-  document.getElementById('changeImgBtn').style.display = 'none';
-  document.getElementById('results').style.display      = 'none';
-  document.getElementById('secSaving').style.display    = 'none';
-  document.getElementById('secReview').style.display    = 'none';
-  document.getElementById('secProgress').style.display  = 'none';
-  document.getElementById('secIdentity').style.display  = 'block';
-  document.getElementById('secDetails').style.display   = 'block';
-  document.getElementById('secUpload').style.display    = 'block';
-  document.getElementById('secBtn').style.display       = 'block';
-  updateBtn(); setStep(2);
-}
-
-function setStep(n) {
-  for(let i=1;i<=5;i++){
-    const el = document.getElementById('step'+i);
-    if(el) el.className = 'step' + (i<n?' done':i===n?' active':'');
   }
 }
 </script>
