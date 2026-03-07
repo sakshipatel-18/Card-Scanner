@@ -50,7 +50,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
         city:            req.body.city        || '',
         department: '', email: '', alternatePhone: '',
         website: '', address: '', state: '', country: '',
-        pincode: '', linkedin: '', twitter: '', otherInfo: ''
+        pincode: ''
       };
 
     } else if (req.file) {
@@ -68,7 +68,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
             content: [
               { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64Image } },
               { type: 'text', text: `Extract ALL info from this business card as JSON only (no markdown):
-{"brandName":"","personName":"","designation":"","department":"","email":"","phone":"","alternatePhone":"","website":"","address":"","city":"","state":"","country":"","pincode":"","linkedin":"","twitter":"","otherInfo":""}` }
+{"brandName":"","personName":"","designation":"","department":"","email":"","phone":"","alternatePhone":"","website":"","address":"","city":"","state":"","country":"","pincode":""}` }
             ]
           }]
         },

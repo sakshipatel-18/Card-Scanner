@@ -288,9 +288,6 @@
       <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
       <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
-      <div class="eg1"><div class="el">💼 LinkedIn</div><input type="text" id="e-linkedin" placeholder="LinkedIn"/></div>
-      <div class="eg1"><div class="el">🐦 Twitter</div><input type="text" id="e-twitter" placeholder="Twitter"/></div>
-      <div class="eg2"><div class="el">ℹ️ Other Info</div><textarea id="e-otherInfo" placeholder="Other Info"></textarea></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
@@ -344,7 +341,7 @@
 let user = null, file = null, mode = null, scannedCardData = null;
 
 const CARD_FIELDS = ['brandName','personName','designation','department','email','phone',
-  'alternatePhone','website','address','city','state','country','pincode','linkedin','twitter','otherInfo'];
+  'alternatePhone','website','address','city','state','country','pincode'];
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
