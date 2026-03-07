@@ -105,6 +105,28 @@
   .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
   .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
   .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
+
+  /* SQL Counter pill */
+  .sql-bar{display:none;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border:1.5px solid #6ee7b7;border-radius:12px;padding:10px 16px;margin-bottom:12px;}
+  .sql-bar.show{display:flex;}
+  .sql-count{font-size:22px;font-weight:700;color:var(--success);}
+  .sql-label{font-size:12px;color:var(--success);font-weight:500;margin-top:1px;}
+  .sql-left{display:flex;flex-direction:column;}
+  .sql-right{font-size:26px;}
+
+  /* SQL / NSQL popup overlay */
+  .lead-popup{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
+  .lead-popup.show{opacity:1;pointer-events:all;}
+  .lead-box{background:#fff;border-radius:20px;padding:32px 28px;max-width:320px;width:90%;text-align:center;transform:scale(.85);transition:transform .3s;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+  .lead-popup.show .lead-box{transform:scale(1);}
+  .lead-emoji{font-size:56px;margin-bottom:12px;display:block;animation:bounce .6s ease;}
+  .lead-title{font-size:22px;font-weight:700;margin-bottom:8px;}
+  .lead-sub{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px;}
+  .lead-count{font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;display:inline-block;margin-bottom:20px;}
+  .lead-count.sql{background:#d1fae5;color:var(--success);}
+  .lead-count.nsql{background:#fef3c7;color:#d97706;}
+  .lead-close{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-16px)}70%{transform:translateY(-8px)}}
   .err-msg{font-size:12px;color:var(--error);margin-top:4px;display:none;font-weight:500;}
   .field-err input,.field-err textarea{border-color:var(--error) !important;box-shadow:0 0 0 3px rgba(225,29,72,.12) !important;}
   input[type=file]{display:none;}
@@ -279,7 +301,27 @@
     <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 New Entry</button>
   </div>
 
+  <!-- SQL Counter Bar -->
+  <div class="sql-bar" id="sqlBar">
+    <div class="sql-left">
+      <span class="sql-count" id="sqlCount">0</span>
+      <span class="sql-label">SQL Leads Today 🎯</span>
+    </div>
+    <span class="sql-right">🏆</span>
+  </div>
+
   <p class="footer">CardScan · Saved to your team's Google Sheet</p>
+
+  <!-- Lead result popup -->
+  <div class="lead-popup" id="leadPopup" onclick="closeLeadPopup()">
+    <div class="lead-box" onclick="event.stopPropagation()">
+      <span class="lead-emoji" id="leadEmoji"></span>
+      <div class="lead-title" id="leadTitle"></div>
+      <div class="lead-sub"   id="leadSub"></div>
+      <div class="lead-count" id="leadCountBadge"></div>
+      <button class="lead-close" onclick="closeLeadPopup()">Continue 🚀</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -338,6 +380,7 @@ function applyUser(u) {
   document.getElementById('idForm').style.display    = 'none';
   document.getElementById('userPill').classList.add('show');
   document.getElementById('secMode').style.display   = 'block';
+  updateSQLBar();
 }
 function changeIdentity() {
   user = null;
@@ -543,6 +586,9 @@ function showResults(result, localData) {
   b.innerHTML = result.sheetSuccess ? '✅ ' + result.sheetMessage : '⚠️ ' + result.sheetMessage;
   document.getElementById('secSaving').style.display  = 'none';
   document.getElementById('secResults').style.display = 'block';
+  // Show SQL/NSQL popup
+  const posVal = result.cardData?.pos || localData?.pos || '';
+  setTimeout(() => showLeadPopup(posVal), 400);
 }
 
 function showError(msg) {
@@ -588,6 +634,106 @@ function clearErr(fieldId) {
   const errEl = document.getElementById('err-' + fieldId);
   if (el && el.closest('.iw')) el.closest('.iw').classList.remove('field-err');
   if (errEl) errEl.style.display = 'none';
+}
+
+// ── SQL POS list ─────────────────────────────────────────────────────────────
+const SQL_POS = new Set([
+  'petpooja','posist','ezeepos','gofrugal','websys','ciferon','centramation',
+  'posify','tmbill','sparrowpos','vasypos','sanguinepos','horecafox','allpos',
+  'digitory','quickbill','binix','rista by dotpe','lucid','quintapos','csat',
+  'royalpos','dotpe','eezeepos','qpos','happyonpos','csatpos','lucidpos',
+  'lucid pos','romio','romiopos','restroworks','petpooja','sanguine pos',
+  'dataman','sanguinepos','vasy pos','royal','posist (restroworks)',
+  'billing fast pos','billingfastpos','billingfast pos','devourin','devorin',
+  'airmenus','air menu','airmenu','chefdeskpos','chef desk pos','chefdesk pos',
+  'devoruinpos','devoruin','devoruin pos','mishipay','mishipaypos','mishi pay',
+  'misipay','misi pay','rista','quinta','tmBill','abitzu','sparktech',
+  'sparktech pos','quinta pos','royal pos','lucid pos'
+]);
+
+const SQL_MOTIVATIONAL = [
+  "You're on fire! Keep it up! 🔥",
+  "Another one in the bag! 💼",
+  "You're crushing it today! 💪",
+  "That's what we call a winner! 🏅",
+  "Keep the momentum going! ⚡",
+  "You're making it happen! 🌟",
+  "One step closer to the top! 🚀",
+  "Legendary work right there! 👑"
+];
+
+const NSQL_MOTIVATIONAL = [
+  "Every conversation counts — keep going! 💬",
+  "Building relationships one card at a time! 🤝",
+  "Not every lead is SQL, but every effort matters! 💡",
+  "Stay consistent — the SQLs will follow! 🎯",
+  "Great networking! Keep scanning! 📇",
+  "You're building your pipeline! Keep hustling! 🏃",
+  "Every entry brings you closer to a SQL! ⭐",
+  "Solid work — keep the energy up! ⚡"
+];
+
+function isSQL(pos) {
+  if (!pos) return false;
+  return SQL_POS.has(pos.toLowerCase().trim());
+}
+
+function getTodayKey() {
+  const today = new Date().toISOString().slice(0, 10);
+  return `sqlCount_${user?.name || 'user'}_${today}`;
+}
+
+function getSQLCount() {
+  try { return parseInt(localStorage.getItem(getTodayKey()) || '0'); } catch(e) { return 0; }
+}
+
+function incrementSQL() {
+  try {
+    const count = getSQLCount() + 1;
+    localStorage.setItem(getTodayKey(), count);
+    return count;
+  } catch(e) { return 1; }
+}
+
+function updateSQLBar() {
+  const count = getSQLCount();
+  const bar   = document.getElementById('sqlBar');
+  document.getElementById('sqlCount').textContent = count;
+  if (user) bar.classList.add('show');
+}
+
+function showLeadPopup(pos) {
+  const sql   = isSQL(pos);
+  const emoji = document.getElementById('leadEmoji');
+  const title = document.getElementById('leadTitle');
+  const sub   = document.getElementById('leadSub');
+  const badge = document.getElementById('leadCountBadge');
+
+  if (sql) {
+    const count = incrementSQL();
+    updateSQLBar();
+    emoji.textContent = ['🎯','🏆','🔥','⚡','🚀','💎'][Math.floor(Math.random()*6)];
+    title.textContent = 'SQL Lead! 🎉';
+    title.style.color = 'var(--success)';
+    sub.textContent   = SQL_MOTIVATIONAL[Math.floor(Math.random() * SQL_MOTIVATIONAL.length)];
+    badge.textContent = `🏆 ${count} SQL Lead${count>1?'s':''} today!`;
+    badge.className   = 'lead-count sql';
+    document.getElementById('leadBox') && (document.getElementById('leadBox').style.borderTop = '4px solid var(--success)');
+  } else {
+    emoji.textContent = ['😊','👍','💬','🤝','📇','🌱'][Math.floor(Math.random()*6)];
+    title.textContent = 'Entry Saved!';
+    title.style.color = 'var(--accent)';
+    sub.textContent   = NSQL_MOTIVATIONAL[Math.floor(Math.random() * NSQL_MOTIVATIONAL.length)];
+    const sqlToday    = getSQLCount();
+    badge.textContent = sqlToday > 0 ? `🎯 ${sqlToday} SQL lead${sqlToday>1?'s':''} so far today!` : '💪 Keep going — your first SQL is coming!';
+    badge.className   = 'lead-count nsql';
+  }
+
+  document.getElementById('leadPopup').classList.add('show');
+}
+
+function closeLeadPopup() {
+  document.getElementById('leadPopup').classList.remove('show');
 }
 
 function setPS(n) {
