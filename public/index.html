@@ -688,7 +688,9 @@ const NSQL_MOTIVATIONAL = [
 
 function isSQL(pos) {
   if (!pos) return false;
-  return SQL_POS.has(pos.toLowerCase().trim());
+  // Normalize: lowercase and collapse multiple spaces
+  const normalized = pos.toLowerCase().trim().replace(/\s+/g, ' ');
+  return SQL_POS.has(normalized);
 }
 
 function getTodayKey() {
