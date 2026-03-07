@@ -4,12 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CardScan — Business Card Reader</title>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0d9488">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="CardScan">
-<link rel="apple-touch-icon" href="/icon-192.svg">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -336,15 +330,6 @@ function resetForNextScan(){
 }
 function setStep(n){for(let i=1;i<=4;i++){const el=document.getElementById('step'+i);if(el)el.className='step'+(i<n?' done':i===n?' active':'');}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('SW registered'))
-      .catch(err => console.log('SW error:', err));
-  });
-}
 </script>
 </body>
 </html>
