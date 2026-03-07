@@ -105,6 +105,8 @@
   .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
   .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
   .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
+  .err-msg{font-size:12px;color:var(--error);margin-top:4px;display:none;font-weight:500;}
+  .field-err input,.field-err textarea{border-color:var(--error) !important;box-shadow:0 0 0 3px rgba(225,29,72,.12) !important;}
   input[type=file]{display:none;}
   @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
 </style>
@@ -155,19 +157,26 @@
   <div class="card" id="secManual" style="display:none">
     <div class="card-title">Manual Entry</div>
     <div class="row2">
-      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" placeholder="Person Name *" required/></div>
-      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" placeholder="Phone Number *" required/></div>
+      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *" required/></div>
+    <span class="err-msg" id="err-m-personName"></span>
+      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" required/></div>
+    <span class="err-msg" id="err-m-phone"></span>
     </div>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" placeholder="Brand Name *" required/></div>
-      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" placeholder="Designation *" required/></div>
+      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *" required/></div>
+    <span class="err-msg" id="err-m-brandName"></span>
+      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *" required/></div>
+    <span class="err-msg" id="err-m-designation"></span>
     </div>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" placeholder="POS *" required/></div>
-      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" placeholder="City *" required/></div>
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *" required/></div>
+    <span class="err-msg" id="err-m-pos"></span>
+      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *" required/></div>
+    <span class="err-msg" id="err-m-city"></span>
     </div>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" placeholder="Store Count *" min="0" required/></div>
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0" required/></div>
+    <span class="err-msg" id="err-m-storeCount"></span>
       <div class="iw nomb"></div>
     </div>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
@@ -178,8 +187,10 @@
   <div class="card" id="secScanForm" style="display:none">
     <div class="card-title">Scan Details</div>
     <div class="row2">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="s-pos" placeholder="POS Name *" required/></div>
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="s-outlets" placeholder="Number of Outlets *" min="0" required/></div>
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="s-pos" oninput="clearErr('s-pos')" placeholder="POS Name *" required/></div>
+    <span class="err-msg" id="err-s-pos"></span>
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="s-outlets" oninput="clearErr('s-outlets')" placeholder="Number of Outlets *" min="0" required/></div>
+    <span class="err-msg" id="err-s-outlets"></span>
     </div>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="s-comments" placeholder="Additional comments (optional)..."></textarea></div>
   </div>
@@ -281,6 +292,14 @@ const CARD_FIELDS = ['brandName','personName','designation','department','email'
 window.addEventListener('DOMContentLoaded', () => {
   try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
   document.getElementById('inName').addEventListener('input',  checkId);
+  // Phone: digits only, max 10 — works on mobile too
+  const phoneEl = document.getElementById('m-phone');
+  if (phoneEl) {
+    ['input','keyup','change'].forEach(ev => phoneEl.addEventListener(ev, () => {
+      const pos = phoneEl.selectionStart;
+      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, '').slice(0, 10);
+    }));
+  }
   document.getElementById('inEmail').addEventListener('input', checkId);
   ['inName','inEmail'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); }));
   document.getElementById('fp').addEventListener('change',  e => { if(e.target.files[0]) setFile(e.target.files[0]); });
@@ -553,39 +572,23 @@ function hideAll() {
 }
 
 function showFieldError(fieldId, msg) {
-  const el = document.getElementById(fieldId);
+  const el    = document.getElementById(fieldId);
+  const errEl = document.getElementById('err-' + fieldId);
   if (el) {
-    el.style.borderColor = 'var(--error)';
-    el.style.boxShadow   = '0 0 0 3px rgba(225,29,72,.12)';
-    el.focus();
-    el.addEventListener('input', () => {
-      el.style.borderColor = '';
-      el.style.boxShadow   = '';
-    }, { once: true });
+    el.closest('.iw').classList.add('field-err');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-  // Show toast
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#e11d48;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;font-family:Outfit,sans-serif;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .3s';
-    document.body.appendChild(toast);
+  if (errEl) {
+    errEl.textContent = '⚠️ ' + msg;
+    errEl.style.display = 'block';
   }
-  toast.textContent = '⚠️ ' + msg;
-  toast.style.opacity = '1';
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => toast.style.opacity = '0', 2800);
 }
-
-// Phone: only allow digits, max 10
-document.addEventListener('DOMContentLoaded', () => {
-  const phoneEl = document.getElementById('m-phone');
-  if (phoneEl) {
-    phoneEl.addEventListener('input', () => {
-      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, '').slice(0, 10);
-    });
-  }
-});
+function clearErr(fieldId) {
+  const el    = document.getElementById(fieldId);
+  const errEl = document.getElementById('err-' + fieldId);
+  if (el && el.closest('.iw')) el.closest('.iw').classList.remove('field-err');
+  if (errEl) errEl.style.display = 'none';
+}
 
 function setPS(n) {
   for(let i=1;i<=3;i++){
