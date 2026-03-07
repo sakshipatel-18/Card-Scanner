@@ -131,7 +131,7 @@
     </div>
     <div class="row2" style="margin-top:10px">
       <div class="iw" style="margin-bottom:0"><span class="ii">🔢</span><input type="number" id="inStoreCount" placeholder="Store Count" min="0"/></div>
-      <div class="iw" style="margin-bottom:0"></div>
+      <div class="iw" style="margin-bottom:0"><span class="ii">💼</span><input type="text" id="inDesignation" placeholder="Designation (manual)"/></div>
     </div>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="inComments" placeholder="Comments (optional)..."></textarea></div>
   </div>
@@ -199,6 +199,7 @@
         <div class="f"><div class="fl">🔢 Store Count</div><div class="fv" id="r-storeCount"></div></div>
         <div class="f"><div class="fl">👤 Manual Person</div><div class="fv" id="r-manualPersonName"></div></div>
         <div class="f"><div class="fl">📞 Manual Phone</div><div class="fv" id="r-manualPhone"></div></div>
+        <div class="f fw"><div class="fl">💼 Manual Designation</div><div class="fv" id="r-manualDesignation"></div></div>
         <div class="f fw"><div class="fl">💬 Comments</div><div class="fv" id="r-comments"></div></div>
         <div class="f fw"><div class="fl">👤 Scanned By</div><div class="fv" id="r-scannedBy"></div></div>
       </div>
@@ -339,6 +340,7 @@ async function doScan() {
     fd.append('outletName',       document.getElementById('inOutlet').value.trim());
     fd.append('storeCount',       document.getElementById('inStoreCount').value.trim());
     fd.append('manualPersonName', document.getElementById('inManualPerson').value.trim());
+    fd.append('manualDesignation',  document.getElementById('inDesignation').value.trim());
     fd.append('manualPhone',      document.getElementById('inManualPhone').value.trim());
     fd.append('comments',         document.getElementById('inComments').value.trim());
     if (!file) fd.append('manualOnly', 'true');
@@ -364,7 +366,7 @@ function showResults(result) {
   const d = result.cardData;
   ['brandName','personName','designation','department','email','phone','alternatePhone',
    'website','address','city','state','country','pincode','linkedin','twitter','otherInfo',
-   'pos','outletName','storeCount','manualPersonName','manualPhone','comments'].forEach(f => {
+   'pos','outletName','storeCount','manualPersonName','manualPhone','manualDesignation','comments'].forEach(f => {
     const el = document.getElementById('r-'+f);
     if (el) el.textContent = d[f] || '';
   });
@@ -379,7 +381,7 @@ function showResults(result) {
 
 function reset() {
   removeImg();
-  ['inPOS','inOutlet','inStoreCount','inManualPerson','inManualPhone','inComments'].forEach(id => {
+  ['inPOS','inOutlet','inStoreCount','inManualPerson','inManualPhone','inDesignation','inComments'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('results').style.display       = 'none';

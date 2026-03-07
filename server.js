@@ -84,15 +84,16 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
       );
 
       cardData = JSON.parse(claudeRes.data.content[0].text.trim().replace(/```json|```/g, '').trim());
-      fs.unlinkSync(req.file.path);
+      // keep file alive for Drive upload below
     }
 
     // Attach scan detail fields
     cardData.pos              = pos;
     cardData.outletName       = outletName;
     cardData.storeCount       = storeCount;
-    cardData.manualPersonName = manualPersonName;
-    cardData.manualPhone      = manualPhone;
+    cardData.manualPersonName  = manualPersonName;
+    cardData.manualPhone       = manualPhone;
+    cardData.manualDesignation = manualDesignation;
     cardData.comments         = comments;
 
     // ── Save to Sheet + Drive ─────────────────────────────────────────────
