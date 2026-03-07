@@ -285,17 +285,14 @@ async function startScan(){
   setStep(3);setProgressStep(1);
   try{
     const fd=new FormData();
-    fd.append('card',selectedFile);
+    if(selectedFile) fd.append('card', selectedFile);
     fd.append('scannerName',currentUser.name);
     fd.append('scannerEmail',currentUser.email);
     fd.append('pos',document.getElementById('inputPOS').value.trim());
     fd.append('storeCount',document.getElementById('inputStoreCount').value.trim());
     fd.append('comments',document.getElementById('inputComments').value.trim());
+    if(!selectedFile) fd.append('manualOnly', 'true');
     setProgressStep(2);
-    if (!selectedFile) {
-      // Manual entry — send empty image signal
-      fd.append('manualOnly', 'true');
-    }
     const res=await fetch('/api/scan',{method:'POST',body:fd});
     const result=await res.json();
     setProgressStep(3);await sleep(500);

@@ -23,7 +23,12 @@ const upload = multer({
   fileFilter: (req, file, cb) => file.mimetype.startsWith('image/') ? cb(null, true) : cb(new Error('Images only'))
 });
 
-app.post('/api/scan', upload.single('card'), async (req, res) => {
+app.post('/api/scan', (req, res, next) => {
+  upload.single('card')(req, res, (err) => {
+    if (err && err.code !== 'LIMIT_UNEXPECTED_FILE') return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
   const scannerName  = req.body.scannerName  || 'Unknown';
   const scannerEmail = req.body.scannerEmail || '';
   const pos          = req.body.pos          || '';
