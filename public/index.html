@@ -177,7 +177,7 @@
     <div class="scan-animation"><div class="scan-card-icon">🪪</div><div class="scan-line"></div></div>
     <div class="progress-steps">
       <div class="p-step" id="ps1">⚡ Uploading image...</div>
-      <div class="p-step" id="ps2">🔍 Reading your card...</div>
+      <div class="p-step" id="ps2" id="ps2">🔍 Reading your card...</div>
       <div class="p-step" id="ps3">📊 Saving to Google Sheets...</div>
     </div>
   </div>
@@ -223,6 +223,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('inputName').addEventListener('input',checkForm);
   document.getElementById('inputEmail').addEventListener('input',checkForm);
   ['inputName','inputEmail'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')saveIdentity();}));
+  document.getElementById('inputPersonName').addEventListener('input', updateScanBtn);
+  document.getElementById('inputPhoneNumber').addEventListener('input', updateScanBtn);
   document.getElementById('filePicker').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
   document.getElementById('cameraInput').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
   const dz=document.getElementById('dropZone');
@@ -273,7 +275,12 @@ function removeImage(){
   ['filePicker','cameraInput'].forEach(id=>document.getElementById(id).value='');
   updateScanBtn();
 }
-function updateScanBtn(){document.getElementById('scanBtn').disabled=!(selectedFile&&currentUser);}
+function updateScanBtn(){
+  const hasFile   = !!selectedFile;
+  const hasManual = document.getElementById('inputPersonName').value.trim() || document.getElementById('inputPhoneNumber').value.trim();
+  document.getElementById('scanBtn').disabled = !(currentUser && (hasFile || hasManual));
+  document.getElementById('scanBtn').textContent = hasFile ? '🔍 Scan Card' : '💾 Save Manual Entry';
+}
 function setProgressStep(n){
   for(let i=1;i<=3;i++){const el=document.getElementById('ps'+i);el.classList.remove('active','done','pulse');if(i<n)el.classList.add('done');if(i===n)el.classList.add('active','pulse');}
 }
@@ -291,6 +298,10 @@ async function startScan(){
     fd.append('storeCount',document.getElementById('inputStoreCount').value.trim());
     fd.append('comments',document.getElementById('inputComments').value.trim());
     setProgressStep(2);
+    if (!selectedFile) {
+      // Manual entry — send empty image signal
+      fd.append('manualOnly', 'true');
+    }
     const res=await fetch('/api/scan',{method:'POST',body:fd});
     const result=await res.json();
     setProgressStep(3);await sleep(500);

@@ -31,8 +31,31 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
   const comments          = req.body.comments          || '';
   const manualPersonName  = req.body.manualPersonName  || '';
   const manualPhone       = req.body.manualPhone       || '';
+  const manualOnly        = req.body.manualOnly === 'true';
 
-  if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+  // ── Manual entry (no card image) ─────────────────────────────────────────
+  if (manualOnly || !req.file) {
+    const cardData = {
+      brandName:'', personName: manualPersonName, designation:'', department:'',
+      email:'', phone: manualPhone, alternatePhone:'', website:'', address:'',
+      city:'', state:'', country:'', pincode:'', linkedin:'', twitter:'', otherInfo:'',
+      pos, storeCount, comments, manualPersonName, manualPhone
+    };
+    let sheetSuccess = false, sheetMessage = '';
+    if (APPS_SCRIPT_URL) {
+      try {
+        await axios.post(APPS_SCRIPT_URL, {
+          ...cardData,
+          scannedBy: scannerName, scannedEmail: scannerEmail,
+          scannedAt: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+          manualPersonName, manualPhone, scannerFolder: scannerName
+        }, { timeout: 30000 });
+        sheetSuccess = true;
+        sheetMessage = 'Manual entry saved to Sheet ✓';
+      } catch(err) { sheetMessage = 'Save failed: ' + err.message; }
+    }
+    return res.json({ success: true, cardData, sheetSuccess, sheetMessage, driveUrl: '' });
+  }
 
   try {
     const base64Image = fs.readFileSync(req.file.path).toString('base64');
