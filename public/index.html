@@ -155,19 +155,19 @@
   <div class="card" id="secManual" style="display:none">
     <div class="card-title">Manual Entry</div>
     <div class="row2">
-      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" placeholder="Person Name *"/></div>
-      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" placeholder="Phone Number *"/></div>
+      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" placeholder="Person Name *" required/></div>
+      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" placeholder="Phone Number *" required/></div>
     </div>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" placeholder="Brand Name"/></div>
-      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" placeholder="Designation"/></div>
+      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" placeholder="Brand Name *" required/></div>
+      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" placeholder="Designation *" required/></div>
     </div>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" placeholder="POS"/></div>
-      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" placeholder="City"/></div>
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" placeholder="POS *" required/></div>
+      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" placeholder="City *" required/></div>
     </div>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" placeholder="Store Count" min="0"/></div>
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" placeholder="Store Count *" min="0" required/></div>
       <div class="iw nomb"></div>
     </div>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
@@ -178,8 +178,8 @@
   <div class="card" id="secScanForm" style="display:none">
     <div class="card-title">Scan Details</div>
     <div class="row2">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="s-pos" placeholder="POS Name"/></div>
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="s-outlets" placeholder="Number of Outlets" min="0"/></div>
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="s-pos" placeholder="POS Name *" required/></div>
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="s-outlets" placeholder="Number of Outlets *" min="0" required/></div>
     </div>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="s-comments" placeholder="Additional comments (optional)..."></textarea></div>
   </div>
@@ -235,16 +235,16 @@
     <button class="btn btn-o btn-sm" id="changePhotoBtn" onclick="document.getElementById('fp2').click()" style="display:none;width:auto;margin-bottom:12px;">🔄 Change Photo</button>
     <input type="file" id="fp2" accept="image/*"/>
     <div class="eg">
-      <div class="eg2"><div class="el">🏢 Brand / Company</div><input type="text" id="e-brandName" placeholder="Brand Name"/></div>
+      <div class="eg2"><div class="el">🏢 Brand / Company</div><input type="text" id="e-brandName" placeholder="Brand Name *" required/></div>
       <div class="eg1"><div class="el">👤 Person Name</div><input type="text" id="e-personName" placeholder="Person Name"/></div>
-      <div class="eg1"><div class="el">💼 Designation</div><input type="text" id="e-designation" placeholder="Designation"/></div>
+      <div class="eg1"><div class="el">💼 Designation</div><input type="text" id="e-designation" placeholder="Designation *" required/></div>
       <div class="eg1"><div class="el">🏬 Department</div><input type="text" id="e-department" placeholder="Department"/></div>
       <div class="eg1"><div class="el">📞 Phone</div><input type="text" id="e-phone" placeholder="Phone"/></div>
       <div class="eg1"><div class="el">📱 Alt Phone</div><input type="text" id="e-alternatePhone" placeholder="Alt Phone"/></div>
       <div class="eg2"><div class="el">✉️ Email</div><input type="text" id="e-email" placeholder="Email"/></div>
       <div class="eg2"><div class="el">🌐 Website</div><input type="text" id="e-website" placeholder="Website"/></div>
       <div class="eg2"><div class="el">📍 Address</div><input type="text" id="e-address" placeholder="Address"/></div>
-      <div class="eg1"><div class="el">🏙️ City</div><input type="text" id="e-city" placeholder="City"/></div>
+      <div class="eg1"><div class="el">🏙️ City</div><input type="text" id="e-city" placeholder="City *" required/></div>
       <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
       <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
@@ -365,9 +365,23 @@ function removeImg() {
 
 // ── MANUAL SUBMIT ─────────────────────────────────────────────────────────────
 async function submitManual() {
-  const personName = document.getElementById('m-personName').value.trim();
-  const phone      = document.getElementById('m-phone').value.trim();
-  if (!personName && !phone) return alert('Please enter at least Person Name or Phone Number.');
+  const personName  = document.getElementById('m-personName').value.trim();
+  const phone       = document.getElementById('m-phone').value.trim();
+  const brandName   = document.getElementById('m-brandName').value.trim();
+  const designation = document.getElementById('m-designation').value.trim();
+  const pos         = document.getElementById('m-pos').value.trim();
+  const city        = document.getElementById('m-city').value.trim();
+  const storeCount  = document.getElementById('m-storeCount').value.trim();
+
+  // Validate all required fields
+  if (!personName)  return showFieldError('m-personName',  'Person Name is required');
+  if (!phone)       return showFieldError('m-phone',       'Phone Number is required');
+  if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone', 'Phone must be exactly 10 digits');
+  if (!brandName)   return showFieldError('m-brandName',   'Brand Name is required');
+  if (!designation) return showFieldError('m-designation', 'Designation is required');
+  if (!pos)         return showFieldError('m-pos',         'POS is required');
+  if (!city)        return showFieldError('m-city',        'City is required');
+  if (!storeCount)  return showFieldError('m-storeCount',  'Store Count is required');
 
   hideAll(); document.getElementById('secSaving').style.display = 'block';
 
@@ -400,7 +414,11 @@ async function submitManual() {
 
 // ── SCAN: extract only ────────────────────────────────────────────────────────
 async function doScan() {
-  if (!file) return;
+  const pos     = document.getElementById('s-pos').value.trim();
+  const outlets = document.getElementById('s-outlets').value.trim();
+  if (!pos)     return showFieldError('s-pos',     'POS Name is required');
+  if (!outlets) return showFieldError('s-outlets', 'Number of Outlets is required');
+  if (!file) return showFieldError('dz', 'Please upload a card photo');
   hideAll(); document.getElementById('secProgress').style.display = 'block';
   setPS(1);
 
@@ -533,6 +551,41 @@ function hideAll() {
   ['secManual','secScanForm','secUpload','secProgress','secSaving','secReview','secResults']
     .forEach(id => document.getElementById(id).style.display = 'none');
 }
+
+function showFieldError(fieldId, msg) {
+  const el = document.getElementById(fieldId);
+  if (el) {
+    el.style.borderColor = 'var(--error)';
+    el.style.boxShadow   = '0 0 0 3px rgba(225,29,72,.12)';
+    el.focus();
+    el.addEventListener('input', () => {
+      el.style.borderColor = '';
+      el.style.boxShadow   = '';
+    }, { once: true });
+  }
+  // Show toast
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#e11d48;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;font-family:Outfit,sans-serif;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .3s';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = '⚠️ ' + msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.style.opacity = '0', 2800);
+}
+
+// Phone: only allow digits, max 10
+document.addEventListener('DOMContentLoaded', () => {
+  const phoneEl = document.getElementById('m-phone');
+  if (phoneEl) {
+    phoneEl.addEventListener('input', () => {
+      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+  }
+});
 
 function setPS(n) {
   for(let i=1;i<=3;i++){
