@@ -147,6 +147,31 @@
   @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-16px)}70%{transform:translateY(-8px)}}
   .err-msg{font-size:12px;color:var(--error);margin-top:4px;display:none;font-weight:500;}
   .field-err input,.field-err textarea,.field-err select{border-color:var(--error) !important;box-shadow:0 0 0 3px rgba(225,29,72,.12) !important;}
+
+  /* POS Checker Popup */
+  .pos-popup{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s;}
+  .pos-popup.show{opacity:1;pointer-events:all;}
+  .pos-box{background:#fff;border-radius:18px;padding:24px 22px 20px;max-width:380px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,.22);transform:scale(.88);transition:transform .28s;}
+  .pos-popup.show .pos-box{transform:scale(1);}
+  .pos-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+  .pos-head-icon{font-size:32px;flex-shrink:0;margin-top:2px;}
+  .pos-head-text h3{font-size:16px;font-weight:700;color:var(--error);margin-bottom:3px;}
+  .pos-head-text p{font-size:12px;color:var(--muted);line-height:1.5;}
+  .pos-typed{display:inline-block;background:#fff0f3;border:1px solid #fda4af;border-radius:6px;padding:3px 9px;font-size:13px;font-weight:600;color:var(--error);margin-bottom:14px;}
+  .pos-list-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .pos-list{display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow-y:auto;padding-right:2px;margin-bottom:16px;}
+  .pos-list::-webkit-scrollbar{width:4px;}
+  .pos-list::-webkit-scrollbar-track{background:var(--bg);border-radius:4px;}
+  .pos-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .pos-chip{padding:5px 11px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;color:var(--text);transition:all .18s;font-family:'Outfit',sans-serif;}
+  .pos-chip:hover,.pos-chip.suggested{border-color:var(--accent);background:var(--accentlt);color:var(--accent);}
+  .pos-chip.suggested{border-style:solid;box-shadow:0 0 0 2px rgba(13,148,136,.15);}
+  .pos-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .pos-btn-keep{background:#fff;border:1.5px solid var(--border);color:var(--muted);border-radius:9px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+  .pos-btn-keep:hover{border-color:var(--muted);color:var(--text);}
+  .pos-btn-fix{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:9px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+  .pos-btn-fix:hover{opacity:.9;}
+
   input[type=file]{display:none;}
 
   @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
@@ -384,6 +409,27 @@
 
   <p class="footer">CardScan · Saved to your team's Google Sheet</p>
 
+
+  <!-- POS Checker Popup -->
+  <div class="pos-popup" id="posPopup">
+    <div class="pos-box">
+      <div class="pos-head">
+        <div class="pos-head-icon">🔍</div>
+        <div class="pos-head-text">
+          <h3>POS Not Recognised</h3>
+          <p>The POS you typed doesn't match our list. Please select the correct one below or keep your entry as NSQL.</p>
+        </div>
+      </div>
+      <div class="pos-typed" id="posTypedValue"></div>
+      <div class="pos-list-label">✅ Valid SQL POS — tap to select</div>
+      <div class="pos-list" id="posChipList"></div>
+      <div class="pos-actions">
+        <button class="pos-btn-keep" onclick="closePosPopup(false)">Keep as NSQL</button>
+        <button class="pos-btn-fix" id="posBtnFix" onclick="closePosPopup(true)" disabled>Use Selected ✓</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Lead result popup -->
   <div class="lead-popup" id="leadPopup" onclick="closeLeadPopup()">
     <div class="lead-box" onclick="event.stopPropagation()">
@@ -525,10 +571,15 @@ async function submitManual() {
   if (!storeCount)  return showFieldError('m-storeCount',  'Store Count is required');
   if (!intent)      return showFieldError('m-intent',      'Intent to Buy is required');
 
+  // Check POS — show picker if unknown
+  const resolvedPos = await checkPosAndProceed(pos, 'm-pos');
+  // resolvedPos = corrected name, or null (user chose Keep as NSQL), or original if already valid
+  const finalPos = resolvedPos !== null ? (resolvedPos || pos) : pos;
+
   hideAll(); document.getElementById('secSaving').style.display = 'block';
 
   const payload = {
-    brandName, personName, designation, phone, city, pos, storeCount,
+    brandName, personName, designation, phone, city, pos: finalPos, storeCount,
     comments:    document.getElementById('m-comments').value.trim(),
     intentToBuy: intent,
     manualOnly:  'true',
@@ -628,6 +679,15 @@ async function submitScan() {
     editedCard[f] = el ? el.value.trim() : '';
   });
 
+  // Check POS — show picker if unknown
+  const resolvedPos = await checkPosAndProceed(pos, 'e-pos');
+  const finalPos = resolvedPos !== null ? (resolvedPos || pos) : pos;
+  // Update the field visually if corrected
+  if (resolvedPos && resolvedPos !== pos) {
+    const posEl = document.getElementById('e-pos');
+    if (posEl) posEl.value = resolvedPos;
+  }
+
   hideAll(); document.getElementById('secSaving').style.display = 'block';
 
   try {
@@ -635,7 +695,7 @@ async function submitScan() {
     if(file) fd.append('card', file);
     fd.append('scannerName',  user.name);
     fd.append('scannerEmail', user.email);
-    fd.append('pos',          pos);
+    fd.append('pos',          finalPos);
     fd.append('storeCount',   storeCount);
     fd.append('outletName',   storeCount);
     fd.append('comments',     document.getElementById('e-comments')?.value.trim() || '');
@@ -733,27 +793,102 @@ function clearErr(fieldId) {
 }
 
 // ── SQL POS list ──────────────────────────────────────────────────────────────
+// Canonical display names (shown as chips)
+const SQL_POS_CANONICAL = [
+  'Petpooja','pp','Posist','Posist (Restroworks)','Restroworks',
+  'eZeePOS','Ezeepos','eezeepos','Gofrugal','Websys','Ciferon',
+  'Centramation','Posify','TMbill','sparrowpos','Vasypos','Vasy','Vasy pos',
+  'Sanguine POS','Sanguinepos','Horecafox','allpos','Digitory',
+  'Quickbill','binix','Rista by Dotpe','dotpe',
+  'Lucid','lucidpos','Lucid Pos','quintapos','Quinta',
+  'CSAT','csatpos','Royalpos','Royal','Qpos','happyonpos',
+  'Romio','romiopos','dataman',
+  'Billingfastpos','Billing fast pos','devourin','devorin',
+  'airmenus','airmenu','chefdeskpos','chef desk pos',
+  'devoruin','mishipay','mishi pay','misipay',
+  'abitzu','sparktech','sparktech pos'
+];
+
+// All accepted spellings → normalised lookup
 const SQL_POS = new Set([
-  'petpooja','Petpooja','petPooja','PetPooja','pp',
-  'posist','Posist','Posist (Restroworks)','restroworks',
-  'ezeepos','Ezeepos','eezeepos','eZeePOS',
-  'gofrugal','Gofrugal','websys','Websys','ciferon','Ciferon',
-  'centramation','Centramation','posify','Posify','tmbill','Tmbill','TMbill',
-  'sparrowpos','vasypos','Vasypos','Vasy pos','vasy','Vasy',
-  'sanguinepos','Sanguinepos','SANGUINEPOS','Sanguine POS',
-  'horecafox','Horecafox','allpos','digitory','Digitory',
-  'quickbill','Quickbill','binix','rista by dotpe','Rista by Dotpe','Rista By Dotpe',
-  'dotpe','lucid','Lucid','LUCID','lucidpos','Lucid Pos','lucid pos',
-  'quintapos','quinta','Quinta','quinta pos','csat','Csat','CSAT','csatpos',
-  'royalpos','Royalpos','royal','Royal','royal pos','qpos','Qpos',
-  'happyonpos','romio','Romio','romiopos','dataman',
-  'billing fast pos','billingfastpos','Billingfast pos','Billingfastpos',
+  'petpooja','petpooja','petpooja','petpooja','pp',
+  'posist','posist','posist (restroworks)','restroworks',
+  'ezeepos','ezeepos','eezeepos','ezeepos',
+  'gofrugal','gofrugal','websys','websys','ciferon','ciferon',
+  'centramation','centramation','posify','posify','tmbill','tmbill','tmbill',
+  'sparrowpos','vasypos','vasypos','vasy pos','vasy','vasy',
+  'sanguinepos','sanguinepos','sanguinepos','sanguine pos',
+  'horecafox','horecafox','allpos','digitory','digitory',
+  'quickbill','quickbill','binix','rista by dotpe','rista by dotpe','rista by dotpe',
+  'dotpe','lucid','lucid','lucid','lucidpos','lucid pos','lucid pos',
+  'quintapos','quinta','quinta','quinta pos','csat','csat','csat','csatpos',
+  'royalpos','royalpos','royal','royal','royal pos','qpos','qpos',
+  'happyonpos','romio','romio','romiopos','dataman',
+  'billing fast pos','billingfastpos','billingfast pos','billingfastpos',
   'devourin','devorin','airmenus','air menu','airmenu',
   'chefdeskpos','chef desk pos','chefdesk pos',
   'devoruinpos','devoruin','devoruin pos',
   'mishipay','mishipaypos','mishi pay','misipay','misi pay',
   'abitzu','sparktech','sparktech pos'
 ]);
+
+// ── POS Popup state ───────────────────────────────────────────────────────────
+let posPopupContext = null; // { fieldId, resolve }
+let posPopupSelected = null;
+
+function checkPosAndProceed(posValue, fieldId) {
+  return new Promise(resolve => {
+    const norm = posValue.toLowerCase().trim().replace(/\s+/g, ' ');
+    if (!posValue || SQL_POS.has(norm)) { resolve(posValue); return; }
+
+    // Not in list — show popup
+    posPopupContext = { fieldId, resolve };
+    posPopupSelected = null;
+
+    document.getElementById('posTypedValue').textContent = '❌ "' + posValue + '"';
+    document.getElementById('posBtnFix').disabled = true;
+
+    // Fuzzy suggestions: find canonical names that share chars
+    const typedLow = norm;
+    const suggestions = SQL_POS_CANONICAL.filter(name => {
+      const nLow = name.toLowerCase();
+      // simple: any 3-char substring match or starts-with match
+      if (nLow.startsWith(typedLow.slice(0,3))) return true;
+      for (let i = 0; i <= typedLow.length - 3; i++) {
+        if (nLow.includes(typedLow.slice(i, i+3))) return true;
+      }
+      return false;
+    });
+
+    const chipList = document.getElementById('posChipList');
+    chipList.innerHTML = '';
+    SQL_POS_CANONICAL.forEach(name => {
+      const chip = document.createElement('button');
+      chip.className = 'pos-chip' + (suggestions.includes(name) ? ' suggested' : '');
+      chip.textContent = name;
+      chip.onclick = () => {
+        chipList.querySelectorAll('.pos-chip').forEach(c => c.classList.remove('active-sel'));
+        chip.classList.add('active-sel');
+        chip.style.background = 'var(--accent)';
+        chip.style.color = '#fff';
+        chip.style.borderColor = 'var(--accent)';
+        posPopupSelected = name;
+        document.getElementById('posBtnFix').disabled = false;
+      };
+      chipList.appendChild(chip);
+    });
+
+    document.getElementById('posPopup').classList.add('show');
+  });
+}
+
+function closePosPopup(useSelected) {
+  document.getElementById('posPopup').classList.remove('show');
+  if (!posPopupContext) return;
+  const { resolve } = posPopupContext;
+  posPopupContext = null;
+  resolve(useSelected && posPopupSelected ? posPopupSelected : null);
+}
 
 const SQL_MOTIVATIONAL = [
   "You're on fire! Keep it up! 🔥",
