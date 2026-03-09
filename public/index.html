@@ -55,6 +55,7 @@
   .iw select{width:100%;padding:11px 36px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;}
   .iw select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
   .iw select option{background:#fff;color:var(--text);}
+  .iw select.placeholder{color:var(--muted);opacity:.7;}
   /* chevron on right side of select */
   .iw .chevron{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:11px;color:var(--muted);}
   /* eg grid select — same treatment */
@@ -315,16 +316,16 @@
     <button class="btn btn-o btn-sm" id="changePhotoBtn" onclick="document.getElementById('fp2').click()" style="display:none;width:auto;margin-bottom:12px;">🔄 Change Photo</button>
     <input type="file" id="fp2" accept="image/*"/>
     <div class="eg">
-      <div class="eg2"><div class="el">🏢 Brand / Company</div><input type="text" id="e-brandName" placeholder="Brand Name *" required/></div>
-      <div class="eg1"><div class="el">👤 Person Name</div><input type="text" id="e-personName" placeholder="Person Name"/></div>
-      <div class="eg1"><div class="el">💼 Designation</div><input type="text" id="e-designation" placeholder="Designation *" required/></div>
+      <div class="eg2"><div class="el">🏢 Brand / Company</div><input type="text" id="e-brandName" placeholder="Brand Name *" required required/></div>
+      <div class="eg1"><div class="el">👤 Person Name</div><input type="text" id="e-personName" placeholder="Person Name *" required/></div>
+      <div class="eg1"><div class="el">💼 Designation</div><input type="text" id="e-designation" placeholder="Designation *" required required/></div>
       <div class="eg1"><div class="el">🏬 Department</div><input type="text" id="e-department" placeholder="Department"/></div>
-      <div class="eg1"><div class="el">📞 Phone</div><input type="text" id="e-phone" placeholder="Phone"/></div>
+      <div class="eg1"><div class="el">📞 Phone</div><input type="text" id="e-phone" placeholder="Phone *" required/></div>
       <div class="eg1"><div class="el">📱 Alt Phone</div><input type="text" id="e-alternatePhone" placeholder="Alt Phone"/></div>
       <div class="eg2"><div class="el">✉️ Email</div><input type="text" id="e-email" placeholder="Email"/></div>
       <div class="eg2"><div class="el">🌐 Website</div><input type="text" id="e-website" placeholder="Website"/></div>
       <div class="eg2"><div class="el">📍 Address</div><input type="text" id="e-address" placeholder="Address"/></div>
-      <div class="eg1"><div class="el">🏙️ City</div><input type="text" id="e-city" placeholder="City *" required/></div>
+      <div class="eg1"><div class="el">🏙️ City</div><input type="text" id="e-city" placeholder="City *" required required/></div>
       <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
       <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
@@ -404,6 +405,14 @@ const CARD_FIELDS = ['brandName','personName','designation','department','email'
 // ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
+  // Intent select placeholder styling
+  function syncSelectPlaceholder(sel) {
+    sel.classList.toggle('placeholder', sel.value === '');
+  }
+  const intentSel = document.getElementById('m-intent');
+  syncSelectPlaceholder(intentSel);
+  intentSel.addEventListener('change', () => { syncSelectPlaceholder(intentSel); clearErr('m-intent'); });
+
   document.getElementById('inName').addEventListener('input',  checkId);
   document.getElementById('inEmail').addEventListener('input', checkId);
 
@@ -596,9 +605,19 @@ function goRescan() {
 
 // ── SCAN SUBMIT ───────────────────────────────────────────────────────────────
 async function submitScan() {
+  const brandName  = document.getElementById('e-brandName')?.value.trim();
+  const personName = document.getElementById('e-personName')?.value.trim();
+  const designation= document.getElementById('e-designation')?.value.trim();
+  const phone      = document.getElementById('e-phone')?.value.trim();
+  const city       = document.getElementById('e-city')?.value.trim();
   const pos        = document.getElementById('e-pos')?.value.trim();
   const storeCount = document.getElementById('e-storeCount')?.value.trim();
   const intent     = document.getElementById('e-intent')?.value;
+  if (!brandName)   return showError('Brand / Company Name is required');
+  if (!personName)  return showError('Person Name is required');
+  if (!designation) return showError('Designation is required');
+  if (!phone)       return showError('Phone is required');
+  if (!city)        return showError('City is required');
   if (!pos)        return showError('POS is required');
   if (!storeCount) return showError('Store Count is required');
   if (!intent)     return showError('Intent to Buy is required');
@@ -672,7 +691,7 @@ function reset() {
   removeImg();
   ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments',
    'e-pos','e-storeCount','e-comments'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  const mi = document.getElementById('m-intent'); if(mi) mi.value='';
+  const mi = document.getElementById('m-intent'); if(mi){ mi.value=''; mi.classList.add('placeholder'); }
   const ei = document.getElementById('e-intent'); if(ei) ei.value='';
   document.getElementById('tabManual').classList.remove('active');
   document.getElementById('tabScan').classList.remove('active');
