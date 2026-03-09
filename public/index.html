@@ -46,27 +46,20 @@
   .iw:last-child,.iw.nomb{margin-bottom:0;}
   .ii{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
   .ii.top{top:13px;transform:none;}
-  input[type=text],input[type=email],input[type=number],textarea,select{
-  width:100%;
-  padding:11px 11px 11px 38px;
-  background:var(--bg);
-  border:1.5px solid var(--border);
-  border-radius:9px;
-  color:var(--text);
-  font-family:'Outfit',sans-serif;
-  font-size:14px;
-  outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
-
-input:focus,textarea:focus,select:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(13,148,136,.12);
-  background:#fff;
-}
+  input[type=text],input[type=email],input[type=number],textarea{width:100%;padding:11px 11px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
   input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
   input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7;}
   textarea{padding-top:11px;resize:vertical;min-height:75px;line-height:1.5;}
+
+  /* Select inside .iw — identical look to text inputs */
+  .iw select{width:100%;padding:11px 36px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;}
+  .iw select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
+  .iw select option{background:#fff;color:var(--text);}
+  /* chevron on right side of select */
+  .iw .chevron{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:11px;color:var(--muted);}
+  /* eg grid select — same treatment */
+  .eg select{width:100%;padding:9px 32px 9px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;outline:none;cursor:pointer;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235f9ea0' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+  .eg select:focus{border-color:var(--accent);background-color:#fff;}
 
   /* Buttons */
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;width:100%;}
@@ -152,8 +145,9 @@ input:focus,textarea:focus,select:focus{
   .lead-close{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;}
   @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-16px)}70%{transform:translateY(-8px)}}
   .err-msg{font-size:12px;color:var(--error);margin-top:4px;display:none;font-weight:500;}
-  .field-err input,.field-err textarea{border-color:var(--error) !important;box-shadow:0 0 0 3px rgba(225,29,72,.12) !important;}
+  .field-err input,.field-err textarea,.field-err select{border-color:var(--error) !important;box-shadow:0 0 0 3px rgba(225,29,72,.12) !important;}
   input[type=file]{display:none;}
+
   @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
 </style>
 </head>
@@ -202,43 +196,76 @@ input:focus,textarea:focus,select:focus{
   <!-- ── MANUAL ENTRY FORM ── -->
   <div class="card" id="secManual" style="display:none">
     <div class="card-title">Manual Entry</div>
+
     <div class="row2">
-      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *" required/></div>
-    <span class="err-msg" id="err-m-personName"></span>
-      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" required/></div>
-    <span class="err-msg" id="err-m-phone"></span>
-    </div>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *" required/></div>
-    <span class="err-msg" id="err-m-brandName"></span>
-      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *" required/></div>
-    <span class="err-msg" id="err-m-designation"></span>
-    </div>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *" required/></div>
-    <span class="err-msg" id="err-m-pos"></span>
-      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *" required/></div>
-    <span class="err-msg" id="err-m-city"></span>
-    </div>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0" required/></div>
-    <span class="err-msg" id="err-m-storeCount"></span>
       <div class="iw nomb">
+        <span class="ii">👤</span>
+        <input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *" required/>
+      </div>
+      <div class="iw nomb">
+        <span class="ii">📞</span>
+        <input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" required/>
+      </div>
+    </div>
+    <span class="err-msg" id="err-m-personName"></span>
+    <span class="err-msg" id="err-m-phone"></span>
+
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb">
+        <span class="ii">🏢</span>
+        <input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *" required/>
+      </div>
+      <div class="iw nomb">
+        <span class="ii">💼</span>
+        <input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *" required/>
+      </div>
+    </div>
+    <span class="err-msg" id="err-m-brandName"></span>
+    <span class="err-msg" id="err-m-designation"></span>
+
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb">
+        <span class="ii">🏪</span>
+        <input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *" required/>
+      </div>
+      <div class="iw nomb">
+        <span class="ii">🏙️</span>
+        <input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *" required/>
+      </div>
+    </div>
+    <span class="err-msg" id="err-m-pos"></span>
+    <span class="err-msg" id="err-m-city"></span>
+
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb">
+        <span class="ii">🔢</span>
+        <input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0" required/>
+      </div>
+
+      <!-- ✅ Intent to Buy — same .iw box as every other field -->
+      <div class="iw nomb" id="wrap-m-intent">
         <span class="ii">🎯</span>
-        <select id="m-intent" oninput="clearErr('m-intent')" style="flex:1;border:none;background:transparent;font-size:15px;color:var(--text);outline:none;">
+        <select id="m-intent" oninput="clearErr('m-intent')">
           <option value="">Intent to Buy *</option>
           <option value="High">🔥 High</option>
           <option value="Medium">🌤 Medium</option>
           <option value="Low">❄️ Low</option>
         </select>
+        <span class="chevron">▼</span>
       </div>
-    <span class="err-msg" id="err-m-intent"></span>
     </div>
-    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
+    <span class="err-msg" id="err-m-storeCount"></span>
+    <span class="err-msg" id="err-m-intent"></span>
+
+    <div class="iw" style="margin-top:10px;margin-bottom:0">
+      <span class="ii top">💬</span>
+      <textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea>
+    </div>
+
     <button class="btn btn-p" onclick="submitManual()" style="margin-top:12px">📤 Submit Entry</button>
   </div>
 
-  <!-- ── SCAN FORM — just upload ── -->
+  <!-- ── SCAN FORM ── -->
   <div class="card" id="secScanForm" style="display:none">
     <div class="card-title">Scan a Card</div>
     <div id="prevWrap">
@@ -303,16 +330,22 @@ input:focus,textarea:focus,select:focus{
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
       <div class="eg1"><div class="el">🏪 POS *</div><input type="text" id="e-pos" placeholder="POS" required/></div>
       <div class="eg1"><div class="el">🔢 Store Count *</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0" required/></div>
+
+      <!-- ✅ Intent to Buy in scan review — same eg select style -->
       <div class="eg1">
         <div class="el">🎯 Intent to Buy *</div>
-        <select id="e-intent" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text);outline:none;">
+        <select id="e-intent">
           <option value="">Select intent...</option>
           <option value="High">🔥 High</option>
           <option value="Medium">🌤 Medium</option>
           <option value="Low">❄️ Low</option>
         </select>
       </div>
-      <div class="eg2"><div class="el">💬 Comments</div><textarea id="e-comments" placeholder="Additional comments..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:70px;"></textarea></div>
+
+      <div class="eg2">
+        <div class="el">💬 Comments</div>
+        <textarea id="e-comments" placeholder="Additional comments..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:70px;font-family:'Outfit',sans-serif;"></textarea>
+      </div>
     </div>
     <div class="btn-row">
       <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
@@ -372,15 +405,15 @@ const CARD_FIELDS = ['brandName','personName','designation','department','email'
 window.addEventListener('DOMContentLoaded', () => {
   try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
   document.getElementById('inName').addEventListener('input',  checkId);
-  // Phone: digits only, max 10 — works on mobile too
+  document.getElementById('inEmail').addEventListener('input', checkId);
+
   const phoneEl = document.getElementById('m-phone');
   if (phoneEl) {
     ['input','keyup','change'].forEach(ev => phoneEl.addEventListener(ev, () => {
-      const pos = phoneEl.selectionStart;
       phoneEl.value = phoneEl.value.replace(/[^0-9]/g, '').slice(0, 10);
     }));
   }
-  document.getElementById('inEmail').addEventListener('input', checkId);
+
   ['inName','inEmail'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); }));
   document.getElementById('fp').addEventListener('change',  e => { if(e.target.files[0]) setFile(e.target.files[0]); });
   document.getElementById('cam').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
@@ -392,6 +425,7 @@ window.addEventListener('DOMContentLoaded', () => {
       r.readAsDataURL(e.target.files[0]);
     }
   });
+
   const dz = document.getElementById('dz');
   ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
   ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
@@ -428,7 +462,6 @@ function changeIdentity() {
   document.getElementById('secMode').style.display    = 'none';
   document.getElementById('secManual').style.display  = 'none';
   document.getElementById('secScanForm').style.display = 'none';
-  document.getElementById('secUpload').style.display  = 'none';
   removeImg();
 }
 
@@ -439,7 +472,6 @@ function setMode(m) {
   document.getElementById('tabScan').classList.toggle('active',   m==='scan');
   document.getElementById('secManual').style.display   = m==='manual' ? 'block' : 'none';
   document.getElementById('secScanForm').style.display = m==='scan'   ? 'block' : 'none';
-  document.getElementById('secUpload').style.display   = m==='scan'   ? 'block' : 'none';
 }
 
 // ── File handling ─────────────────────────────────────────────────────────────
@@ -472,10 +504,8 @@ async function submitManual() {
   const pos         = document.getElementById('m-pos').value.trim();
   const city        = document.getElementById('m-city').value.trim();
   const storeCount  = document.getElementById('m-storeCount').value.trim();
-
   const intent      = document.getElementById('m-intent').value;
 
-  // Validate all required fields
   if (!personName)  return showFieldError('m-personName',  'Person Name is required');
   if (!phone)       return showFieldError('m-phone',       'Phone Number is required');
   if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone', 'Phone must be exactly 10 digits');
@@ -489,15 +519,9 @@ async function submitManual() {
   hideAll(); document.getElementById('secSaving').style.display = 'block';
 
   const payload = {
-    brandName:   document.getElementById('m-brandName').value.trim(),
-    personName,
-    designation: document.getElementById('m-designation').value.trim(),
-    phone,
-    city:        document.getElementById('m-city').value.trim(),
-    pos:         document.getElementById('m-pos').value.trim(),
-    storeCount:  document.getElementById('m-storeCount').value.trim(),
+    brandName, personName, designation, phone, city, pos, storeCount,
     comments:    document.getElementById('m-comments').value.trim(),
-    intentToBuy: document.getElementById('m-intent').value,
+    intentToBuy: intent,
     manualOnly:  'true',
     scannerName:  user.name,
     scannerEmail: user.email
@@ -570,7 +594,7 @@ function goRescan() {
   removeImg();
 }
 
-// ── SCAN SUBMIT: save with edited data ────────────────────────────────────────
+// ── SCAN SUBMIT ───────────────────────────────────────────────────────────────
 async function submitScan() {
   const pos        = document.getElementById('e-pos')?.value.trim();
   const storeCount = document.getElementById('e-storeCount')?.value.trim();
@@ -632,7 +656,6 @@ function showResults(result, localData) {
   b.innerHTML = result.sheetSuccess ? '✅ ' + result.sheetMessage : '⚠️ ' + result.sheetMessage;
   document.getElementById('secSaving').style.display  = 'none';
   document.getElementById('secResults').style.display = 'block';
-  // Show SQL/NSQL popup
   const posVal = result.cardData?.pos || localData?.pos || '';
   setTimeout(() => showLeadPopup(posVal), 400);
 }
@@ -669,8 +692,11 @@ function showFieldError(fieldId, msg) {
   const el    = document.getElementById(fieldId);
   const errEl = document.getElementById('err-' + fieldId);
   if (el) {
-    el.closest('.iw').classList.add('field-err');
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const wrapper = el.closest('.iw');
+    if (wrapper) {
+      wrapper.classList.add('field-err');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
   if (errEl) {
     errEl.textContent = '⚠️ ' + msg;
@@ -680,47 +706,34 @@ function showFieldError(fieldId, msg) {
 function clearErr(fieldId) {
   const el    = document.getElementById(fieldId);
   const errEl = document.getElementById('err-' + fieldId);
-  if (el && el.closest('.iw')) el.closest('.iw').classList.remove('field-err');
+  if (el) {
+    const wrapper = el.closest('.iw');
+    if (wrapper) wrapper.classList.remove('field-err');
+  }
   if (errEl) errEl.style.display = 'none';
 }
 
-// ── SQL POS list ─────────────────────────────────────────────────────────────
+// ── SQL POS list ──────────────────────────────────────────────────────────────
 const SQL_POS = new Set([
   'petpooja','Petpooja','petPooja','PetPooja','pp',
   'posist','Posist','Posist (Restroworks)','restroworks',
   'ezeepos','Ezeepos','eezeepos','eZeePOS',
-  'gofrugal','Gofrugal',
-  'websys','Websys',
-  'ciferon','Ciferon',
-  'centramation','Centramation',
-  'posify','Posify',
-  'tmbill','Tmbill','TMbill',
-  'sparrowpos',
-  'vasypos','Vasypos','Vasy pos','vasy','Vasy',
+  'gofrugal','Gofrugal','websys','Websys','ciferon','Ciferon',
+  'centramation','Centramation','posify','Posify','tmbill','Tmbill','TMbill',
+  'sparrowpos','vasypos','Vasypos','Vasy pos','vasy','Vasy',
   'sanguinepos','Sanguinepos','SANGUINEPOS','Sanguine POS',
-  'horecafox','Horecafox',
-  'allpos',
-  'digitory','Digitory',
-  'quickbill','Quickbill',
-  'binix',
-  'rista by dotpe','Rista by Dotpe','Rista By Dotpe',
-  'dotpe',
-  'lucid','Lucid','LUCID','lucidpos','Lucid Pos','lucid pos',
-  'quintapos','quinta','Quinta','quinta pos',
-  'csat','Csat','CSAT','csatpos',
-  'royalpos','Royalpos','royal','Royal','royal pos',
-  'qpos','Qpos',
-  'happyonpos',
-  'romio','Romio','romiopos',
-  'dataman',
+  'horecafox','Horecafox','allpos','digitory','Digitory',
+  'quickbill','Quickbill','binix','rista by dotpe','Rista by Dotpe','Rista By Dotpe',
+  'dotpe','lucid','Lucid','LUCID','lucidpos','Lucid Pos','lucid pos',
+  'quintapos','quinta','Quinta','quinta pos','csat','Csat','CSAT','csatpos',
+  'royalpos','Royalpos','royal','Royal','royal pos','qpos','Qpos',
+  'happyonpos','romio','Romio','romiopos','dataman',
   'billing fast pos','billingfastpos','Billingfast pos','Billingfastpos',
-  'devourin','devorin',
-  'airmenus','air menu','airmenu',
+  'devourin','devorin','airmenus','air menu','airmenu',
   'chefdeskpos','chef desk pos','chefdesk pos',
   'devoruinpos','devoruin','devoruin pos',
   'mishipay','mishipaypos','mishi pay','misipay','misi pay',
-  'abitzu',
-  'sparktech','sparktech pos'
+  'abitzu','sparktech','sparktech pos'
 ]);
 
 const SQL_MOTIVATIONAL = [
@@ -747,7 +760,6 @@ const NSQL_MOTIVATIONAL = [
 
 function isSQL(pos) {
   if (!pos) return false;
-  // Normalize: lowercase and collapse multiple spaces
   const normalized = pos.toLowerCase().trim().replace(/\s+/g, ' ');
   return SQL_POS.has(normalized);
 }
@@ -756,26 +768,13 @@ function getTodayKey() {
   const today = new Date().toISOString().slice(0, 10);
   return `sqlCount_${user?.name || 'user'}_${today}`;
 }
-
-function getSQLCount() {
-  try { return parseInt(localStorage.getItem(getTodayKey()) || '0'); } catch(e) { return 0; }
-}
-function getNSQLCount() {
-  try { return parseInt(localStorage.getItem(getTodayKey() + '_nsql') || '0'); } catch(e) { return 0; }
-}
+function getSQLCount()  { try { return parseInt(localStorage.getItem(getTodayKey()) || '0'); } catch(e) { return 0; } }
+function getNSQLCount() { try { return parseInt(localStorage.getItem(getTodayKey() + '_nsql') || '0'); } catch(e) { return 0; } }
 function incrementSQL() {
-  try {
-    const count = getSQLCount() + 1;
-    localStorage.setItem(getTodayKey(), count);
-    return count;
-  } catch(e) { return 1; }
+  try { const c = getSQLCount() + 1; localStorage.setItem(getTodayKey(), c); return c; } catch(e) { return 1; }
 }
 function incrementNSQL() {
-  try {
-    const count = getNSQLCount() + 1;
-    localStorage.setItem(getTodayKey() + '_nsql', count);
-    return count;
-  } catch(e) { return 1; }
+  try { const c = getNSQLCount() + 1; localStorage.setItem(getTodayKey() + '_nsql', c); return c; } catch(e) { return 1; }
 }
 function updateSQLBar() {
   document.getElementById('sqlCount').textContent  = getSQLCount();
@@ -799,9 +798,8 @@ function showLeadPopup(pos) {
     sub.textContent   = SQL_MOTIVATIONAL[Math.floor(Math.random() * SQL_MOTIVATIONAL.length)];
     badge.textContent = `🏆 ${count} SQL Lead${count>1?'s':''} today!`;
     badge.className   = 'lead-count sql';
-    document.getElementById('leadBox') && (document.getElementById('leadBox').style.borderTop = '4px solid var(--success)');
   } else {
-    const nsqlCount   = incrementNSQL();
+    const nsqlCount = incrementNSQL();
     updateSQLBar();
     emoji.textContent = ['😊','👍','💬','🤝','📇','🌱'][Math.floor(Math.random()*6)];
     title.textContent = 'Entry Saved!';
@@ -813,13 +811,9 @@ function showLeadPopup(pos) {
       : `📋 ${nsqlCount} NSQL so far — keep going for that SQL! 💪`;
     badge.className   = 'lead-count nsql';
   }
-
   document.getElementById('leadPopup').classList.add('show');
 }
-
-function closeLeadPopup() {
-  document.getElementById('leadPopup').classList.remove('show');
-}
+function closeLeadPopup() { document.getElementById('leadPopup').classList.remove('show'); }
 
 function setPS(n) {
   for(let i=1;i<=3;i++){
