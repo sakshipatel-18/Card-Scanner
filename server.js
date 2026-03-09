@@ -32,6 +32,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
   const outletName = req.body.outletName || '';
   const storeCount = req.body.storeCount || '';
   const comments   = req.body.comments   || '';
+  const intentToBuy = req.body.intentToBuy || '';
 
   try {
     let cardData = {};
@@ -48,6 +49,10 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
         designation:     req.body.designation || '',
         phone:           req.body.phone       || '',
         city:            req.body.city        || '',
+        pos:             req.body.pos         || '',
+        storeCount:      req.body.storeCount  || '',
+        comments:        req.body.comments    || '',
+        intentToBuy:     req.body.intentToBuy || '',
         department: '', email: '', alternatePhone: '',
         website: '', address: '', state: '', country: '',
         pincode: ''
@@ -85,6 +90,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
     cardData.outletName = outletName;
     cardData.storeCount = storeCount || cardData.storeCount || '';
     cardData.comments   = comments;
+    cardData.intentToBuy = intentToBuy || cardData.intentToBuy || '';
 
     // ── If extractOnly: return for review, don't save ─────────────────
     if (extractOnly) {

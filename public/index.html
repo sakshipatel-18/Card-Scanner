@@ -206,40 +206,36 @@
     <div class="row2" style="margin-top:10px">
       <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0" required/></div>
     <span class="err-msg" id="err-m-storeCount"></span>
-      <div class="iw nomb"></div>
+      <div class="iw nomb">
+        <span class="ii">🎯</span>
+        <select id="m-intent" oninput="clearErr('m-intent')" style="flex:1;border:none;background:transparent;font-size:15px;color:var(--text);outline:none;">
+          <option value="">Intent to Buy *</option>
+          <option value="High">🔥 High</option>
+          <option value="Medium">🌤 Medium</option>
+          <option value="Low">❄️ Low</option>
+        </select>
+      </div>
+    <span class="err-msg" id="err-m-intent"></span>
     </div>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
     <button class="btn btn-p" onclick="submitManual()" style="margin-top:12px">📤 Submit Entry</button>
   </div>
 
-  <!-- ── SCAN FORM ── -->
+  <!-- ── SCAN FORM — just upload ── -->
   <div class="card" id="secScanForm" style="display:none">
-    <div class="card-title">Scan Details</div>
-    <div class="row2">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="s-pos" oninput="clearErr('s-pos')" placeholder="POS Name *" required/></div>
-    <span class="err-msg" id="err-s-pos"></span>
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="s-outlets" oninput="clearErr('s-outlets')" placeholder="Number of Outlets *" min="0" required/></div>
-    <span class="err-msg" id="err-s-outlets"></span>
-    </div>
-    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="s-comments" placeholder="Additional comments (optional)..."></textarea></div>
-  </div>
-
-  <!-- Upload -->
-  <div class="card" id="secUpload" style="display:none">
-    <div class="card-title">Upload Business Card</div>
+    <div class="card-title">Scan a Card</div>
     <div id="prevWrap">
       <img id="prevImg" src="" alt=""/>
       <div class="prev-bar"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">✕</button></div>
     </div>
     <div class="dz" id="dz" onclick="document.getElementById('fp').click()">
       <span class="dz-icon">📷</span>
-      <div class="dz-main">Click to upload or drag & drop</div>
+      <div class="dz-main">Tap to browse or use camera</div>
       <div class="dz-sub">JPG, PNG, WEBP · Max 10MB</div>
     </div>
-    <div class="or">or</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <button class="btn btn-o btn-sm" onclick="document.getElementById('fp').click()">📁 Gallery</button>
-      <button class="btn btn-o btn-sm" onclick="document.getElementById('cam').click()">📸 Camera</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('fp').click()">📁 Browse</button>
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('cam').click()">📸 Scan Now</button>
     </div>
     <input type="file" id="fp" accept="image/*"/>
     <input type="file" id="cam" accept="image/*" capture="environment"/>
@@ -288,8 +284,18 @@
       <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
       <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
-      <div class="eg1"><div class="el">🏪 POS</div><input type="text" id="e-pos" placeholder="POS"/></div>
-      <div class="eg1"><div class="el">🔢 Store Count</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0"/></div>
+      <div class="eg1"><div class="el">🏪 POS *</div><input type="text" id="e-pos" placeholder="POS" required/></div>
+      <div class="eg1"><div class="el">🔢 Store Count *</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0" required/></div>
+      <div class="eg1">
+        <div class="el">🎯 Intent to Buy *</div>
+        <select id="e-intent" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text);outline:none;">
+          <option value="">Select intent...</option>
+          <option value="High">🔥 High</option>
+          <option value="Medium">🌤 Medium</option>
+          <option value="Low">❄️ Low</option>
+        </select>
+      </div>
+      <div class="eg2"><div class="el">💬 Comments</div><textarea id="e-comments" placeholder="Additional comments..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:70px;"></textarea></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
@@ -450,6 +456,8 @@ async function submitManual() {
   const city        = document.getElementById('m-city').value.trim();
   const storeCount  = document.getElementById('m-storeCount').value.trim();
 
+  const intent      = document.getElementById('m-intent').value;
+
   // Validate all required fields
   if (!personName)  return showFieldError('m-personName',  'Person Name is required');
   if (!phone)       return showFieldError('m-phone',       'Phone Number is required');
@@ -459,6 +467,7 @@ async function submitManual() {
   if (!pos)         return showFieldError('m-pos',         'POS is required');
   if (!city)        return showFieldError('m-city',        'City is required');
   if (!storeCount)  return showFieldError('m-storeCount',  'Store Count is required');
+  if (!intent)      return showFieldError('m-intent',      'Intent to Buy is required');
 
   hideAll(); document.getElementById('secSaving').style.display = 'block';
 
@@ -471,6 +480,7 @@ async function submitManual() {
     pos:         document.getElementById('m-pos').value.trim(),
     storeCount:  document.getElementById('m-storeCount').value.trim(),
     comments:    document.getElementById('m-comments').value.trim(),
+    intentToBuy: document.getElementById('m-intent').value,
     manualOnly:  'true',
     scannerName:  user.name,
     scannerEmail: user.email
@@ -491,11 +501,7 @@ async function submitManual() {
 
 // ── SCAN: extract only ────────────────────────────────────────────────────────
 async function doScan() {
-  const pos     = document.getElementById('s-pos').value.trim();
-  const outlets = document.getElementById('s-outlets').value.trim();
-  if (!pos)     return showFieldError('s-pos',     'POS Name is required');
-  if (!outlets) return showFieldError('s-outlets', 'Number of Outlets is required');
-  if (!file) return showFieldError('dz', 'Please upload a card photo');
+  if (!file) return showError('Please select a card photo first');
   hideAll(); document.getElementById('secProgress').style.display = 'block';
   setPS(1);
 
@@ -525,11 +531,6 @@ function showReview(cardData) {
     const el = document.getElementById('e-'+f);
     if(el) el.value = cardData[f] || '';
   });
-  // Pre-fill POS and Store Count from the scan detail fields
-  const posEl   = document.getElementById('e-pos');
-  const scEl    = document.getElementById('e-storeCount');
-  if (posEl && !posEl.value)  posEl.value   = document.getElementById('s-pos').value.trim();
-  if (scEl  && !scEl.value)   scEl.value    = document.getElementById('s-outlets').value.trim();
   if (file) {
     const r = new FileReader();
     r.onload = e => {
@@ -549,12 +550,18 @@ function goRescan() {
   document.getElementById('secReview').style.display   = 'none';
   document.getElementById('secMode').style.display     = 'block';
   document.getElementById('secScanForm').style.display = 'block';
-  document.getElementById('secUpload').style.display   = 'block';
   removeImg();
 }
 
 // ── SCAN SUBMIT: save with edited data ────────────────────────────────────────
 async function submitScan() {
+  const pos        = document.getElementById('e-pos')?.value.trim();
+  const storeCount = document.getElementById('e-storeCount')?.value.trim();
+  const intent     = document.getElementById('e-intent')?.value;
+  if (!pos)        return showError('POS is required');
+  if (!storeCount) return showError('Store Count is required');
+  if (!intent)     return showError('Intent to Buy is required');
+
   const editedCard = {};
   CARD_FIELDS.forEach(f => {
     const el = document.getElementById('e-'+f);
@@ -568,10 +575,11 @@ async function submitScan() {
     if(file) fd.append('card', file);
     fd.append('scannerName',  user.name);
     fd.append('scannerEmail', user.email);
-    fd.append('pos',          document.getElementById('e-pos')?.value.trim() || document.getElementById('s-pos').value.trim());
-    fd.append('outletName',   document.getElementById('e-storeCount')?.value.trim() || document.getElementById('s-outlets').value.trim());
-    fd.append('storeCount',   document.getElementById('e-storeCount')?.value.trim() || document.getElementById('s-outlets').value.trim());
-    fd.append('comments',     document.getElementById('s-comments').value.trim());
+    fd.append('pos',          pos);
+    fd.append('storeCount',   storeCount);
+    fd.append('outletName',   storeCount);
+    fd.append('comments',     document.getElementById('e-comments')?.value.trim() || '');
+    fd.append('intentToBuy',  intent);
     fd.append('saveOnly',     'true');
     fd.append('editedCard',   JSON.stringify(editedCard));
 
@@ -623,7 +631,9 @@ function reset() {
   scannedCardData = null; mode = null;
   removeImg();
   ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments',
-   's-pos','s-outlets','s-comments'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+   'e-pos','e-storeCount','e-comments'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const mi = document.getElementById('m-intent'); if(mi) mi.value='';
+  const ei = document.getElementById('e-intent'); if(ei) ei.value='';
   document.getElementById('tabManual').classList.remove('active');
   document.getElementById('tabScan').classList.remove('active');
   document.getElementById('reviewPhoto').style.display    = 'none';
@@ -634,7 +644,7 @@ function reset() {
 }
 
 function hideAll() {
-  ['secManual','secScanForm','secUpload','secProgress','secSaving','secReview','secResults']
+  ['secManual','secScanForm','secProgress','secSaving','secReview','secResults']
     .forEach(id => document.getElementById(id).style.display = 'none');
 }
 
