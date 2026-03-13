@@ -476,9 +476,73 @@ function checkPOSThenSubmitScan() {
 }
 async function submitScan() {
   const editedCard = {};
-  CARD_FIELDS.forEach(f => { const el = document.getElementById('e-'+f); editedCard[f] = el ? el.value.trim() : ''; });
-  hideAll(); document.getElementById('secSaving').style.display = 'block';
-  await saveToSheet({ ...editedCard, intentToBuy: document.getElementById('e-intent').value, comments: document.getElementById('e-comments').value.trim(), scannerName: user.name, scannerEmail: user.email, scannedAt: new Date().toLocaleString('en-IN') });
+  CARD_FIELDS.forEach(f => {
+    const el = document.getElementById('e-' + f);
+    editedCard[f] = el ? el.value.trim() : '';
+  });
+  editedCard.intentToBuy = document.getElementById('e-intent').value;
+  editedCard.comments    = document.getElementById('e-comments').value.trim();
+
+  hideAll();
+  document.getElementById('secSaving').style.display = 'block';
+
+  // Route through backend so image gets saved to Drive
+  const fd = new FormData();
+  fd.append('saveOnly',    'true');
+  fd.append('editedCard',  JSON.stringify(editedCard));
+  fd.append('scannerName', user.name);
+  fd.append('scannerEmail',user.email);
+
+  if (compressedBase64) {
+    const byteString = atob(compressedBase64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+    const blob = new Blob([ab], { type: 'image/jpeg' });
+    fd.append('card', blob, 'card.jpg');
+  }
+
+  let success = false, sheetMessage = '';
+  try {
+    const res  = await fetch('/api/scan', { method: 'POST', body: fd });
+    const data = await res.json();
+    success      = data.sheetSuccess === true;
+    sheetMessage = data.sheetMessage || '';
+  } catch(e) { success = false; }
+
+  if (success) {
+    if (isSQL(editedCard.pos || '')) { localSqlCount++;  }
+    else                             { localNsqlCount++; }
+    renderCounts(localSqlCount, localNsqlCount);
+  }
+
+  document.getElementById('secSaving').style.display = 'none';
+
+  const rows = [
+    ['👤 Person',      editedCard.personName],
+    ['🏢 Brand',       editedCard.brandName],
+    ['💼 Designation', editedCard.designation],
+    ['📞 Phone',       editedCard.phone],
+    ['✉️ Email',       editedCard.email],
+    ['🏙️ City',        editedCard.city],
+    ['🌐 Website',     editedCard.website],
+    ['🏪 POS',         editedCard.pos],
+    ['🔢 Store Count', editedCard.storeCount],
+    ['🎯 Intent',      editedCard.intentToBuy],
+    ['💬 Comments',    editedCard.comments],
+    ['👤 Scanned By',  user.name]
+  ];
+  document.getElementById('resultsGrid').innerHTML = rows
+    .filter(([,v]) => v)
+    .map(([l,v]) => `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`)
+    .join('');
+
+  const b = document.getElementById('badge');
+  b.className = success ? 'badge bok' : 'badge berr';
+  b.innerHTML = success ? '✅ Saved to Google Sheets & Drive!' : '⚠️ Could not save — check connection';
+
+  document.getElementById('secResults').style.display = 'block';
+  setTimeout(() => showLeadPopup(editedCard.pos || ''), 400);
 }
 
 // ── SQL POS LIST ──────────────────────────────────────────────────────────────
@@ -600,18 +664,54 @@ async function submitManual() {
 
 async function saveToSheet(payload) {
   let success = false;
-  try { const res = await fetch(APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)}); const data = await res.json(); success = data.success===true; } catch(e){}
-  if (success) { if(isSQL(payload.pos||'')){localSqlCount++;}else{localNsqlCount++;} renderCounts(localSqlCount,localNsqlCount); }
+  // Fix field names to match what Apps Script expects
+  const appsPayload = {
+    ...payload,
+    scannedBy:     payload.scannerName,
+    scannedEmail:  payload.scannerEmail,
+    scannerFolder: payload.scannerName,
+    scannedAt:     payload.scannedAt || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+  };
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(appsPayload) });
+    const data = await res.json();
+    success = data.success === true;
+  } catch(e) { success = false; }
+
+  if (success) {
+    if (isSQL(payload.pos || '')) { localSqlCount++;  }
+    else                          { localNsqlCount++; }
+    renderCounts(localSqlCount, localNsqlCount);
+  }
+
   document.getElementById('secSaving').style.display = 'none';
-  const rows=[['Person',payload.personName],['Brand',payload.brandName],['Designation',payload.designation],['Phone',payload.phone],['Email',payload.email],['City',payload.city],['Website',payload.website],['POS',payload.pos],['Store Count',payload.storeCount],['Intent',payload.intentToBuy],['Comments',payload.comments],['Scanned By',payload.scannerName]];
-  document.getElementById('resultsGrid').innerHTML = rows.filter(([,v])=>v).map(([l,v])=>`<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`).join('');
+
+  const rows = [
+    ['👤 Person',     payload.personName],
+    ['🏢 Brand',      payload.brandName],
+    ['💼 Designation',payload.designation],
+    ['📞 Phone',      payload.phone],
+    ['✉️ Email',      payload.email],
+    ['🏙️ City',       payload.city],
+    ['🌐 Website',    payload.website],
+    ['🏪 POS',        payload.pos],
+    ['🔢 Store Count',payload.storeCount],
+    ['🎯 Intent',     payload.intentToBuy],
+    ['💬 Comments',   payload.comments],
+    ['👤 Scanned By', payload.scannerName]
+  ];
+  document.getElementById('resultsGrid').innerHTML = rows
+    .filter(([,v]) => v)
+    .map(([l,v]) => `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`)
+    .join('');
+
   const b = document.getElementById('badge');
   b.className = success ? 'badge bok' : 'badge berr';
-  b.innerHTML = success ? 'Saved to Google Sheets!' : 'Could not save - check connection';
-  document.getElementById('secResults').style.display = 'block';
-  setTimeout(() => showLeadPopup(payload.pos||''), 400);
-}
+  b.innerHTML = success ? '✅ Saved to Google Sheets!' : '⚠️ Could not save — check connection';
 
+  document.getElementById('secResults').style.display = 'block';
+  setTimeout(() => showLeadPopup(payload.pos || ''), 400);
+}
 function renderCounts(sql,nsql) { document.getElementById('sqlCount').textContent=sql; document.getElementById('nsqlCount').textContent=nsql; document.getElementById('sqlBar').classList.add('show'); }
 async function fetchAndUpdateCounts() {
   if (!user) return;
