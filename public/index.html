@@ -80,7 +80,7 @@
   .r1{grid-column:span 1;}.r2{grid-column:span 2;}
   .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
   .rv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;min-height:34px;word-break:break-word;}
-  .rv:empty::after{content:'—';color:#b2e0e0;}
+  .rv:empty::after{content:'--';color:#b2e0e0;}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:13px;}
   .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
   .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
@@ -112,50 +112,46 @@
   @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-16px)}70%{transform:translateY(-8px)}}
   .err-msg{font-size:12px;color:var(--error);margin-top:4px;display:none;font-weight:500;}
   .field-err input,.field-err select,.field-err textarea{border-color:var(--error)!important;box-shadow:0 0 0 3px rgba(225,29,72,.12)!important;}
-
-  /* POS Suggestion popup */
+  /* POS Popup */
   .pos-popup{position:fixed;inset:0;z-index:2000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
   .pos-popup.show{opacity:1;pointer-events:all;}
-  .pos-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);}
+  .pos-box{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:82vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,0,.67,0);}
   .pos-popup.show .pos-box{transform:translateY(0);}
   .pos-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
   .pos-box-title{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--text);}
   .pos-box-sub{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.45;}
+  .pos-section-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
   .pos-suggestions{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
   .pos-sug-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:8px;}
-  .pos-sug-btn:hover{border-color:var(--accent);background:var(--accentlt);color:var(--accent);}
-  /* All SQL POS list inside popup */
-  .pos-all-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+  .pos-sug-btn:hover,.pos-sug-btn.selected{border-color:var(--accent);background:var(--accentlt);color:var(--accent);}
+  .pos-all-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
   .pos-all-chip{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 11px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s;}
-  .pos-all-chip:hover{border-color:var(--accent);background:var(--accentlt);color:var(--accent);}
-  .pos-section-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-  .pos-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
-  .pos-keep-btn{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;}
-  .pos-keep-btn:hover{border-color:#d97706;color:#d97706;}
-  .pos-cancel-btn{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--error);cursor:pointer;transition:all .2s;}
-  .pos-cancel-btn:hover{border-color:var(--error);background:#fff5f5;}
+  .pos-all-chip:hover,.pos-all-chip.selected{border-color:var(--accent);background:var(--accentlt);color:var(--accent);}
+  .pos-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;position:sticky;bottom:0;background:#fff;padding-top:10px;}
+  .pos-keep-btn{background:#fff;border:1.5px solid #fcd34d;border-radius:9px;padding:12px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#d97706;cursor:pointer;transition:all .2s;}
+  .pos-keep-btn:hover{background:#fefce8;}
+  .pos-use-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:12px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:all .2s;opacity:.35;pointer-events:none;}
+  .pos-use-btn.ready{opacity:1;pointer-events:all;box-shadow:0 4px 12px rgba(13,148,136,.3);}
   input[type=file]{display:none;}
   @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <header>
-    <div class="logo"><div class="logo-icon">🪪</div><span class="logo-text">Card Scanner</span></div>
-    <p>Scan business cards · Save to Google Sheets instantly</p>
+    <div class="logo"><div class="logo-icon">&#128667;</div><span class="logo-text">Card Scanner</span></div>
+    <p>Scan business cards &middot; Save to Google Sheets instantly</p>
   </header>
 
-  <!-- IDENTITY -->
   <div class="card" id="secIdentity">
     <div class="card-title">Your Identity</div>
     <div id="idForm">
       <div class="row2">
-        <div class="iw nomb"><span class="ii">👤</span><input type="text" id="inName" placeholder="Your full name"/></div>
-        <div class="iw nomb"><span class="ii">✉️</span><input type="email" id="inEmail" placeholder="Your email"/></div>
+        <div class="iw nomb"><span class="ii">&#128100;</span><input type="text" id="inName" placeholder="Your full name"/></div>
+        <div class="iw nomb"><span class="ii">&#9993;&#65039;</span><input type="email" id="inEmail" placeholder="Your email"/></div>
       </div>
-      <button class="btn btn-p" id="btnContinue" onclick="saveIdentity()" disabled style="margin-top:10px">Continue →</button>
-      <p style="font-size:12px;color:var(--muted);margin-top:7px;">ℹ️ Remembered on this device</p>
+      <button class="btn btn-p" id="btnContinue" onclick="saveIdentity()" disabled style="margin-top:10px">Continue &rarr;</button>
+      <p style="font-size:12px;color:var(--muted);margin-top:7px;">&#8505;&#65039; Remembered on this device</p>
     </div>
     <div class="pill" id="userPill">
       <div class="avatar" id="userInitial"></div>
@@ -164,193 +160,170 @@
     </div>
   </div>
 
-  <!-- SQL/NSQL Bar -->
   <div class="sql-bar" id="sqlBar">
     <div class="sql-pill sql-side">
       <span class="sql-pill-num" id="sqlCount">0</span>
-      <div class="sql-pill-info">
-        <span class="sql-pill-label">🎯 SQL</span>
-        <span class="sql-pill-sub">Today's leads</span>
-      </div>
+      <div class="sql-pill-info"><span class="sql-pill-label">&#127919; SQL</span><span class="sql-pill-sub">Today's leads</span></div>
     </div>
     <div class="sql-pill nsql-side">
       <span class="sql-pill-num" id="nsqlCount">0</span>
-      <div class="sql-pill-info">
-        <span class="sql-pill-label">📋 NSQL</span>
-        <span class="sql-pill-sub">Today's entries</span>
-      </div>
+      <div class="sql-pill-info"><span class="sql-pill-label">&#128203; NSQL</span><span class="sql-pill-sub">Today's entries</span></div>
     </div>
   </div>
 
-  <!-- MODE SELECTOR -->
   <div id="secMode" style="display:none">
     <div class="mode-tabs">
       <div class="mode-tab" id="tabManual" onclick="setMode('manual')">
-        <div class="mt-icon">✏️</div>
+        <div class="mt-icon">&#9999;&#65039;</div>
         <div class="mt-title">Enter Manually</div>
         <div class="mt-sub">Type details directly</div>
       </div>
       <div class="mode-tab" id="tabScan" onclick="setMode('scan')">
-        <div class="mt-icon">📷</div>
+        <div class="mt-icon">&#128247;</div>
         <div class="mt-title">Scan a Card</div>
-        <div class="mt-sub">Capture & auto-extract</div>
+        <div class="mt-sub">Capture &amp; auto-extract</div>
       </div>
     </div>
   </div>
 
-  <!-- MANUAL ENTRY FORM -->
   <div class="card" id="secManual" style="display:none">
     <div class="card-title">Manual Entry</div>
     <div class="row2">
-      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *"/></div>
-      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" maxlength="10"/></div>
+      <div class="iw nomb"><span class="ii">&#128100;</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *"/></div>
+      <div class="iw nomb"><span class="ii">&#128222;</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" maxlength="10"/></div>
     </div>
     <span class="err-msg" id="err-m-personName"></span>
     <span class="err-msg" id="err-m-phone"></span>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *"/></div>
-      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *"/></div>
+      <div class="iw nomb"><span class="ii">&#127970;</span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *"/></div>
+      <div class="iw nomb"><span class="ii">&#128188;</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *"/></div>
     </div>
     <span class="err-msg" id="err-m-brandName"></span>
     <span class="err-msg" id="err-m-designation"></span>
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *"/></div>
-      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *"/></div>
+      <div class="iw nomb"><span class="ii">&#127978;</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *"/></div>
+      <div class="iw nomb"><span class="ii">&#127961;&#65039;</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *"/></div>
     </div>
     <span class="err-msg" id="err-m-pos"></span>
     <span class="err-msg" id="err-m-city"></span>
-
-    <!-- ✅ FIX 1: Intent to Buy in Manual — now uses same .iw wrapper style as other fields -->
     <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0"/></div>
+      <div class="iw nomb"><span class="ii">&#128290;</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0"/></div>
       <div class="iw nomb">
-        <span class="ii">🎯</span>
+        <span class="ii">&#127919;</span>
         <select id="m-intent" onchange="clearErr('m-intent')">
           <option value="">Intent to Buy *</option>
-          <option value="Hot">🔥 Hot</option>
-          <option value="Warm">🌤 Warm</option>
+          <option value="Hot">&#128293; Hot</option>
+          <option value="Warm">&#127780; Warm</option>
         </select>
       </div>
     </div>
     <span class="err-msg" id="err-m-storeCount"></span>
     <span class="err-msg" id="err-m-intent"></span>
-
-    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
-    <button class="btn btn-p" onclick="checkPOSThenSubmit()" style="margin-top:12px">📤 Submit Entry</button>
+    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">&#128172;</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
+    <button class="btn btn-p" onclick="checkPOSThenSubmit()" style="margin-top:12px">&#128228; Submit Entry</button>
   </div>
 
-  <!-- SCAN FORM -->
   <div class="card" id="secScanForm" style="display:none">
     <div class="card-title">Scan a Card</div>
     <div id="prevWrap">
       <img id="prevImg" src="" alt=""/>
-      <div class="prev-bar"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">✕</button></div>
+      <div class="prev-bar"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">&#10005;</button></div>
     </div>
     <div class="dz" id="dz" onclick="document.getElementById('fp').click()">
-      <span class="dz-icon">📷</span>
+      <span class="dz-icon">&#128247;</span>
       <div class="dz-main">Tap to browse or use camera</div>
-      <div class="dz-sub">JPG, PNG, WEBP · Auto-compressed before scan</div>
+      <div class="dz-sub">JPG, PNG, WEBP &middot; Auto-compressed before scan</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-      <button class="btn btn-o btn-sm" onclick="var i=document.getElementById('fp');i.removeAttribute('capture');i.click()">📁 Browse</button>
-      <button class="btn btn-o btn-sm" onclick="document.getElementById('cam').click()">📸 Camera</button>
+      <button class="btn btn-o btn-sm" onclick="var i=document.getElementById('fp');i.removeAttribute('capture');i.click()">&#128193; Browse</button>
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('cam').click()">&#128248; Camera</button>
     </div>
     <input type="file" id="fp" accept="image/*"/>
     <input type="file" id="cam" accept="image/*" capture="environment"/>
-    <button class="btn btn-p" id="scanBtn" onclick="doScan()" disabled style="margin-top:12px">🔍 Scan Card</button>
+    <button class="btn btn-p" id="scanBtn" onclick="doScan()" disabled style="margin-top:12px">&#128269; Scan Card</button>
   </div>
 
-  <!-- PROGRESS -->
   <div class="card" id="secProgress" style="display:none">
     <div class="prog-wrap">
-      <div class="scan-anim"><div class="scan-icon-box">🪪</div><div class="scan-line"></div></div>
+      <div class="scan-anim"><div class="scan-icon-box">&#128667;</div><div class="scan-line"></div></div>
       <div class="psteps">
-        <div class="ps" id="ps1">⚡ Compressing image...</div>
-        <div class="ps" id="ps2">🤖 Reading card with Claude AI...</div>
-        <div class="ps" id="ps3">📊 Preparing data...</div>
+        <div class="ps" id="ps1">&#9889; Compressing image...</div>
+        <div class="ps" id="ps2">&#129302; Reading card with Claude AI...</div>
+        <div class="ps" id="ps3">&#128202; Preparing data...</div>
       </div>
     </div>
   </div>
 
-  <!-- SAVING PROGRESS -->
   <div class="card" id="secSaving" style="display:none">
     <div class="prog-wrap">
-      <div class="scan-anim"><div class="scan-icon-box">📊</div><div class="scan-line"></div></div>
+      <div class="scan-anim"><div class="scan-icon-box">&#128202;</div><div class="scan-line"></div></div>
       <div class="psteps">
-        <div class="ps active pulse">📊 Saving to Google Sheets...</div>
+        <div class="ps active pulse">&#128202; Saving to Google Sheets...</div>
       </div>
     </div>
   </div>
 
-  <!-- REVIEW & EDIT -->
   <div class="card" id="secReview" style="display:none">
-    <div class="card-title">Review & Edit</div>
+    <div class="card-title">Review &amp; Edit</div>
     <img id="reviewPhoto" class="review-photo" src="" alt="Card"/>
     <div class="eg">
-      <div class="eg2"><div class="el">🏢 Brand / Company *</div><input type="text" id="e-brandName" placeholder="Brand Name"/></div>
-      <div class="eg1"><div class="el">👤 Person Name *</div><input type="text" id="e-personName" placeholder="Person Name"/></div>
-      <div class="eg1"><div class="el">💼 Designation *</div><input type="text" id="e-designation" placeholder="Designation"/></div>
-      <div class="eg1"><div class="el">🏬 Department</div><input type="text" id="e-department" placeholder="Department"/></div>
-      <div class="eg1"><div class="el">📞 Phone *</div><input type="text" id="e-phone" placeholder="Phone"/></div>
-      <div class="eg1"><div class="el">📱 Alt Phone</div><input type="text" id="e-alternatePhone" placeholder="Alt Phone"/></div>
-      <div class="eg2"><div class="el">✉️ Email</div><input type="text" id="e-email" placeholder="Email"/></div>
-      <div class="eg2"><div class="el">🌐 Website</div><input type="text" id="e-website" placeholder="Website"/></div>
-      <div class="eg2"><div class="el">📍 Address</div><input type="text" id="e-address" placeholder="Address"/></div>
-      <div class="eg1"><div class="el">🏙️ City *</div><input type="text" id="e-city" placeholder="City"/></div>
-      <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
-      <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
+      <div class="eg2"><div class="el">&#127970; Brand / Company *</div><input type="text" id="e-brandName" placeholder="Brand Name"/></div>
+      <div class="eg1"><div class="el">&#128100; Person Name *</div><input type="text" id="e-personName" placeholder="Person Name"/></div>
+      <div class="eg1"><div class="el">&#128188; Designation *</div><input type="text" id="e-designation" placeholder="Designation"/></div>
+      <div class="eg1"><div class="el">&#127978; Department</div><input type="text" id="e-department" placeholder="Department"/></div>
+      <div class="eg1"><div class="el">&#128222; Phone *</div><input type="text" id="e-phone" placeholder="Phone"/></div>
+      <div class="eg1"><div class="el">&#128241; Alt Phone</div><input type="text" id="e-alternatePhone" placeholder="Alt Phone"/></div>
+      <div class="eg2"><div class="el">&#9993;&#65039; Email</div><input type="text" id="e-email" placeholder="Email"/></div>
+      <div class="eg2"><div class="el">&#127760; Website</div><input type="text" id="e-website" placeholder="Website"/></div>
+      <div class="eg2"><div class="el">&#128205; Address</div><input type="text" id="e-address" placeholder="Address"/></div>
+      <div class="eg1"><div class="el">&#127961;&#65039; City *</div><input type="text" id="e-city" placeholder="City"/></div>
+      <div class="eg1"><div class="el">&#128204; State</div><input type="text" id="e-state" placeholder="State"/></div>
+      <div class="eg1"><div class="el">&#127758; Country</div><input type="text" id="e-country" placeholder="Country"/></div>
       <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
-      <div class="eg1"><div class="el">🏪 POS *</div><input type="text" id="e-pos" placeholder="POS"/></div>
-      <div class="eg1"><div class="el">🔢 Store Count *</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0"/></div>
+      <div class="eg1"><div class="el">&#127978; POS *</div><input type="text" id="e-pos" placeholder="POS"/></div>
+      <div class="eg1"><div class="el">&#128290; Store Count *</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0"/></div>
       <div class="eg1">
-        <div class="el">🎯 Intent to Buy *</div>
+        <div class="el">&#127919; Intent to Buy *</div>
         <select id="e-intent">
           <option value="">Select intent...</option>
-          <option value="Hot">🔥 Hot</option>
-          <option value="Warm">🌤 Warm</option>
+          <option value="Hot">&#128293; Hot</option>
+          <option value="Warm">&#127780; Warm</option>
         </select>
       </div>
-      <div class="eg2"><div class="el">💬 Comments</div><textarea id="e-comments" placeholder="Additional comments..."></textarea></div>
+      <div class="eg2"><div class="el">&#128172; Comments</div><textarea id="e-comments" placeholder="Additional comments..."></textarea></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
-      <!-- ✅ FIX 3: Scan submit now also goes through POS check popup -->
-      <button class="btn btn-p" onclick="checkPOSThenSubmitScan()">✅ Submit</button>
+      <button class="btn btn-o" onclick="goRescan()">&#128260; Re-scan</button>
+      <button class="btn btn-p" onclick="checkPOSThenSubmitScan()">&#9989; Submit</button>
     </div>
   </div>
 
-  <!-- RESULTS -->
   <div id="secResults" style="display:none">
     <div id="badge" class="badge"></div>
     <div class="card">
       <div class="card-title">Saved Successfully</div>
       <div class="rg" id="resultsGrid"></div>
     </div>
-    <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 New Entry</button>
+    <button class="btn btn-p" onclick="reset()" style="margin-top:4px">&#128260; New Entry</button>
   </div>
 
-  <p class="footer">Card Scanner · Powered by Claude AI · Saves to Google Sheets</p>
+  <p class="footer">Card Scanner &middot; Powered by Claude AI &middot; Saves to Google Sheets</p>
 
   <!-- POS Suggestion Popup -->
   <div class="pos-popup" id="posPopup">
     <div class="pos-box">
       <div class="pos-drag"></div>
-      <div class="pos-box-title">⚠️ POS Not Recognised</div>
+      <div class="pos-box-title">&#9888;&#65039; POS Not Recognised</div>
       <div class="pos-box-sub" id="posPopupSub"></div>
-
-      <!-- Close matches shown first if any -->
       <div id="posSuggestionsWrap" style="display:none">
-        <div class="pos-section-label">🔍 Close matches</div>
+        <div class="pos-section-label">&#128269; Close matches</div>
         <div class="pos-suggestions" id="posSuggestions"></div>
       </div>
-
-      <!-- Full SQL POS list always shown -->
-      <div class="pos-section-label" style="margin-top:4px">📋 All SQL POS options</div>
+      <div class="pos-section-label" style="margin-top:4px">&#128203; All SQL POS &mdash; tap to select</div>
       <div class="pos-all-list" id="posAllList"></div>
-
       <div class="pos-actions">
-        <button class="pos-cancel-btn" onclick="closePosPopup()">✕ Cancel</button>
-        <button class="pos-keep-btn" onclick="keepAsNSQL()">📋 Keep as NSQL</button>
+        <button class="pos-keep-btn" onclick="keepAsNSQL()">&#128203; Keep as NSQL</button>
+        <button class="pos-use-btn" id="posUseBtn" onclick="confirmSelectedPOS()">&#9989; Select POS</button>
       </div>
     </div>
   </div>
@@ -362,71 +335,48 @@
       <div class="lead-title" id="leadTitle"></div>
       <div class="lead-sub" id="leadSub"></div>
       <div class="lead-count" id="leadCountBadge"></div>
-      <button class="lead-close" onclick="closeLeadPopup()">Continue 🚀</button>
+      <button class="lead-close" onclick="closeLeadPopup()">Continue &#128640;</button>
     </div>
   </div>
 </div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjPt3qb3DpOfIIqtv4csjy0VvfABXFqKnjxyqN1TgfNXOGSeJwms-Zs82LZGlhnNlQLw/exec';
-
-// ── STATE ─────────────────────────────────────────────────────────────────────
 let user = null, compressedBase64 = null, compressedDataUrl = null;
+let localSqlCount = 0, localNsqlCount = 0;
+const CARD_FIELDS = ['brandName','personName','designation','department','email','phone','alternatePhone','website','address','city','state','country','pincode','pos','storeCount'];
 
-// ✅ FIX 2: Local session counters — source of truth for the SQL/NSQL bar
-// These are incremented immediately after every successful save.
-// Apps Script counts are fetched on login and every 30s, but only used if > local.
-let localSqlCount  = 0;
-let localNsqlCount = 0;
-
-const CARD_FIELDS = ['brandName','personName','designation','department','email','phone',
-  'alternatePhone','website','address','city','state','country','pincode','pos','storeCount'];
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
   document.getElementById('inName').addEventListener('input', checkId);
   document.getElementById('inEmail').addEventListener('input', checkId);
-  ['inName','inEmail'].forEach(id =>
-    document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); })
-  );
+  ['inName','inEmail'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); }));
   const phoneEl = document.getElementById('m-phone');
-  ['input','keyup','change'].forEach(ev => phoneEl.addEventListener(ev, () => {
-    phoneEl.value = phoneEl.value.replace(/[^0-9]/g,'').slice(0,10);
-  }));
-  document.getElementById('fp').addEventListener('change',  e => { if(e.target.files[0]) setFile(e.target.files[0]); });
+  ['input','keyup','change'].forEach(ev => phoneEl.addEventListener(ev, () => { phoneEl.value = phoneEl.value.replace(/[^0-9]/g,'').slice(0,10); }));
+  document.getElementById('fp').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
   document.getElementById('cam').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
   const dz = document.getElementById('dz');
   ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
   ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
   dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) setFile(f); });
-
-  // Build the full SQL POS chip list in the popup once on load
   buildPosAllList();
 });
 
-// ── IDENTITY ──────────────────────────────────────────────────────────────────
-function checkId() {
-  document.getElementById('btnContinue').disabled =
-    !(document.getElementById('inName').value.trim() && document.getElementById('inEmail').value.trim());
-}
+function checkId() { document.getElementById('btnContinue').disabled = !(document.getElementById('inName').value.trim() && document.getElementById('inEmail').value.trim()); }
 function saveIdentity() {
-  const name  = document.getElementById('inName').value.trim();
-  const email = document.getElementById('inEmail').value.trim();
-  if(!name || !email) return;
+  const name = document.getElementById('inName').value.trim(), email = document.getElementById('inEmail').value.trim();
+  if(!name||!email) return;
   try { localStorage.setItem('cardScanUser', JSON.stringify({name,email})); } catch(e){}
   applyUser({name,email});
 }
 function applyUser(u) {
   user = u;
-  document.getElementById('pillName').textContent    = u.name;
-  document.getElementById('pillEmail').textContent   = u.email;
+  document.getElementById('pillName').textContent = u.name;
+  document.getElementById('pillEmail').textContent = u.email;
   document.getElementById('userInitial').textContent = u.name.charAt(0).toUpperCase();
-  document.getElementById('idForm').style.display    = 'none';
+  document.getElementById('idForm').style.display = 'none';
   document.getElementById('userPill').classList.add('show');
-  document.getElementById('secMode').style.display   = 'block';
-  // Reset local counts on login and fetch from Apps Script
+  document.getElementById('secMode').style.display = 'block';
   localSqlCount = 0; localNsqlCount = 0;
   fetchAndUpdateCounts();
 }
@@ -434,45 +384,37 @@ function changeIdentity() {
   user = null;
   try { localStorage.removeItem('cardScanUser'); } catch(e){}
   localSqlCount = 0; localNsqlCount = 0;
-  document.getElementById('idForm').style.display      = 'block';
+  document.getElementById('idForm').style.display = 'block';
   document.getElementById('userPill').classList.remove('show');
-  document.getElementById('secMode').style.display     = 'none';
-  document.getElementById('secManual').style.display   = 'none';
+  document.getElementById('secMode').style.display = 'none';
+  document.getElementById('secManual').style.display = 'none';
   document.getElementById('secScanForm').style.display = 'none';
   document.getElementById('sqlBar').classList.remove('show');
   removeImg();
 }
-
-// ── MODE ──────────────────────────────────────────────────────────────────────
 function setMode(m) {
   document.getElementById('tabManual').classList.toggle('active', m==='manual');
-  document.getElementById('tabScan').classList.toggle('active',   m==='scan');
-  document.getElementById('secManual').style.display   = m==='manual' ? 'block' : 'none';
-  document.getElementById('secScanForm').style.display = m==='scan'   ? 'block' : 'none';
+  document.getElementById('tabScan').classList.toggle('active', m==='scan');
+  document.getElementById('secManual').style.display = m==='manual' ? 'block' : 'none';
+  document.getElementById('secScanForm').style.display = m==='scan' ? 'block' : 'none';
 }
-
-// ── FILE HANDLING — compress to stay under 5MB ────────────────────────────────
 function setFile(f) {
   const reader = new FileReader();
   reader.onload = ev => {
     const image = new Image();
     image.onload = () => {
       const canvas = document.createElement('canvas');
-      let w = image.width, h = image.height;
-      const MAX = 1600;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else       { w = Math.round(w * MAX / h); h = MAX; }
-      }
+      let w = image.width, h = image.height, MAX = 1600;
+      if (w > MAX || h > MAX) { if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;} }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(image, 0, 0, w, h);
       compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-      compressedBase64  = compressedDataUrl.split(',')[1];
-      document.getElementById('prevImg').src             = compressedDataUrl;
-      document.getElementById('prevName').textContent    = f.name;
-      document.getElementById('prevWrap').style.display  = 'block';
-      document.getElementById('dz').style.display        = 'none';
-      document.getElementById('scanBtn').disabled        = false;
+      compressedBase64 = compressedDataUrl.split(',')[1];
+      document.getElementById('prevImg').src = compressedDataUrl;
+      document.getElementById('prevName').textContent = f.name;
+      document.getElementById('prevWrap').style.display = 'block';
+      document.getElementById('dz').style.display = 'none';
+      document.getElementById('scanBtn').disabled = false;
     };
     image.src = ev.target.result;
   };
@@ -481,116 +423,65 @@ function setFile(f) {
 function removeImg() {
   compressedBase64 = null; compressedDataUrl = null;
   document.getElementById('prevWrap').style.display = 'none';
-  document.getElementById('dz').style.display       = 'block';
+  document.getElementById('dz').style.display = 'block';
   document.getElementById('fp').value = document.getElementById('cam').value = '';
   document.getElementById('scanBtn').disabled = true;
 }
-
-// ── SCAN with Claude API (direct browser) ─────────────────────────────────────
 async function doScan() {
   if (!compressedBase64) return alert('Please select a card photo first');
-  hideAll();
-  document.getElementById('secProgress').style.display = 'block';
-  setPS(1);
+  hideAll(); document.getElementById('secProgress').style.display = 'block'; setPS(1);
   try {
     setPS(2);
-    const fd = new FormData();
-    fd.append('extractOnly', 'true');
-    // Convert base64 back to a blob to send as a file
     const byteString = atob(compressedBase64);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
+    const ab = new ArrayBuffer(byteString.length), ia = new Uint8Array(ab);
     for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
     const blob = new Blob([ab], { type: 'image/jpeg' });
-    fd.append('card', blob, 'card.jpg');
-
+    const fd = new FormData(); fd.append('extractOnly','true'); fd.append('card', blob, 'card.jpg');
     setPS(3);
-    const res  = await fetch('/api/scan', { method: 'POST', body: fd });
+    const res = await fetch('/api/scan', { method:'POST', body:fd });
     const data = await res.json();
     if (!res.ok || !data.success) throw new Error(data.error || 'Scan failed');
     await new Promise(r => setTimeout(r, 300));
     showReview(data.cardData);
-  } catch(err) {
-    document.getElementById('secProgress').style.display = 'none';
-    setMode('scan');
-    alert('Could not read card: ' + err.message);
-  }
+  } catch(err) { document.getElementById('secProgress').style.display = 'none'; setMode('scan'); alert('Could not read card: ' + err.message); }
 }
-
-// ── REVIEW ────────────────────────────────────────────────────────────────────
 function showReview(cardData) {
-  CARD_FIELDS.forEach(f => {
-    const el = document.getElementById('e-' + f);
-    if (el) el.value = cardData[f] || '';
-  });
-  if (compressedDataUrl) {
-    const rp = document.getElementById('reviewPhoto');
-    rp.src = compressedDataUrl;
-    rp.style.display = 'block';
-  }
+  CARD_FIELDS.forEach(f => { const el = document.getElementById('e-'+f); if(el) el.value = cardData[f]||''; });
+  if (compressedDataUrl) { const rp = document.getElementById('reviewPhoto'); rp.src = compressedDataUrl; rp.style.display = 'block'; }
   document.getElementById('secProgress').style.display = 'none';
-  document.getElementById('secReview').style.display   = 'block';
+  document.getElementById('secReview').style.display = 'block';
 }
-
 function goRescan() {
-  document.getElementById('secReview').style.display   = 'none';
-  document.getElementById('secMode').style.display     = 'block';
+  document.getElementById('secReview').style.display = 'none';
+  document.getElementById('secMode').style.display = 'block';
   document.getElementById('secScanForm').style.display = 'block';
   removeImg();
 }
 
-// ── CHECK POS THEN SUBMIT SCAN (✅ FIX 3) ─────────────────────────────────────
+// ── POS POPUP STATE ───────────────────────────────────────────────────────────
+let _pendingSubmit = null, _pendingPosField = 'm-pos', _selectedPOS = null;
+
 function checkPOSThenSubmitScan() {
-  const brandName   = document.getElementById('e-brandName').value.trim();
-  const personName  = document.getElementById('e-personName').value.trim();
-  const designation = document.getElementById('e-designation').value.trim();
-  const phone       = document.getElementById('e-phone').value.trim();
-  const city        = document.getElementById('e-city').value.trim();
-  const pos         = document.getElementById('e-pos').value.trim();
-  const storeCount  = document.getElementById('e-storeCount').value.trim();
-  const intent      = document.getElementById('e-intent').value;
-
-  if (!brandName)   return alert('Brand Name is required');
-  if (!personName)  return alert('Person Name is required');
-  if (!designation) return alert('Designation is required');
-  if (!phone)       return alert('Phone is required');
-  if (!city)        return alert('City is required');
-  if (!pos)         return alert('POS is required');
-  if (!storeCount)  return alert('Store Count is required');
-  if (!intent)      return alert('Intent to Buy is required');
-
-  // If already SQL — go straight to save
+  const b=document.getElementById('e-brandName').value.trim(), p=document.getElementById('e-personName').value.trim(),
+        d=document.getElementById('e-designation').value.trim(), ph=document.getElementById('e-phone').value.trim(),
+        c=document.getElementById('e-city').value.trim(), pos=document.getElementById('e-pos').value.trim(),
+        sc=document.getElementById('e-storeCount').value.trim(), intent=document.getElementById('e-intent').value;
+  if (!b) return alert('Brand Name is required'); if (!p) return alert('Person Name is required');
+  if (!d) return alert('Designation is required'); if (!ph) return alert('Phone is required');
+  if (!c) return alert('City is required'); if (!pos) return alert('POS is required');
+  if (!sc) return alert('Store Count is required'); if (!intent) return alert('Intent to Buy is required');
   if (isSQL(pos)) { submitScan(); return; }
-
-  // Not SQL — show POS suggestion popup
-  _pendingSubmit    = () => submitScan();
-  _pendingPosField  = 'e-pos';
+  _pendingSubmit = () => submitScan(); _pendingPosField = 'e-pos';
   openPosPopup(pos);
 }
-
-// ── SUBMIT SCAN ───────────────────────────────────────────────────────────────
 async function submitScan() {
   const editedCard = {};
-  CARD_FIELDS.forEach(f => {
-    const el = document.getElementById('e-' + f);
-    editedCard[f] = el ? el.value.trim() : '';
-  });
-
-  hideAll();
-  document.getElementById('secSaving').style.display = 'block';
-
-  await saveToSheet({
-    ...editedCard,
-    intentToBuy:  document.getElementById('e-intent').value,
-    comments:     document.getElementById('e-comments').value.trim(),
-    scannerName:  user.name,
-    scannerEmail: user.email,
-    scannedAt:    new Date().toLocaleString('en-IN')
-  });
+  CARD_FIELDS.forEach(f => { const el = document.getElementById('e-'+f); editedCard[f] = el ? el.value.trim() : ''; });
+  hideAll(); document.getElementById('secSaving').style.display = 'block';
+  await saveToSheet({ ...editedCard, intentToBuy: document.getElementById('e-intent').value, comments: document.getElementById('e-comments').value.trim(), scannerName: user.name, scannerEmail: user.email, scannedAt: new Date().toLocaleString('en-IN') });
 }
 
-
-// ── POS SUGGESTION ENGINE ─────────────────────────────────────────────────────
+// ── SQL POS LIST ──────────────────────────────────────────────────────────────
 const SQL_POS_DISPLAY = [
   'PetPooja','PP','Posist','Posist (Restroworks)','Restroworks','EzeePos','EezeePos',
   'GoFrugal','WebSys','Ciferon','Centramation','Posify','tmBill','SparrowPOS',
@@ -603,318 +494,176 @@ const SQL_POS_DISPLAY = [
   'DevoruinPOS','Devoruin','Devoruin POS','MishiPay','MishiPayPOS','Mishi Pay',
   'MisiPay','Misi Pay','Abitzu','Sparktech','Sparktech POS'
 ];
-
 function buildPosAllList() {
-  const container = document.getElementById('posAllList');
-  container.innerHTML = '';
+  const c = document.getElementById('posAllList'); c.innerHTML = '';
   SQL_POS_DISPLAY.forEach(name => {
-    const chip = document.createElement('button');
-    chip.className   = 'pos-all-chip';
-    chip.textContent = name;
-    chip.onclick     = () => selectSuggestedPOS(name);
-    container.appendChild(chip);
+    const chip = document.createElement('button'); chip.className = 'pos-all-chip'; chip.textContent = name;
+    chip.onclick = () => highlightPOS(name, chip); c.appendChild(chip);
   });
 }
-
 function fuzzyMatchPOS(input) {
   if (!input) return [];
-  const q = input.toLowerCase().replace(/\s+/g,' ').trim();
-  const results = [];
+  const q = input.toLowerCase().replace(/\s+/g,' ').trim(), results = [];
   SQL_POS_DISPLAY.forEach(name => {
-    const n = name.toLowerCase().replace(/\s+/g,' ');
-    let score = 0;
-    if (n === q) score = 100;
-    else if (n.replace(/\s/g,'') === q.replace(/\s/g,'')) score = 95;
-    else if (n.startsWith(q) || q.startsWith(n)) score = 80;
-    else if (n.includes(q) || q.includes(n)) score = 65;
-    else {
-      function bigrams(s) { const b = new Set(); for(let i=0;i<s.length-1;i++) b.add(s.slice(i,i+2)); return b; }
-      const bq = bigrams(q), bn = bigrams(n);
-      let shared = 0; bq.forEach(b => { if(bn.has(b)) shared++; });
-      score = shared > 0 ? Math.round(shared / Math.max(bq.size, bn.size) * 55) : 0;
-    }
-    if (score > 18) results.push({ name, score });
+    const n = name.toLowerCase().replace(/\s+/g,' '); let score = 0;
+    if (n===q) score=100; else if (n.replace(/\s/g,'')=== q.replace(/\s/g,'')) score=95;
+    else if (n.startsWith(q)||q.startsWith(n)) score=80; else if (n.includes(q)||q.includes(n)) score=65;
+    else { function bigrams(s){const b=new Set();for(let i=0;i<s.length-1;i++)b.add(s.slice(i,i+2));return b;} const bq=bigrams(q),bn=bigrams(n); let sh=0; bq.forEach(b=>{if(bn.has(b))sh++;}); score=sh>0?Math.round(sh/Math.max(bq.size,bn.size)*55):0; }
+    if (score>18) results.push({name,score});
   });
-  return results.sort((a,b) => b.score - a.score).slice(0,4).map(r => r.name);
+  return results.sort((a,b)=>b.score-a.score).slice(0,4).map(r=>r.name);
 }
 
-// _pendingPosField tracks WHICH input to update (m-pos or e-pos)
-let _pendingSubmit   = null;
-let _pendingPosField = 'm-pos';
-
-// ── CHECK POS THEN SUBMIT (MANUAL) ───────────────────────────────────────────
 function checkPOSThenSubmit() {
-  const personName  = document.getElementById('m-personName').value.trim();
-  const phone       = document.getElementById('m-phone').value.trim();
-  const brandName   = document.getElementById('m-brandName').value.trim();
-  const designation = document.getElementById('m-designation').value.trim();
-  const pos         = document.getElementById('m-pos').value.trim();
-  const city        = document.getElementById('m-city').value.trim();
-  const storeCount  = document.getElementById('m-storeCount').value.trim();
-  const intent      = document.getElementById('m-intent').value;
-  if (!personName)  return showFieldError('m-personName',  'Person Name is required');
-  if (!phone)       return showFieldError('m-phone',       'Phone Number is required');
+  const personName=document.getElementById('m-personName').value.trim(), phone=document.getElementById('m-phone').value.trim(),
+        brandName=document.getElementById('m-brandName').value.trim(), designation=document.getElementById('m-designation').value.trim(),
+        pos=document.getElementById('m-pos').value.trim(), city=document.getElementById('m-city').value.trim(),
+        storeCount=document.getElementById('m-storeCount').value.trim(), intent=document.getElementById('m-intent').value;
+  if (!personName) return showFieldError('m-personName','Person Name is required');
+  if (!phone) return showFieldError('m-phone','Phone Number is required');
   if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone','Must be exactly 10 digits');
-  if (!brandName)   return showFieldError('m-brandName',   'Brand Name is required');
-  if (!designation) return showFieldError('m-designation', 'Designation is required');
-  if (!pos)         return showFieldError('m-pos',         'POS is required');
-  if (!city)        return showFieldError('m-city',        'City is required');
-  if (!storeCount)  return showFieldError('m-storeCount',  'Store Count is required');
-  if (!intent)      return showFieldError('m-intent',      'Intent to Buy is required');
-
-  // Already SQL — submit immediately
+  if (!brandName) return showFieldError('m-brandName','Brand Name is required');
+  if (!designation) return showFieldError('m-designation','Designation is required');
+  if (!pos) return showFieldError('m-pos','POS is required');
+  if (!city) return showFieldError('m-city','City is required');
+  if (!storeCount) return showFieldError('m-storeCount','Store Count is required');
+  if (!intent) return showFieldError('m-intent','Intent to Buy is required');
   if (isSQL(pos)) { submitManual(); return; }
-
-  // Not SQL — show popup
-  _pendingSubmit   = () => submitManual();
-  _pendingPosField = 'm-pos';
+  _pendingSubmit = () => submitManual(); _pendingPosField = 'm-pos';
   openPosPopup(pos);
 }
 
-// ── SHARED POS POPUP OPEN/CLOSE/ACTIONS ──────────────────────────────────────
+// ── OPEN POS POPUP ────────────────────────────────────────────────────────────
 function openPosPopup(pos) {
+  _selectedPOS = null;
+  const useBtn = document.getElementById('posUseBtn');
+  useBtn.textContent = 'Select POS'; useBtn.classList.remove('ready');
+  document.querySelectorAll('.pos-sug-btn.selected,.pos-all-chip.selected').forEach(el=>el.classList.remove('selected'));
   const suggestions = fuzzyMatchPOS(pos);
-  const sugWrap = document.getElementById('posSuggestionsWrap');
-  const sugBox  = document.getElementById('posSuggestions');
+  const sugWrap = document.getElementById('posSuggestionsWrap'), sugBox = document.getElementById('posSuggestions');
   sugBox.innerHTML = '';
-
   if (suggestions.length > 0) {
-    document.getElementById('posPopupSub').textContent =
-      '"' + pos + '" isn\'t a known SQL POS. Did you mean one of these? Or pick from the full list below.';
+    document.getElementById('posPopupSub').textContent = '"' + pos + '" isn\'t a known SQL POS. Tap a match or pick from the full list, then confirm.';
     suggestions.forEach(name => {
-      const btn = document.createElement('button');
-      btn.className = 'pos-sug-btn';
-      btn.innerHTML = '🎯 ' + name;
-      btn.onclick   = () => selectSuggestedPOS(name);
-      sugBox.appendChild(btn);
+      const btn = document.createElement('button'); btn.className = 'pos-sug-btn'; btn.innerHTML = name;
+      btn.onclick = () => highlightPOS(name, btn); sugBox.appendChild(btn);
     });
     sugWrap.style.display = 'block';
   } else {
-    document.getElementById('posPopupSub').textContent =
-      '"' + pos + '" is not in the SQL POS list. Pick the correct one below, or keep it as NSQL.';
+    document.getElementById('posPopupSub').textContent = '"' + pos + '" is not in the SQL POS list. Tap the correct one below and confirm, or keep as NSQL.';
     sugWrap.style.display = 'none';
   }
-
   document.getElementById('posPopup').classList.add('show');
 }
 
-function selectSuggestedPOS(name) {
-  // Update whichever field triggered the popup (m-pos or e-pos)
+// Tap any chip/row — highlights it, updates button label, does NOT submit
+function highlightPOS(name, clickedEl) {
+  document.querySelectorAll('.pos-sug-btn,.pos-all-chip').forEach(el=>el.classList.remove('selected'));
+  clickedEl.classList.add('selected');
+  _selectedPOS = name;
+  const useBtn = document.getElementById('posUseBtn');
+  useBtn.textContent = 'Use ' + name;
+  useBtn.classList.add('ready');
+}
+
+// Bottom button: confirm chosen POS → update field → submit
+function confirmSelectedPOS() {
+  if (!_selectedPOS) return;
   const el = document.getElementById(_pendingPosField);
-  if (el) { el.value = name; clearErr(_pendingPosField); }
+  if (el) { el.value = _selectedPOS; clearErr(_pendingPosField); }
   closePosPopup();
   if (_pendingSubmit) _pendingSubmit();
 }
 
-function keepAsNSQL() {
-  closePosPopup();
-  if (_pendingSubmit) _pendingSubmit();
-}
+// Bottom button: ignore POS check, save as NSQL
+function keepAsNSQL() { closePosPopup(); if (_pendingSubmit) _pendingSubmit(); }
 
-function closePosPopup() {
-  document.getElementById('posPopup').classList.remove('show');
-}
+function closePosPopup() { document.getElementById('posPopup').classList.remove('show'); _selectedPOS = null; }
 
-// ── SUBMIT MANUAL ─────────────────────────────────────────────────────────────
 async function submitManual() {
-  const personName  = document.getElementById('m-personName').value.trim();
-  const phone       = document.getElementById('m-phone').value.trim();
-  const brandName   = document.getElementById('m-brandName').value.trim();
-  const designation = document.getElementById('m-designation').value.trim();
-  const pos         = document.getElementById('m-pos').value.trim();
-  const city        = document.getElementById('m-city').value.trim();
-  const storeCount  = document.getElementById('m-storeCount').value.trim();
-  const intent      = document.getElementById('m-intent').value;
-
-  if (!personName)  return showFieldError('m-personName',  'Person Name is required');
-  if (!phone)       return showFieldError('m-phone',       'Phone Number is required');
+  const personName=document.getElementById('m-personName').value.trim(), phone=document.getElementById('m-phone').value.trim(),
+        brandName=document.getElementById('m-brandName').value.trim(), designation=document.getElementById('m-designation').value.trim(),
+        pos=document.getElementById('m-pos').value.trim(), city=document.getElementById('m-city').value.trim(),
+        storeCount=document.getElementById('m-storeCount').value.trim(), intent=document.getElementById('m-intent').value;
+  if (!personName) return showFieldError('m-personName','Person Name is required');
+  if (!phone) return showFieldError('m-phone','Phone Number is required');
   if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone','Must be exactly 10 digits');
-  if (!brandName)   return showFieldError('m-brandName',   'Brand Name is required');
-  if (!designation) return showFieldError('m-designation', 'Designation is required');
-  if (!pos)         return showFieldError('m-pos',         'POS is required');
-  if (!city)        return showFieldError('m-city',        'City is required');
-  if (!storeCount)  return showFieldError('m-storeCount',  'Store Count is required');
-  if (!intent)      return showFieldError('m-intent',      'Intent to Buy is required');
-
-  hideAll();
-  document.getElementById('secSaving').style.display = 'block';
-
-  await saveToSheet({
-    personName, phone, brandName, designation, pos, city, storeCount,
-    intentToBuy:  intent,
-    comments:     document.getElementById('m-comments').value.trim(),
-    scannerName:  user.name,
-    scannerEmail: user.email,
-    scannedAt:    new Date().toLocaleString('en-IN')
-  });
+  if (!brandName) return showFieldError('m-brandName','Brand Name is required');
+  if (!designation) return showFieldError('m-designation','Designation is required');
+  if (!pos) return showFieldError('m-pos','POS is required');
+  if (!city) return showFieldError('m-city','City is required');
+  if (!storeCount) return showFieldError('m-storeCount','Store Count is required');
+  if (!intent) return showFieldError('m-intent','Intent to Buy is required');
+  hideAll(); document.getElementById('secSaving').style.display = 'block';
+  await saveToSheet({ personName,phone,brandName,designation,pos,city,storeCount, intentToBuy:intent, comments:document.getElementById('m-comments').value.trim(), scannerName:user.name, scannerEmail:user.email, scannedAt:new Date().toLocaleString('en-IN') });
 }
 
-// ── SAVE TO APPS SCRIPT ───────────────────────────────────────────────────────
 async function saveToSheet(payload) {
   let success = false;
-  try {
-    const res  = await fetch(APPS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
-    const data = await res.json();
-    success = data.success === true;
-  } catch(e) { success = false; }
-
-  // ✅ FIX 2: Increment local counters immediately — no waiting for Apps Script query
-  if (success) {
-    if (isSQL(payload.pos || '')) { localSqlCount++;  }
-    else                          { localNsqlCount++; }
-    renderCounts(localSqlCount, localNsqlCount);
-  }
-
+  try { const res = await fetch(APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)}); const data = await res.json(); success = data.success===true; } catch(e){}
+  if (success) { if(isSQL(payload.pos||'')){localSqlCount++;}else{localNsqlCount++;} renderCounts(localSqlCount,localNsqlCount); }
   document.getElementById('secSaving').style.display = 'none';
-
-  const rows = [
-    ['👤 Person',     payload.personName],
-    ['🏢 Brand',      payload.brandName],
-    ['💼 Designation',payload.designation],
-    ['📞 Phone',      payload.phone],
-    ['✉️ Email',      payload.email],
-    ['🏙️ City',       payload.city],
-    ['🌐 Website',    payload.website],
-    ['🏪 POS',        payload.pos],
-    ['🔢 Store Count',payload.storeCount],
-    ['🎯 Intent',     payload.intentToBuy],
-    ['💬 Comments',   payload.comments],
-    ['👤 Scanned By', payload.scannerName]
-  ];
-  document.getElementById('resultsGrid').innerHTML = rows
-    .filter(([,v]) => v)
-    .map(([l,v]) => `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`)
-    .join('');
-
+  const rows=[['Person',payload.personName],['Brand',payload.brandName],['Designation',payload.designation],['Phone',payload.phone],['Email',payload.email],['City',payload.city],['Website',payload.website],['POS',payload.pos],['Store Count',payload.storeCount],['Intent',payload.intentToBuy],['Comments',payload.comments],['Scanned By',payload.scannerName]];
+  document.getElementById('resultsGrid').innerHTML = rows.filter(([,v])=>v).map(([l,v])=>`<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`).join('');
   const b = document.getElementById('badge');
   b.className = success ? 'badge bok' : 'badge berr';
-  b.innerHTML = success ? '✅ Saved to Google Sheets!' : '⚠️ Could not save — check connection';
-
+  b.innerHTML = success ? 'Saved to Google Sheets!' : 'Could not save - check connection';
   document.getElementById('secResults').style.display = 'block';
-  setTimeout(() => showLeadPopup(payload.pos || ''), 400);
+  setTimeout(() => showLeadPopup(payload.pos||''), 400);
 }
 
-// ── SQL/NSQL COUNTS ───────────────────────────────────────────────────────────
-// Render the bar from whatever counts are passed in
-function renderCounts(sql, nsql) {
-  document.getElementById('sqlCount').textContent  = sql;
-  document.getElementById('nsqlCount').textContent = nsql;
-  document.getElementById('sqlBar').classList.add('show');
-}
-
-// Fetch from Apps Script (used on login + periodic refresh).
-// If Apps Script returns higher numbers than our local session counts, adopt them.
+function renderCounts(sql,nsql) { document.getElementById('sqlCount').textContent=sql; document.getElementById('nsqlCount').textContent=nsql; document.getElementById('sqlBar').classList.add('show'); }
 async function fetchAndUpdateCounts() {
   if (!user) return;
   try {
-    const now  = new Date();
-    const date = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
-    const url  = `${APPS_SCRIPT_URL}?action=counts&scannedBy=${encodeURIComponent(user.name)}&date=${encodeURIComponent(date)}`;
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const sql  = data.sql  ?? data.SQL  ?? 0;
-    const nsql = data.nsql ?? data.NSQL ?? 0;
-    // Use whichever is higher — local increments take precedence if Apps Script lags
-    localSqlCount  = Math.max(localSqlCount,  sql);
-    localNsqlCount = Math.max(localNsqlCount, nsql);
-    renderCounts(localSqlCount, localNsqlCount);
-  } catch(e) {
-    // If Apps Script fetch fails, still show local counts
-    renderCounts(localSqlCount, localNsqlCount);
-    console.warn('Counts fetch failed:', e.message);
-  }
+    const now=new Date(), date=now.toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'});
+    const url=`${APPS_SCRIPT_URL}?action=counts&scannedBy=${encodeURIComponent(user.name)}&date=${encodeURIComponent(date)}`;
+    const res=await fetch(url); if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    localSqlCount=Math.max(localSqlCount,data.sql??data.SQL??0);
+    localNsqlCount=Math.max(localNsqlCount,data.nsql??data.NSQL??0);
+    renderCounts(localSqlCount,localNsqlCount);
+  } catch(e) { renderCounts(localSqlCount,localNsqlCount); console.warn('Counts fetch failed:',e.message); }
 }
-setInterval(() => { if(user) fetchAndUpdateCounts(); }, 30000);
+setInterval(()=>{if(user)fetchAndUpdateCounts();},30000);
 
-// ── SQL POS LIST ──────────────────────────────────────────────────────────────
-const SQL_POS = new Set([
-  'petpooja','posist','ezeepos','gofrugal','websys','ciferon','centramation',
-  'posify','tmbill','sparrowpos','vasypos','sanguinepos','horecafox','allpos',
-  'digitory','quickbill','binix','rista by dotpe','lucid','quintapos','csat',
-  'royalpos','dotpe','eezeepos','qpos','happyonpos','csatpos','lucidpos',
-  'lucid pos','romio','romiopos','restroworks','sanguine pos','dataman',
-  'vasy pos','royal','posist (restroworks)','billing fast pos','billingfastpos',
-  'billingfast pos','devourin','devorin','airmenus','air menu','airmenu',
-  'chefdeskpos','chef desk pos','chefdesk pos','devoruinpos','devoruin',
-  'devoruin pos','mishipay','mishipaypos','mishi pay','misipay','misi pay',
-  'rista','quinta','abitzu','sparktech','sparktech pos','quinta pos','royal pos',
-  'pp'
-]);
+const SQL_POS = new Set(['petpooja','posist','ezeepos','gofrugal','websys','ciferon','centramation','posify','tmbill','sparrowpos','vasypos','sanguinepos','horecafox','allpos','digitory','quickbill','binix','rista by dotpe','lucid','quintapos','csat','royalpos','dotpe','eezeepos','qpos','happyonpos','csatpos','lucidpos','lucid pos','romio','romiopos','restroworks','sanguine pos','dataman','vasy pos','royal','posist (restroworks)','billing fast pos','billingfastpos','billingfast pos','devourin','devorin','airmenus','air menu','airmenu','chefdeskpos','chef desk pos','chefdesk pos','devoruinpos','devoruin','devoruin pos','mishipay','mishipaypos','mishi pay','misipay','misi pay','rista','quinta','abitzu','sparktech','sparktech pos','quinta pos','royal pos','pp']);
+const SQL_MSGS=["You're on fire!","Another SQL in the bag!","You're crushing it!","That's a winner!","Keep the momentum!","You're making it happen!","Legendary work!","One step closer to the top!"];
+const NSQL_MSGS=["Every conversation counts!","Building relationships one card at a time!","Not every lead is SQL - every effort matters!","Stay consistent, SQLs will follow!","Great networking! Keep scanning!","You're building your pipeline!","Keep hustling!","Every entry brings you closer to a SQL!"];
 
-const SQL_MSGS  = ["You're on fire! 🔥","Another SQL in the bag! 💼","You're crushing it! 💪",
-  "That's a winner! 🏅","Keep the momentum! ⚡","You're making it happen! 🌟",
-  "Legendary work! 👑","One step closer to the top! 🚀"];
-const NSQL_MSGS = ["Every conversation counts! 💬","Building relationships one card at a time! 🤝",
-  "Not every lead is SQL — every effort matters! 💡","Stay consistent, SQLs will follow! 🎯",
-  "Great networking! Keep scanning! 📇","You're building your pipeline! 🏃",
-  "Keep hustling! ⚡","Every entry brings you closer to a SQL! ⭐"];
-
-function isSQL(pos) {
-  return SQL_POS.has((pos||'').toLowerCase().trim().replace(/\s+/g,' '));
-}
-
+function isSQL(pos) { return SQL_POS.has((pos||'').toLowerCase().trim().replace(/\s+/g,' ')); }
 function showLeadPopup(pos) {
-  const sql = isSQL(pos);
-  // Use local counts (already updated after save — no refetch needed)
-  const sc = localSqlCount;
-  const nc = localNsqlCount;
+  const sql=isSQL(pos), sc=localSqlCount, nc=localNsqlCount;
   if (sql) {
-    document.getElementById('leadEmoji').textContent     = ['🎯','🏆','🔥','⚡','🚀','💎'][Math.floor(Math.random()*6)];
-    document.getElementById('leadTitle').textContent     = 'SQL Lead! 🎉';
-    document.getElementById('leadTitle').style.color     = 'var(--success)';
-    document.getElementById('leadSub').textContent       = SQL_MSGS[Math.floor(Math.random()*SQL_MSGS.length)];
-    document.getElementById('leadCountBadge').textContent= `🏆 ${sc} SQL Lead${sc>1?'s':''} today!`;
-    document.getElementById('leadCountBadge').className  = 'lead-count sql';
+    document.getElementById('leadEmoji').textContent=['🎯','🏆','🔥','⚡','🚀','💎'][Math.floor(Math.random()*6)];
+    document.getElementById('leadTitle').textContent='SQL Lead! 🎉'; document.getElementById('leadTitle').style.color='var(--success)';
+    document.getElementById('leadSub').textContent=SQL_MSGS[Math.floor(Math.random()*SQL_MSGS.length)];
+    document.getElementById('leadCountBadge').textContent=`🏆 ${sc} SQL Lead${sc>1?'s':''} today!`;
+    document.getElementById('leadCountBadge').className='lead-count sql';
   } else {
-    document.getElementById('leadEmoji').textContent     = ['😊','👍','💬','🤝','📇','🌱'][Math.floor(Math.random()*6)];
-    document.getElementById('leadTitle').textContent     = 'Entry Saved!';
-    document.getElementById('leadTitle').style.color     = 'var(--accent)';
-    document.getElementById('leadSub').textContent       = NSQL_MSGS[Math.floor(Math.random()*NSQL_MSGS.length)];
-    document.getElementById('leadCountBadge').textContent= sc > 0
-      ? `📋 ${nc} NSQL · 🎯 ${sc} SQL today!`
-      : `📋 ${nc} NSQL so far — keep going for that SQL! 💪`;
-    document.getElementById('leadCountBadge').className  = 'lead-count nsql';
+    document.getElementById('leadEmoji').textContent=['😊','👍','💬','🤝','📇','🌱'][Math.floor(Math.random()*6)];
+    document.getElementById('leadTitle').textContent='Entry Saved!'; document.getElementById('leadTitle').style.color='var(--accent)';
+    document.getElementById('leadSub').textContent=NSQL_MSGS[Math.floor(Math.random()*NSQL_MSGS.length)];
+    document.getElementById('leadCountBadge').textContent=sc>0?`📋 ${nc} NSQL · 🎯 ${sc} SQL today!`:`📋 ${nc} NSQL so far - keep going for that SQL!`;
+    document.getElementById('leadCountBadge').className='lead-count nsql';
   }
   document.getElementById('leadPopup').classList.add('show');
 }
 function closeLeadPopup() { document.getElementById('leadPopup').classList.remove('show'); }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
 function reset() {
   removeImg();
-  ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments',
-   'e-pos','e-storeCount','e-comments'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  ['m-intent','e-intent'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('tabManual').classList.remove('active');
-  document.getElementById('tabScan').classList.remove('active');
-  document.getElementById('reviewPhoto').style.display = 'none';
-  hideAll();
-  document.getElementById('secIdentity').style.display = 'block';
-  document.getElementById('secMode').style.display     = user ? 'block' : 'none';
+  ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments','e-pos','e-storeCount','e-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['m-intent','e-intent'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('tabManual').classList.remove('active'); document.getElementById('tabScan').classList.remove('active');
+  document.getElementById('reviewPhoto').style.display='none'; hideAll();
+  document.getElementById('secIdentity').style.display='block';
+  document.getElementById('secMode').style.display=user?'block':'none';
 }
-function hideAll() {
-  ['secManual','secScanForm','secProgress','secSaving','secReview','secResults']
-    .forEach(id => document.getElementById(id).style.display = 'none');
-}
-function showFieldError(fieldId, msg) {
-  const el = document.getElementById(fieldId);
-  if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); }
-  const errEl = document.getElementById('err-' + fieldId);
-  if (errEl) { errEl.textContent = '⚠️ ' + msg; errEl.style.display = 'block'; }
-}
-function clearErr(fieldId) {
-  const errEl = document.getElementById('err-' + fieldId);
-  if (errEl) errEl.style.display = 'none';
-}
-function setPS(n) {
-  for(let i=1;i<=3;i++){
-    const el = document.getElementById('ps'+i);
-    el.classList.remove('active','done','pulse');
-    if(i < n)  el.classList.add('done');
-    if(i === n) el.classList.add('active','pulse');
-  }
-}
+function hideAll() { ['secManual','secScanForm','secProgress','secSaving','secReview','secResults'].forEach(id=>document.getElementById(id).style.display='none'); }
+function showFieldError(fieldId,msg) { const el=document.getElementById(fieldId); if(el)el.scrollIntoView({behavior:'smooth',block:'center'}); const e=document.getElementById('err-'+fieldId); if(e){e.textContent='Warning: '+msg;e.style.display='block';} }
+function clearErr(fieldId) { const e=document.getElementById('err-'+fieldId); if(e)e.style.display='none'; }
+function setPS(n) { for(let i=1;i<=3;i++){const el=document.getElementById('ps'+i);el.classList.remove('active','done','pulse');if(i<n)el.classList.add('done');if(i===n)el.classList.add('active','pulse');} }
 </script>
 </body>
 </html>
