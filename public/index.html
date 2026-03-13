@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Scanner</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f0f9f9;--card:#fff;--border:#b2e0e0;--accent:#0d9488;--accent2:#0891b2;--accentlt:#ccfbf1;--text:#0f2e2e;--muted:#5f9ea0;--success:#059669;--error:#e11d48;--radius:14px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 80% 10%,rgba(13,148,136,.08),transparent 50%),radial-gradient(circle at 10% 90%,rgba(8,145,178,.07),transparent 50%);}
+  .wrap{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:24px 16px 60px;}
+
+  header{text-align:center;margin-bottom:24px;}
+  .logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(13,148,136,.3);}
+  .logo-text{font-size:26px;font-weight:700;color:var(--accent);}
+  header p{color:var(--muted);font-size:13px;}
+
+  /* Card */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(13,148,136,.07);}
+  .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* Identity pill */
+  .pill{display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#e6faf8,#f0fdfc);border:1.5px solid rgba(13,148,136,.25);border-radius:11px;padding:11px 14px;}
+  .pill.show{display:flex;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+  .uinfo{flex:1;}.uname{font-size:14px;font-weight:600;}.uemail{font-size:12px;color:var(--muted);}
+  .chg{background:none;border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+  .chg:hover{border-color:var(--error);color:var(--error);}
+
+  /* Mode selector */
+  .mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .mode-tab{padding:16px 12px;border-radius:12px;border:2px solid var(--border);background:#fff;cursor:pointer;text-align:center;transition:all .25s;font-family:'Outfit',sans-serif;}
+  .mode-tab:hover{border-color:var(--accent);background:var(--accentlt);}
+  .mode-tab.active{border-color:var(--accent);background:linear-gradient(135deg,#e6faf8,#f0fdfc);}
+  .mode-tab .mt-icon{font-size:28px;margin-bottom:6px;}
+  .mode-tab .mt-title{font-size:14px;font-weight:700;color:var(--text);}
+  .mode-tab .mt-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* Inputs */
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .iw{position:relative;margin-bottom:10px;}
+  .iw:last-child,.iw.nomb{margin-bottom:0;}
+  .ii{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+  .ii.top{top:13px;transform:none;}
+  input[type=text],input[type=email],input[type=number],textarea{width:100%;padding:11px 11px 11px 38px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
+  input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12);background:#fff;}
+  input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7;}
+  textarea{padding-top:11px;resize:vertical;min-height:75px;line-height:1.5;}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;width:100%;}
+  .btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px rgba(13,148,136,.25);}
+  .btn-p:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(13,148,136,.35);}
+  .btn-p:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+  .btn-o{background:#fff;border:1.5px solid var(--border);color:var(--accent);font-weight:600;}
+  .btn-o:hover{border-color:var(--accent);background:var(--accentlt);}
+  .btn-sm{padding:9px 13px;font-size:13px;}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+
+  /* Upload / Drop zone */
+  .dz{border:2px dashed var(--border);border-radius:11px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);}
+  .dz:hover,.dz.over{border-color:var(--accent);background:var(--accentlt);}
+  .dz-icon{font-size:30px;margin-bottom:6px;display:block;}
+  .dz-main{font-size:14px;font-weight:600;margin-bottom:2px;}
+  .dz-sub{font-size:12px;color:var(--muted);}
+  .or{display:flex;align-items:center;gap:10px;margin:10px 0;color:var(--muted);font-size:12px;font-weight:500;}
+  .or::before,.or::after{content:'';flex:1;height:1px;background:var(--border);}
+  #prevWrap{display:none;margin-bottom:10px;}
+  #prevWrap img{width:100%;border-radius:9px;border:1.5px solid var(--border);max-height:200px;object-fit:contain;background:var(--bg);}
+  .prev-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:7px;margin-top:6px;font-size:13px;}
+  .rm{background:none;border:none;color:var(--error);cursor:pointer;font-size:17px;}
+
+  /* Progress */
+  .prog-wrap{text-align:center;padding:28px 20px;}
+  .scan-anim{position:relative;width:76px;height:76px;margin:0 auto 18px;}
+  .scan-icon-box{width:76px;height:76px;background:linear-gradient(135deg,var(--accentlt),#e0f2fe);border:2px solid var(--border);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+  .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanline 1.6s ease-in-out infinite;box-shadow:0 0 8px rgba(13,148,136,.6);}
+  @keyframes scanline{0%{top:8px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:66px;opacity:0}}
+  .psteps{display:flex;flex-direction:column;gap:7px;text-align:left;max-width:260px;margin:0 auto;}
+  .ps{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px;font-weight:500;}
+  .ps.active{color:var(--accent);}.ps.done{color:var(--success);}
+  .pulse{animation:pulse 1.2s ease infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* Review edit grid */
+  .review-photo{width:100%;border-radius:10px;border:1.5px solid var(--border);max-height:160px;object-fit:contain;background:var(--bg);margin-bottom:10px;display:none;}
+  .eg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .eg1{grid-column:span 1;}.eg2{grid-column:span 2;}
+  .el{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+  .eg input,.eg textarea{padding:9px 11px;font-size:13px;border-radius:7px;background:var(--bg);border:1.5px solid var(--border);width:100%;color:var(--text);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s;}
+  .eg input:focus,.eg textarea:focus{border-color:var(--accent);background:#fff;}
+  .eg textarea{min-height:60px;resize:vertical;padding-top:9px;}
+
+  /* Results */
+  .rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .r1{grid-column:span 1;}.r2{grid-column:span 2;}
+  .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+  .rv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;min-height:34px;word-break:break-word;}
+  .rv:empty::after{content:'—';color:#b2e0e0;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:13px;}
+  .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
+  .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
+  .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
+
+  /* SQL/NSQL Counter bar */
+  .sql-bar{display:none;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(13,148,136,.07);}
+  .sql-bar.show{display:flex;}
+  .sql-pill{flex:1;display:flex;align-items:center;gap:10px;border-radius:10px;padding:8px 12px;}
+  .sql-pill.sql-side{background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border:1px solid #6ee7b7;}
+  .sql-pill.nsql-side{background:linear-gradient(135deg,#fefce8,#fffbeb);border:1px solid #fcd34d;}
+  .sql-pill-num{font-size:22px;font-weight:700;}
+  .sql-pill.sql-side .sql-pill-num{color:var(--success);}
+  .sql-pill.nsql-side .sql-pill-num{color:#d97706;}
+  .sql-pill-info{display:flex;flex-direction:column;}
+  .sql-pill-label{font-size:11px;font-weight:700;letter-spacing:.5px;}
+  .sql-pill.sql-side .sql-pill-label{color:var(--success);}
+  .sql-pill.nsql-side .sql-pill-label{color:#d97706;}
+  .sql-pill-sub{font-size:10px;color:var(--muted);}
+
+  /* SQL / NSQL popup overlay */
+  .lead-popup{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
+  .lead-popup.show{opacity:1;pointer-events:all;}
+  .lead-box{background:#fff;border-radius:20px;padding:32px 28px;max-width:320px;width:90%;text-align:center;transform:scale(.85);transition:transform .3s;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+  .lead-popup.show .lead-box{transform:scale(1);}
+  .lead-emoji{font-size:56px;margin-bottom:12px;display:block;animation:bounce .6s ease;}
+  .lead-title{font-size:22px;font-weight:700;margin-bottom:8px;}
+  .lead-sub{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px;}
+  .lead-count{font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;display:inline-block;margin-bottom:20px;}
+  .lead-count.sql{background:#d1fae5;color:var(--success);}
+  .lead-count.nsql{background:#fef3c7;color:#d97706;}
+  .lead-close{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;}
+  @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-16px)}70%{transform:translateY(-8px)}}
+  .err-msg{font-size:12px;color:var(--error);margin-top:4px;display:none;font-weight:500;}
+  .field-err input,.field-err textarea{border-color:var(--error) !important;box-shadow:0 0 0 3px rgba(225,29,72,.12) !important;}
+  input[type=file]{display:none;}
+  @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo"><div class="logo-icon">🪪</div><span class="logo-text">Card Scanner</span></div>
+    <p>Scan business cards · Save to Google Sheets instantly</p>
+  </header>
+
+  <!-- ── IDENTITY ── -->
+  <div class="card" id="secIdentity">
+    <div class="card-title">Your Identity</div>
+    <div id="idForm">
+      <div class="row2">
+        <div class="iw nomb"><span class="ii">👤</span><input type="text" id="inName" placeholder="Your full name"/></div>
+        <div class="iw nomb"><span class="ii">✉️</span><input type="email" id="inEmail" placeholder="Your email"/></div>
+      </div>
+      <button class="btn btn-p" id="btnContinue" onclick="saveIdentity()" disabled style="margin-top:10px">Continue →</button>
+      <p style="font-size:12px;color:var(--muted);margin-top:7px;">ℹ️ Remembered on this device — no need to re-enter</p>
+    </div>
+    <div class="pill" id="userPill">
+      <div class="avatar" id="userInitial"></div>
+      <div class="uinfo"><div class="uname" id="pillName"></div><div class="uemail" id="pillEmail"></div></div>
+      <button class="chg" onclick="changeIdentity()">Change</button>
+    </div>
+  </div>
+
+  <!-- ── MODE SELECTOR ── -->
+  <div id="secMode" style="display:none">
+    <div class="mode-tabs">
+      <div class="mode-tab" id="tabManual" onclick="setMode('manual')">
+        <div class="mt-icon">✏️</div>
+        <div class="mt-title">Enter Manually</div>
+        <div class="mt-sub">Type details directly</div>
+      </div>
+      <div class="mode-tab" id="tabScan" onclick="setMode('scan')">
+        <div class="mt-icon">📷</div>
+        <div class="mt-title">Scan a Card</div>
+        <div class="mt-sub">Capture & auto-extract</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MANUAL ENTRY FORM ── -->
+  <div class="card" id="secManual" style="display:none">
+    <div class="card-title">Manual Entry</div>
+    <div class="row2">
+      <div class="iw nomb"><span class="ii">👤</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *" required/></div>
+    <span class="err-msg" id="err-m-personName"></span>
+      <div class="iw nomb"><span class="ii">📞</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" required/></div>
+    <span class="err-msg" id="err-m-phone"></span>
+    </div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb"><span class="ii">🏢</span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *" required/></div>
+    <span class="err-msg" id="err-m-brandName"></span>
+      <div class="iw nomb"><span class="ii">💼</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *" required/></div>
+    <span class="err-msg" id="err-m-designation"></span>
+    </div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb"><span class="ii">🏪</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *" required/></div>
+    <span class="err-msg" id="err-m-pos"></span>
+      <div class="iw nomb"><span class="ii">🏙️</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *" required/></div>
+    <span class="err-msg" id="err-m-city"></span>
+    </div>
+    <div class="row2" style="margin-top:10px">
+      <div class="iw nomb"><span class="ii">🔢</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0" required/></div>
+    <span class="err-msg" id="err-m-storeCount"></span>
+      <div class="iw nomb">
+        <span class="ii">🎯</span>
+        <select id="m-intent" oninput="clearErr('m-intent')" style="flex:1;border:none;background:transparent;font-size:15px;color:var(--text);outline:none;">
+          <option value="">Intent to Buy *</option>
+          <option value="High">🔥 High</option>
+          <option value="Medium">🌤 Medium</option>
+          <option value="Low">❄️ Low</option>
+        </select>
+      </div>
+    <span class="err-msg" id="err-m-intent"></span>
+    </div>
+    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">💬</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
+    <button class="btn btn-p" onclick="submitManual()" style="margin-top:12px">📤 Submit Entry</button>
+  </div>
+
+  <!-- ── SCAN FORM — just upload ── -->
+  <div class="card" id="secScanForm" style="display:none">
+    <div class="card-title">Scan a Card</div>
+    <div id="prevWrap">
+      <img id="prevImg" src="" alt=""/>
+      <div class="prev-bar"><span id="prevName" style="font-weight:500;font-size:13px"></span><button class="rm" onclick="removeImg()">✕</button></div>
+    </div>
+    <div class="dz" id="dz" onclick="document.getElementById('fp').click()">
+      <span class="dz-icon">📷</span>
+      <div class="dz-main">Tap to browse or use camera</div>
+      <div class="dz-sub">JPG, PNG, WEBP · Max 10MB</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('fp').click()">📁 Browse</button>
+      <button class="btn btn-o btn-sm" onclick="document.getElementById('cam').click()">📸 Scan Now</button>
+    </div>
+    <input type="file" id="fp" accept="image/*"/>
+    <input type="file" id="cam" accept="image/*" capture="environment"/>
+    <button class="btn btn-p" id="scanBtn" onclick="doScan()" disabled style="margin-top:12px">🔍 Scan Card</button>
+  </div>
+
+  <!-- ── PROGRESS ── -->
+  <div class="card" id="secProgress" style="display:none">
+    <div class="prog-wrap">
+      <div class="scan-anim"><div class="scan-icon-box">🪪</div><div class="scan-line"></div></div>
+      <div class="psteps">
+        <div class="ps" id="ps1">⚡ Uploading image...</div>
+        <div class="ps" id="ps2">🔍 Reading your card...</div>
+        <div class="ps" id="ps3">📊 Preparing data...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SAVING PROGRESS ── -->
+  <div class="card" id="secSaving" style="display:none">
+    <div class="prog-wrap">
+      <div class="scan-anim"><div class="scan-icon-box">📊</div><div class="scan-line"></div></div>
+      <div class="psteps">
+        <div class="ps active pulse">📊 Saving to Google Sheets...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REVIEW & EDIT ── -->
+  <div class="card" id="secReview" style="display:none">
+    <div class="card-title">Review & Edit</div>
+    <img id="reviewPhoto" class="review-photo" src="" alt="Card"/>
+    <button class="btn btn-o btn-sm" id="changePhotoBtn" onclick="document.getElementById('fp2').click()" style="display:none;width:auto;margin-bottom:12px;">🔄 Change Photo</button>
+    <input type="file" id="fp2" accept="image/*"/>
+    <div class="eg">
+      <div class="eg2"><div class="el">🏢 Brand / Company</div><input type="text" id="e-brandName" placeholder="Brand Name *" required/></div>
+      <div class="eg1"><div class="el">👤 Person Name</div><input type="text" id="e-personName" placeholder="Person Name"/></div>
+      <div class="eg1"><div class="el">💼 Designation</div><input type="text" id="e-designation" placeholder="Designation *" required/></div>
+      <div class="eg1"><div class="el">🏬 Department</div><input type="text" id="e-department" placeholder="Department"/></div>
+      <div class="eg1"><div class="el">📞 Phone</div><input type="text" id="e-phone" placeholder="Phone"/></div>
+      <div class="eg1"><div class="el">📱 Alt Phone</div><input type="text" id="e-alternatePhone" placeholder="Alt Phone"/></div>
+      <div class="eg2"><div class="el">✉️ Email</div><input type="text" id="e-email" placeholder="Email"/></div>
+      <div class="eg2"><div class="el">🌐 Website</div><input type="text" id="e-website" placeholder="Website"/></div>
+      <div class="eg2"><div class="el">📍 Address</div><input type="text" id="e-address" placeholder="Address"/></div>
+      <div class="eg1"><div class="el">🏙️ City</div><input type="text" id="e-city" placeholder="City *" required/></div>
+      <div class="eg1"><div class="el">📌 State</div><input type="text" id="e-state" placeholder="State"/></div>
+      <div class="eg1"><div class="el">🌍 Country</div><input type="text" id="e-country" placeholder="Country"/></div>
+      <div class="eg1"><div class="el"># Pincode</div><input type="text" id="e-pincode" placeholder="Pincode"/></div>
+      <div class="eg1"><div class="el">🏪 POS *</div><input type="text" id="e-pos" placeholder="POS" required/></div>
+      <div class="eg1"><div class="el">🔢 Store Count *</div><input type="number" id="e-storeCount" placeholder="Store Count" min="0" required/></div>
+      <div class="eg1">
+        <div class="el">🎯 Intent to Buy *</div>
+        <select id="e-intent" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text);outline:none;">
+          <option value="">Select intent...</option>
+          <option value="High">🔥 High</option>
+          <option value="Medium">🌤 Medium</option>
+          <option value="Low">❄️ Low</option>
+        </select>
+      </div>
+      <div class="eg2"><div class="el">💬 Comments</div><textarea id="e-comments" placeholder="Additional comments..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:70px;"></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-o" onclick="goRescan()">🔄 Re-scan</button>
+      <button class="btn btn-p" onclick="submitScan()">✅ Submit</button>
+    </div>
+  </div>
+
+  <!-- ── RESULTS ── -->
+  <div id="secResults" style="display:none">
+    <div id="badge" class="badge"></div>
+    <div class="card">
+      <div class="card-title">Saved Successfully</div>
+      <div class="rg" id="resultsGrid"></div>
+    </div>
+    <button class="btn btn-p" onclick="reset()" style="margin-top:4px">🔄 New Entry</button>
+  </div>
+
+  <!-- SQL / NSQL Counter Bar -->
+  <div class="sql-bar" id="sqlBar">
+    <div class="sql-pill sql-side">
+      <span class="sql-pill-num" id="sqlCount">0</span>
+      <div class="sql-pill-info">
+        <span class="sql-pill-label">🎯 SQL</span>
+        <span class="sql-pill-sub">Today's leads</span>
+      </div>
+    </div>
+    <div class="sql-pill nsql-side">
+      <span class="sql-pill-num" id="nsqlCount">0</span>
+      <div class="sql-pill-info">
+        <span class="sql-pill-label">📋 NSQL</span>
+        <span class="sql-pill-sub">Today's entries</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer">CardScan · Saved to your team's Google Sheet</p>
+
+  <!-- Lead result popup -->
+  <div class="lead-popup" id="leadPopup" onclick="closeLeadPopup()">
+    <div class="lead-box" onclick="event.stopPropagation()">
+      <span class="lead-emoji" id="leadEmoji"></span>
+      <div class="lead-title" id="leadTitle"></div>
+      <div class="lead-sub"   id="leadSub"></div>
+      <div class="lead-count" id="leadCountBadge"></div>
+      <button class="lead-close" onclick="closeLeadPopup()">Continue 🚀</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let user = null, file = null, mode = null, scannedCardData = null;
+
+const CARD_FIELDS = ['brandName','personName','designation','department','email','phone',
+  'alternatePhone','website','address','city','state','country','pincode','pos','storeCount'];
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
+  document.getElementById('inName').addEventListener('input',  checkId);
+  const phoneEl = document.getElementById('m-phone');
+  if (phoneEl) {
+    ['input','keyup','change'].forEach(ev => phoneEl.addEventListener(ev, () => {
+      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, '').slice(0, 10);
+    }));
+  }
+  document.getElementById('inEmail').addEventListener('input', checkId);
+  ['inName','inEmail'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') saveIdentity(); }));
+  document.getElementById('fp').addEventListener('change',  e => { if(e.target.files[0]) setFile(e.target.files[0]); });
+  document.getElementById('cam').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
+  document.getElementById('fp2').addEventListener('change', e => {
+    if(e.target.files[0]) {
+      setFile(e.target.files[0]);
+      const r = new FileReader();
+      r.onload = ev => { document.getElementById('reviewPhoto').src = ev.target.result; };
+      r.readAsDataURL(e.target.files[0]);
+    }
+  });
+  const dz = document.getElementById('dz');
+  ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
+  dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) setFile(f); });
+});
+
+// ── Identity ──────────────────────────────────────────────────────────────────
+function checkId() {
+  document.getElementById('btnContinue').disabled =
+    !(document.getElementById('inName').value.trim() && document.getElementById('inEmail').value.trim());
+}
+function saveIdentity() {
+  const name = document.getElementById('inName').value.trim();
+  const email = document.getElementById('inEmail').value.trim();
+  if(!name||!email) return;
+  try { localStorage.setItem('cardScanUser', JSON.stringify({name,email})); } catch(e){}
+  applyUser({name,email});
+}
+function applyUser(u) {
+  user = u;
+  document.getElementById('pillName').textContent    = u.name;
+  document.getElementById('pillEmail').textContent   = u.email;
+  document.getElementById('userInitial').textContent = u.name.charAt(0).toUpperCase();
+  document.getElementById('idForm').style.display    = 'none';
+  document.getElementById('userPill').classList.add('show');
+  document.getElementById('secMode').style.display   = 'block';
+  fetchAndUpdateCounts();
+}
+function changeIdentity() {
+  user = null;
+  try { localStorage.removeItem('cardScanUser'); } catch(e){}
+  document.getElementById('idForm').style.display = 'block';
+  document.getElementById('userPill').classList.remove('show');
+  document.getElementById('secMode').style.display    = 'none';
+  document.getElementById('secManual').style.display  = 'none';
+  document.getElementById('secScanForm').style.display = 'none';
+  removeImg();
+}
+
+// ── Mode selector ─────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('tabManual').classList.toggle('active', m==='manual');
+  document.getElementById('tabScan').classList.toggle('active',   m==='scan');
+  document.getElementById('secManual').style.display   = m==='manual' ? 'block' : 'none';
+  document.getElementById('secScanForm').style.display = m==='scan'   ? 'block' : 'none';
+}
+
+// ── File handling — compresses image to stay under 5MB ────────────────────────
+function setFile(f) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    // Show preview immediately
+    document.getElementById('prevImg').src = ev.target.result;
+    document.getElementById('prevName').textContent = f.name;
+    document.getElementById('prevWrap').style.display = 'block';
+    document.getElementById('dz').style.display = 'none';
+    document.getElementById('scanBtn').disabled = false;
+
+    // Compress to stay under 5MB before sending to server
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = image.width, h = image.height;
+      const MAX = 1600;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(image, 0, 0, w, h);
+      canvas.toBlob(blob => { file = blob; }, 'image/jpeg', 0.82);
+    };
+    image.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+
+function removeImg() {
+  file = null;
+  document.getElementById('prevWrap').style.display = 'none';
+  document.getElementById('dz').style.display = 'block';
+  document.getElementById('fp').value = document.getElementById('cam').value = '';
+  document.getElementById('scanBtn').disabled = true;
+}
+
+// ── MANUAL SUBMIT ─────────────────────────────────────────────────────────────
+async function submitManual() {
+  const personName  = document.getElementById('m-personName').value.trim();
+  const phone       = document.getElementById('m-phone').value.trim();
+  const brandName   = document.getElementById('m-brandName').value.trim();
+  const designation = document.getElementById('m-designation').value.trim();
+  const pos         = document.getElementById('m-pos').value.trim();
+  const city        = document.getElementById('m-city').value.trim();
+  const storeCount  = document.getElementById('m-storeCount').value.trim();
+  const intent      = document.getElementById('m-intent').value;
+
+  if (!personName)  return showFieldError('m-personName',  'Person Name is required');
+  if (!phone)       return showFieldError('m-phone',       'Phone Number is required');
+  if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone', 'Phone must be exactly 10 digits');
+  if (!brandName)   return showFieldError('m-brandName',   'Brand Name is required');
+  if (!designation) return showFieldError('m-designation', 'Designation is required');
+  if (!pos)         return showFieldError('m-pos',         'POS is required');
+  if (!city)        return showFieldError('m-city',        'City is required');
+  if (!storeCount)  return showFieldError('m-storeCount',  'Store Count is required');
+  if (!intent)      return showFieldError('m-intent',      'Intent to Buy is required');
+
+  hideAll(); document.getElementById('secSaving').style.display = 'block';
+
+  const payload = {
+    brandName, personName, designation, phone, city, pos, storeCount,
+    comments:    document.getElementById('m-comments').value.trim(),
+    intentToBuy: intent,
+    manualOnly:  'true',
+    scannerName:  user.name,
+    scannerEmail: user.email
+  };
+
+  try {
+    const fd = new FormData();
+    Object.entries(payload).forEach(([k,v]) => fd.append(k,v));
+    const res    = await fetch('/api/scan', { method:'POST', body:fd });
+    const result = await res.json();
+    if(!res.ok || !result.success) throw new Error(result.error || 'Save failed');
+    showResults(result, payload);
+  } catch(err) {
+    document.getElementById('secSaving').style.display = 'none';
+    showError(err.message);
+  }
+}
+
+// ── SCAN: extract only ────────────────────────────────────────────────────────
+async function doScan() {
+  if (!file) return showError('Please select a card photo first');
+  hideAll(); document.getElementById('secProgress').style.display = 'block';
+  setPS(1);
+
+  try {
+    const fd = new FormData();
+    fd.append('card',         file);
+    fd.append('scannerName',  user.name);
+    fd.append('scannerEmail', user.email);
+    fd.append('extractOnly',  'true');
+    setPS(2);
+    const res    = await fetch('/api/scan', { method:'POST', body:fd });
+    const result = await res.json();
+    setPS(3);
+    await new Promise(r => setTimeout(r,400));
+    if(!res.ok || !result.success) throw new Error(result.error || 'Scan failed');
+    scannedCardData = result.cardData;
+    showReview(result.cardData);
+  } catch(err) {
+    document.getElementById('secProgress').style.display = 'none';
+    showError(err.message);
+  }
+}
+
+// ── Show review screen ────────────────────────────────────────────────────────
+function showReview(cardData) {
+  CARD_FIELDS.forEach(f => {
+    const el = document.getElementById('e-'+f);
+    if(el) el.value = cardData[f] || '';
+  });
+  if (file) {
+    const r = new FileReader();
+    r.onload = e => {
+      document.getElementById('reviewPhoto').src = e.target.result;
+      document.getElementById('reviewPhoto').style.display = 'block';
+      document.getElementById('changePhotoBtn').style.display = 'inline-flex';
+    };
+    r.readAsDataURL(file);
+  }
+  document.getElementById('secProgress').style.display = 'none';
+  document.getElementById('secReview').style.display   = 'block';
+}
+
+// ── Re-scan ───────────────────────────────────────────────────────────────────
+function goRescan() {
+  scannedCardData = null;
+  document.getElementById('secReview').style.display   = 'none';
+  document.getElementById('secMode').style.display     = 'block';
+  document.getElementById('secScanForm').style.display = 'block';
+  removeImg();
+}
+
+// ── SCAN SUBMIT: save with edited data ────────────────────────────────────────
+async function submitScan() {
+  const pos        = document.getElementById('e-pos')?.value.trim();
+  const storeCount = document.getElementById('e-storeCount')?.value.trim();
+  const intent     = document.getElementById('e-intent')?.value;
+  if (!pos)        return showError('POS is required');
+  if (!storeCount) return showError('Store Count is required');
+  if (!intent)     return showError('Intent to Buy is required');
+
+  const editedCard = {};
+  CARD_FIELDS.forEach(f => {
+    const el = document.getElementById('e-'+f);
+    editedCard[f] = el ? el.value.trim() : '';
+  });
+
+  hideAll(); document.getElementById('secSaving').style.display = 'block';
+
+  try {
+    const fd = new FormData();
+    if(file) fd.append('card', file);
+    fd.append('scannerName',  user.name);
+    fd.append('scannerEmail', user.email);
+    fd.append('pos',          pos);
+    fd.append('storeCount',   storeCount);
+    fd.append('outletName',   storeCount);
+    fd.append('comments',     document.getElementById('e-comments')?.value.trim() || '');
+    fd.append('intentToBuy',  intent);
+    fd.append('saveOnly',     'true');
+    fd.append('editedCard',   JSON.stringify(editedCard));
+
+    const res    = await fetch('/api/scan', { method:'POST', body:fd });
+    const result = await res.json();
+    if(!res.ok || !result.success) throw new Error(result.error || 'Save failed');
+    showResults(result, editedCard);
+  } catch(err) {
+    document.getElementById('secSaving').style.display = 'none';
+    showError(err.message);
+  }
+}
+
+// ── Show results ──────────────────────────────────────────────────────────────
+function showResults(result, localData) {
+  const d = { ...result.cardData, ...localData };
+  const rows = [
+    ['👤 Person Name', d.personName], ['🏢 Brand', d.brandName],
+    ['💼 Designation', d.designation], ['📞 Phone', d.phone],
+    ['✉️ Email', d.email], ['🏙️ City', d.city || d.address],
+    ['🌐 Website', d.website], ['🏪 POS', d.pos || result.cardData?.pos],
+    ['🏬 Outlets', d.outletName || result.cardData?.outletName],
+    ['🔢 Store Count', d.storeCount || result.cardData?.storeCount],
+    ['💬 Comments', d.comments || result.cardData?.comments],
+    ['👤 Scanned By', user.name + ' (' + user.email + ')']
+  ];
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = rows.filter(([,v]) => v).map(([l,v]) =>
+    `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`
+  ).join('');
+  const b = document.getElementById('badge');
+  b.className = result.sheetSuccess ? 'badge bok' : 'badge berr';
+  b.innerHTML = result.sheetSuccess ? '✅ ' + result.sheetMessage : '⚠️ ' + result.sheetMessage;
+  document.getElementById('secSaving').style.display  = 'none';
+  document.getElementById('secResults').style.display = 'block';
+  const posVal = result.cardData?.pos || localData?.pos || '';
+  setTimeout(() => showLeadPopup(posVal), 400);
+}
+
+function showError(msg) {
+  const b = document.getElementById('badge');
+  b.className = 'badge berr'; b.innerHTML = '❌ ' + msg;
+  document.getElementById('secResults').style.display = 'block';
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function reset() {
+  scannedCardData = null; mode = null;
+  removeImg();
+  ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments',
+   'e-pos','e-storeCount','e-comments'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const mi = document.getElementById('m-intent'); if(mi) mi.value='';
+  const ei = document.getElementById('e-intent'); if(ei) ei.value='';
+  document.getElementById('tabManual').classList.remove('active');
+  document.getElementById('tabScan').classList.remove('active');
+  document.getElementById('reviewPhoto').style.display    = 'none';
+  document.getElementById('changePhotoBtn').style.display = 'none';
+  hideAll();
+  document.getElementById('secIdentity').style.display = 'block';
+  document.getElementById('secMode').style.display     = user ? 'block' : 'none';
+}
+
+function hideAll() {
+  ['secManual','secScanForm','secProgress','secSaving','secReview','secResults']
+    .forEach(id => document.getElementById(id).style.display = 'none');
+}
+
+function showFieldError(fieldId, msg) {
+  const el    = document.getElementById(fieldId);
+  const errEl = document.getElementById('err-' + fieldId);
+  if (el) {
+    el.closest('.iw').classList.add('field-err');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  if (errEl) {
+    errEl.textContent = '⚠️ ' + msg;
+    errEl.style.display = 'block';
+  }
+}
+function clearErr(fieldId) {
+  const el    = document.getElementById(fieldId);
+  const errEl = document.getElementById('err-' + fieldId);
+  if (el && el.closest('.iw')) el.closest('.iw').classList.remove('field-err');
+  if (errEl) errEl.style.display = 'none';
+}
+
+// ── SQL POS list ──────────────────────────────────────────────────────────────
+const SQL_POS = new Set([
+  'petpooja','posist','ezeepos','gofrugal','websys','ciferon','centramation',
+  'posify','tmbill','sparrowpos','vasypos','sanguinepos','horecafox','allpos',
+  'digitory','quickbill','binix','rista by dotpe','lucid','quintapos','csat',
+  'royalpos','dotpe','eezeepos','qpos','happyonpos','csatpos','lucidpos',
+  'lucid pos','romio','romiopos','restroworks','petpooja','sanguine pos',
+  'dataman','sanguinepos','vasy pos','royal','posist (restroworks)',
+  'billing fast pos','billingfastpos','billingfast pos','devourin','devorin',
+  'airmenus','air menu','airmenu','chefdeskpos','chef desk pos','chefdesk pos',
+  'devoruinpos','devoruin','devoruin pos','mishipay','mishipaypos','mishi pay',
+  'misipay','misi pay','rista','quinta','tmbill','abitzu','sparktech',
+  'sparktech pos','quinta pos','royal pos','lucid pos'
+]);
+
+const SQL_MOTIVATIONAL = [
+  "You're on fire! Keep it up! 🔥",
+  "Another one in the bag! 💼",
+  "You're crushing it today! 💪",
+  "That's what we call a winner! 🏅",
+  "Keep the momentum going! ⚡",
+  "You're making it happen! 🌟",
+  "One step closer to the top! 🚀",
+  "Legendary work right there! 👑"
+];
+
+const NSQL_MOTIVATIONAL = [
+  "Every conversation counts — keep going! 💬",
+  "Building relationships one card at a time! 🤝",
+  "Not every lead is SQL, but every effort matters! 💡",
+  "Stay consistent — the SQLs will follow! 🎯",
+  "Great networking! Keep scanning! 📇",
+  "You're building your pipeline! Keep hustling! 🏃",
+  "Every entry brings you closer to a SQL! ⭐",
+  "Solid work — keep the energy up! ⚡"
+];
+
+function isSQL(pos) {
+  if (!pos) return false;
+  const normalized = pos.toLowerCase().trim().replace(/\s+/g, ' ');
+  return SQL_POS.has(normalized);
+}
+
+// ── Live counts from sheet ────────────────────────────────────────────────────
+async function fetchAndUpdateCounts() {
+  if (!user) return;
+  try {
+    const date = new Date().toLocaleDateString('en-IN');
+    const res  = await fetch(`/api/counts?scannedBy=${encodeURIComponent(user.name)}&date=${encodeURIComponent(date)}`);
+    const data = await res.json();
+    document.getElementById('sqlCount').textContent  = data.sql  ?? 0;
+    document.getElementById('nsqlCount').textContent = data.nsql ?? 0;
+    document.getElementById('sqlBar').classList.add('show');
+  } catch(e) { /* silent */ }
+}
+
+// Auto-refresh every 30 seconds
+setInterval(function() { if (user) fetchAndUpdateCounts(); }, 30000);
+
+function showLeadPopup(pos) {
+  const sql   = isSQL(pos);
+  const emoji = document.getElementById('leadEmoji');
+  const title = document.getElementById('leadTitle');
+  const sub   = document.getElementById('leadSub');
+  const badge = document.getElementById('leadCountBadge');
+
+  fetchAndUpdateCounts().then(function() {
+    const sqlCount  = parseInt(document.getElementById('sqlCount').textContent)  || 0;
+    const nsqlCount = parseInt(document.getElementById('nsqlCount').textContent) || 0;
+
+    if (sql) {
+      emoji.textContent = ['🎯','🏆','🔥','⚡','🚀','💎'][Math.floor(Math.random()*6)];
+      title.textContent = 'SQL Lead! 🎉';
+      title.style.color = 'var(--success)';
+      sub.textContent   = SQL_MOTIVATIONAL[Math.floor(Math.random() * SQL_MOTIVATIONAL.length)];
+      badge.textContent = `🏆 ${sqlCount} SQL Lead${sqlCount>1?'s':''} today!`;
+      badge.className   = 'lead-count sql';
+    } else {
+      emoji.textContent = ['😊','👍','💬','🤝','📇','🌱'][Math.floor(Math.random()*6)];
+      title.textContent = 'Entry Saved!';
+      title.style.color = 'var(--accent)';
+      sub.textContent   = NSQL_MOTIVATIONAL[Math.floor(Math.random() * NSQL_MOTIVATIONAL.length)];
+      badge.textContent = sqlCount > 0
+        ? `📋 ${nsqlCount} NSQL · 🎯 ${sqlCount} SQL today!`
+        : `📋 ${nsqlCount} NSQL so far — keep going for that SQL! 💪`;
+      badge.className   = 'lead-count nsql';
+    }
+    document.getElementById('leadPopup').classList.add('show');
+  });
+}
+
+function closeLeadPopup() {
+  document.getElementById('leadPopup').classList.remove('show');
+}
+
+function setPS(n) {
+  for(let i=1;i<=3;i++){
+    const el=document.getElementById('ps'+i);
+    el.classList.remove('active','done','pulse');
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active','pulse');
+  }
+}
+</script>
+</body>
+</html>
