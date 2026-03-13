@@ -753,12 +753,27 @@ function closeLeadPopup() { document.getElementById('leadPopup').classList.remov
 
 function reset() {
   removeImg();
-  ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city','m-storeCount','m-comments','e-pos','e-storeCount','e-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['m-intent','e-intent'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('tabManual').classList.remove('active'); document.getElementById('tabScan').classList.remove('active');
-  document.getElementById('reviewPhoto').style.display='none'; hideAll();
-  document.getElementById('secIdentity').style.display='block';
-  document.getElementById('secMode').style.display=user?'block':'none';
+  // Clear manual fields
+  ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city',
+   'm-storeCount','m-comments'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  ['m-intent'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+
+  // Clear ALL scan review fields
+  ['e-brandName','e-personName','e-designation','e-department','e-phone',
+   'e-alternatePhone','e-email','e-website','e-address','e-city','e-state',
+   'e-country','e-pincode','e-pos','e-storeCount','e-comments'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  ['e-intent'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+
+  document.getElementById('tabManual').classList.remove('active');
+  document.getElementById('tabScan').classList.remove('active');
+  document.getElementById('reviewPhoto').style.display = 'none';
+  hideAll();
+  document.getElementById('secIdentity').style.display = 'block';
+  document.getElementById('secMode').style.display = user ? 'block' : 'none';
 }
 function hideAll() { ['secManual','secScanForm','secProgress','secSaving','secReview','secResults'].forEach(id=>document.getElementById(id).style.display='none'); }
 function showFieldError(fieldId,msg) { const el=document.getElementById(fieldId); if(el)el.scrollIntoView({behavior:'smooth',block:'center'}); const e=document.getElementById('err-'+fieldId); if(e){e.textContent='Warning: '+msg;e.style.display='block';} }
