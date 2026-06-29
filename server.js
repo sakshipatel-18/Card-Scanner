@@ -48,6 +48,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
 
   const pos         = req.body.pos         || '';
   const outletName  = req.body.outletName  || '';
+  const entryType = manualOnly ? 'Manual' : 'Card Scan';
   const storeCount  = req.body.storeCount  || '';
   const comments    = req.body.comments    || '';
   const intentToBuy = req.body.intentToBuy || '';
@@ -142,6 +143,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
         const payload = {
           ...cardData,
           scannedBy:    scannerName,
+          entryType,
           scannedEmail: scannerEmail,
           scannedAt:    new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
           scannerFolder: scannerName,
