@@ -378,6 +378,15 @@ function applyUser(u) {
   document.getElementById('userPill').classList.add('show');
   document.getElementById('secMode').style.display = 'block';
   localSqlCount = 0; localNsqlCount = 0;
+  try {
+    const saved = localStorage.getItem(getTodayKey(u.name));
+    if (saved) {
+      const c = JSON.parse(saved);
+      localSqlCount  = c.sql  || 0;
+      localNsqlCount = c.nsql || 0;
+      renderCounts(localSqlCount, localNsqlCount);
+    }
+  } catch(e) {}
   fetchAndUpdateCounts();
 }
 function changeIdentity() {
@@ -712,18 +721,17 @@ async function saveToSheet(payload) {
   document.getElementById('secResults').style.display = 'block';
   setTimeout(() => showLeadPopup(payload.pos || ''), 400);
 }
-function renderCounts(sql,nsql) { document.getElementById('sqlCount').textContent=sql; document.getElementById('nsqlCount').textContent=nsql; document.getElementById('sqlBar').classList.add('show'); }
-async function fetchAndUpdateCounts() {
-  if (!user) return;
-  try {
-    const now=new Date(), date=now.toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'});
-    const url=`${APPS_SCRIPT_URL}?action=counts&scannedBy=${encodeURIComponent(user.name)}&date=${encodeURIComponent(date)}`;
-    const res=await fetch(url); if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    localSqlCount=Math.max(localSqlCount,data.sql??data.SQL??0);
-    localNsqlCount=Math.max(localNsqlCount,data.nsql??data.NSQL??0);
-    renderCounts(localSqlCount,localNsqlCount);
-  } catch(e) { renderCounts(localSqlCount,localNsqlCount); console.warn('Counts fetch failed:',e.message); }
+function getTodayKey(name) {
+  const date = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+  return 'counts_' + name + '_' + date;
+}
+function renderCounts(sql, nsql) {
+  document.getElementById('sqlCount').textContent = sql;
+  document.getElementById('nsqlCount').textContent = nsql;
+  document.getElementById('sqlBar').classList.add('show');
+  if (user) {
+    try { localStorage.setItem(getTodayKey(user.name), JSON.stringify({ sql, nsql })); } catch(e) {}
+  }
 }
 setInterval(()=>{if(user)fetchAndUpdateCounts();},30000);
 
