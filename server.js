@@ -148,6 +148,7 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
           ...cardData,
           scannedBy:    scannerName,
           entryType,
+          forBrand: forBrand || cardData.forBrand || '', 
           scannedEmail: scannerEmail,
           scannedAt:    new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
           scannerFolder: scannerName,
