@@ -219,6 +219,18 @@
     </div>
     <span class="err-msg" id="err-m-storeCount"></span>
     <span class="err-msg" id="err-m-intent"></span>
+    <div class="row2" style="margin-top:10px">
+  <div class="iw nomb">
+    <span class="ii">🏷️</span>
+    <select id="m-forBrand" onchange="clearErr('m-forBrand')">
+      <option value="">For *</option>
+      <option value="Reelo">Reelo</option>
+      <option value="Olly">Olly</option>
+      <option value="Both">Both</option>
+    </select>
+  </div>
+</div>
+<span class="err-msg" id="err-m-forBrand"></span>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">&#128172;</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
     <button class="btn btn-p" onclick="checkPOSThenSubmit()" style="margin-top:12px">&#128228; Submit Entry</button>
   </div>
@@ -288,6 +300,15 @@
           <option value="">Select intent...</option>
           <option value="Hot">&#128293; Hot</option>
           <option value="Warm">&#127780; Warm</option>
+        </select>
+      </div>
+      <div class="eg1">
+        <div class="el">🏷️ For *</div>
+        <select id="e-forBrand">
+        <option value="">Select...</option>
+        <option value="Reelo">Reelo</option>
+        <option value="Olly">Olly</option>
+        <option value="Both">Both</option>
         </select>
       </div>
       <div class="eg2"><div class="el">&#128172; Comments</div><textarea id="e-comments" placeholder="Additional comments..."></textarea></div>
@@ -491,6 +512,8 @@ async function submitScan() {
   });
   editedCard.intentToBuy = document.getElementById('e-intent').value;
   editedCard.comments    = document.getElementById('e-comments').value.trim();
+  editedCard.forBrand    = document.getElementById('e-forBrand').value;  // ← ADD
+
 
   hideAll();
   document.getElementById('secSaving').style.display = 'block';
@@ -668,7 +691,14 @@ async function submitManual() {
   if (!storeCount) return showFieldError('m-storeCount','Store Count is required');
   if (!intent) return showFieldError('m-intent','Intent to Buy is required');
   hideAll(); document.getElementById('secSaving').style.display = 'block';
-  await saveToSheet({ personName,phone,brandName,designation,pos,city,storeCount, intentToBuy:intent, comments:document.getElementById('m-comments').value.trim(), scannerName:user.name, scannerEmail:user.email, scannedAt:new Date().toLocaleString('en-IN') });
+  await saveToSheet({
+    personName, phone, brandName, designation, pos, city, storeCount,
+    intentToBuy: intent,
+    forBrand: document.getElementById('m-forBrand').value,  // ← ADD
+    comments: document.getElementById('m-comments').value.trim(),
+    scannerName: user.name, scannerEmail: user.email,
+    scannedAt: new Date().toLocaleString('en-IN')
+  });
 }
 
 async function saveToSheet(payload) {
@@ -679,6 +709,8 @@ async function saveToSheet(payload) {
     scannedBy:     payload.scannerName,
     scannedEmail:  payload.scannerEmail,
     scannerFolder: payload.scannerName,
+    entryType:     'Manual',   // ← ADD THIS
+    forBrand:      payload.forBrand || '' ,
     scannedAt:     payload.scannedAt || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
   };
   try {
@@ -763,7 +795,7 @@ function reset() {
   removeImg();
   // Clear manual fields
   ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city',
-   'm-storeCount','m-comments'].forEach(id => {
+   'm-storeCount','m-comments','m-forBrand'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   ['m-intent'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
@@ -771,7 +803,7 @@ function reset() {
   // Clear ALL scan review fields
   ['e-brandName','e-personName','e-designation','e-department','e-phone',
    'e-alternatePhone','e-email','e-website','e-address','e-city','e-state',
-   'e-country','e-pincode','e-pos','e-storeCount','e-comments'].forEach(id => {
+   'e-country','e-pincode','e-pos','e-storeCount','e-comments','e-forBrand'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   ['e-intent'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });

@@ -47,7 +47,8 @@ const HEADERS = [
   'Scanned Email',
   'Scanned At',
   'Card Image URL',
-  'Type'
+  'Type',
+  'For'
 ];
 
 function setupHeaders() {
@@ -73,9 +74,8 @@ function getCounts(e) {
   try {
     const scannedBy = ((e.parameter.scannedBy) || '').toLowerCase().trim();
     const date      = ((e.parameter.date)      || '').trim();
-
-    const sheet   = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_TAB);
-    const allData = sheet.getDataRange().getValues();
+    const sheet     = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_TAB);
+    const allData   = sheet.getDataRange().getValues();
     if (allData.length <= 1) return jsonOut({ sql: 0, nsql: 0 });
 
     const headers = allData[0].map(String);
@@ -86,21 +86,17 @@ function getCounts(e) {
 
     const sqlSet = new Set(SQL_POS_ARR);
     let sql = 0, nsql = 0;
-
     for (let i = 1; i < allData.length; i++) {
       const row    = allData[i];
       const rowBy  = String(row[byCol]  || '').toLowerCase().trim();
       const rowAt  = String(row[atCol]  || '');
       const rowPos = String(row[posCol] || '').toLowerCase().trim().replace(/\s+/g, ' ');
-      const byMatch   = !scannedBy || rowBy === scannedBy;
-      const dateMatch = !date      || rowAt.includes(date);
-      if (byMatch && dateMatch) {
+      if ((!scannedBy || rowBy === scannedBy) && (!date || rowAt.includes(date))) {
         sqlSet.has(rowPos) ? sql++ : nsql++;
       }
     }
     return jsonOut({ sql, nsql });
   } catch (err) {
-    Logger.log('getCounts error: ' + err.message);
     return jsonOut({ sql: 0, nsql: 0, error: err.message });
   }
 }
@@ -167,12 +163,12 @@ function doPost(e) {
       data.scannedEmail   || '',
       data.scannedAt      || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
       cardImageUrl,
-      data.entryType      || 'Card Scan'
+      data.entryType      || 'Card Scan',
+      data.forBrand       || ''
     ];
 
     sheet.appendRow(row);
     sheet.autoResizeColumns(1, HEADERS.length);
-
     return jsonOut({ success: true, driveUrl: cardImageUrl });
 
   } catch (err) {
@@ -186,17 +182,14 @@ function saveImageToDrive(base64Data, mimeType, fileName, scannerName) {
   try {
     parentFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
   } catch (err) {
-    Logger.log('Drive folder not found, using My Drive: ' + err.message);
     parentFolder = DriveApp.getRootFolder();
   }
-
   const safeName = (scannerName || 'Unknown').replace(/[^a-zA-Z0-9 \-_]/g, '').trim();
   const existing = parentFolder.getFoldersByName(safeName);
   const folder   = existing.hasNext() ? existing.next() : parentFolder.createFolder(safeName);
-
-  const imageBytes = Utilities.base64Decode(base64Data);
-  const blob       = Utilities.newBlob(imageBytes, mimeType, fileName);
-  const file       = folder.createFile(blob);
+  const file     = folder.createFile(
+    Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, fileName)
+  );
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return file.getUrl();
 }
@@ -210,11 +203,10 @@ function jsonOut(obj) {
 function testInsert() {
   const mockData = {
     brandName: 'Acme Corp', personName: 'Ravi Sharma', designation: 'Manager',
-    department: 'Sales', email: 'ravi@acme.com', phone: '+91 98765 43210',
-    alternatePhone: '', website: 'www.acme.com', address: '42 MG Road',
-    city: 'Bengaluru', state: 'Karnataka', country: 'India', pincode: '560001',
-    linkedin: '', twitter: '', otherInfo: '',
-    pos: 'PetPooja', storeCount: '5', intentToBuy: 'Hot', comments: 'Met at trade show',
+    department: 'Sales', email: 'ravi@acme.com', phone: '9876543210',
+    city: 'Bengaluru', state: 'Karnataka', country: 'India',
+    pos: 'PetPooja', storeCount: '8', intentToBuy: 'Hot',
+    comments: 'Met at trade show', forBrand: 'Reelo',
     scannedBy: 'Test User', scannedEmail: 'test@company.com',
     scannedAt: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
     entryType: 'Card Scan'

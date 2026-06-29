@@ -52,6 +52,8 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
   const storeCount  = req.body.storeCount  || '';
   const comments    = req.body.comments    || '';
   const intentToBuy = req.body.intentToBuy || '';
+  const forBrand    = req.body.forBrand    || '';  // ← ADD
+
 
   try {
     let cardData = {};
@@ -128,6 +130,8 @@ app.post('/api/scan', upload.single('card'), async (req, res) => {
     cardData.storeCount  = storeCount  || cardData.storeCount  || '';
     cardData.comments    = comments    || cardData.comments    || '';
     cardData.intentToBuy = intentToBuy || cardData.intentToBuy || '';
+    cardData.forBrand    = forBrand    || cardData.forBrand    || '';  // ← ADD
+
 
     // extractOnly: return the extracted data for the review screen
     if (extractOnly) {
