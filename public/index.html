@@ -524,6 +524,8 @@ async function submitScan() {
   fd.append('editedCard',  JSON.stringify(editedCard));
   fd.append('scannerName', user.name);
   fd.append('scannerEmail',user.email);
+  fd.append('forBrand',    document.getElementById('e-forBrand').value || '');  // ← ADD
+
 
   if (compressedBase64) {
     const byteString = atob(compressedBase64);
