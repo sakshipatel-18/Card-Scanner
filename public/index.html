@@ -220,17 +220,17 @@
     <span class="err-msg" id="err-m-storeCount"></span>
     <span class="err-msg" id="err-m-intent"></span>
     <div class="row2" style="margin-top:10px">
-  <div class="iw nomb">
-    <span class="ii">🏷️</span>
-    <select id="m-forBrand" onchange="clearErr('m-forBrand')">
-      <option value="">For *</option>
-      <option value="Reelo">Reelo</option>
-      <option value="Olly">Olly</option>
-      <option value="Both">Both</option>
-    </select>
-  </div>
-</div>
-<span class="err-msg" id="err-m-forBrand"></span>
+      <div class="iw nomb">
+        <span class="ii">&#127991;&#65039;</span>
+        <select id="m-forBrand" onchange="clearErr('m-forBrand')">
+          <option value="">For *</option>
+          <option value="Reelo">Reelo</option>
+          <option value="Olly">Olly</option>
+          <option value="Both">Both</option>
+        </select>
+      </div>
+    </div>
+    <span class="err-msg" id="err-m-forBrand"></span>
     <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">&#128172;</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
     <button class="btn btn-p" onclick="checkPOSThenSubmit()" style="margin-top:12px">&#128228; Submit Entry</button>
   </div>
@@ -303,12 +303,12 @@
         </select>
       </div>
       <div class="eg1">
-        <div class="el">🏷️ For *</div>
+        <div class="el">&#127991;&#65039; For *</div>
         <select id="e-forBrand">
-        <option value="">Select...</option>
-        <option value="Reelo">Reelo</option>
-        <option value="Olly">Olly</option>
-        <option value="Both">Both</option>
+          <option value="">Select...</option>
+          <option value="Reelo">Reelo</option>
+          <option value="Olly">Olly</option>
+          <option value="Both">Both</option>
         </select>
       </div>
       <div class="eg2"><div class="el">&#128172; Comments</div><textarea id="e-comments" placeholder="Additional comments..."></textarea></div>
@@ -327,8 +327,6 @@
     </div>
     <button class="btn btn-p" onclick="reset()" style="margin-top:4px">&#128260; New Entry</button>
   </div>
-
-  <p class="footer">Card Scanner</p>
 
   <!-- POS Suggestion Popup -->
   <div class="pos-popup" id="posPopup">
@@ -512,9 +510,7 @@ async function submitScan() {
   });
   editedCard.intentToBuy = document.getElementById('e-intent').value;
   editedCard.comments    = document.getElementById('e-comments').value.trim();
-  editedCard.forBrand    = document.getElementById('e-forBrand').value;  // ← ADD
-
-
+  editedCard.forBrand    = document.getElementById('e-forBrand').value;
 
   hideAll();
   document.getElementById('secSaving').style.display = 'block';
@@ -525,8 +521,7 @@ async function submitScan() {
   fd.append('editedCard',  JSON.stringify(editedCard));
   fd.append('scannerName', user.name);
   fd.append('scannerEmail',user.email);
-  fd.append('forBrand',    document.getElementById('e-forBrand').value || '');  // ← ADD
-
+  fd.append('forBrand',    document.getElementById('e-forBrand').value || '');
 
   if (compressedBase64) {
     const byteString = atob(compressedBase64);
@@ -564,6 +559,7 @@ async function submitScan() {
     ['🏪 POS',         editedCard.pos],
     ['🔢 Store Count', editedCard.storeCount],
     ['🎯 Intent',      editedCard.intentToBuy],
+    ['🏷️ For',         editedCard.forBrand],
     ['💬 Comments',    editedCard.comments],
     ['👤 Scanned By',  user.name]
   ];
@@ -679,70 +675,77 @@ function keepAsNSQL() { closePosPopup(); if (_pendingSubmit) _pendingSubmit(); }
 
 function closePosPopup() { document.getElementById('posPopup').classList.remove('show'); _selectedPOS = null; }
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  MANUAL ENTRY — now routed through /api/scan on the server (same as scan)
+//  so Type and For fields are saved correctly.
+// ══════════════════════════════════════════════════════════════════════════════
 async function submitManual() {
-  const personName=document.getElementById('m-personName').value.trim(), phone=document.getElementById('m-phone').value.trim(),
-        brandName=document.getElementById('m-brandName').value.trim(), designation=document.getElementById('m-designation').value.trim(),
-        pos=document.getElementById('m-pos').value.trim(), city=document.getElementById('m-city').value.trim(),
-        storeCount=document.getElementById('m-storeCount').value.trim(), intent=document.getElementById('m-intent').value;
-  if (!personName) return showFieldError('m-personName','Person Name is required');
-  if (!phone) return showFieldError('m-phone','Phone Number is required');
-  if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone','Must be exactly 10 digits');
-  if (!brandName) return showFieldError('m-brandName','Brand Name is required');
-  if (!designation) return showFieldError('m-designation','Designation is required');
-  if (!pos) return showFieldError('m-pos','POS is required');
-  if (!city) return showFieldError('m-city','City is required');
-  if (!storeCount) return showFieldError('m-storeCount','Store Count is required');
-  if (!intent) return showFieldError('m-intent','Intent to Buy is required');
-  hideAll(); document.getElementById('secSaving').style.display = 'block';
-  await saveToSheet({
-    personName, phone, brandName, designation, pos, city, storeCount,
-    intentToBuy: intent,
-    forBrand: document.getElementById('m-forBrand').value,  // ← ADD
-    comments: document.getElementById('m-comments').value.trim(),
-    scannerName: user.name, scannerEmail: user.email,
-    scannedAt: new Date().toLocaleString('en-IN')
-  });
-}
+  const personName   = document.getElementById('m-personName').value.trim();
+  const phone        = document.getElementById('m-phone').value.trim();
+  const brandName    = document.getElementById('m-brandName').value.trim();
+  const designation  = document.getElementById('m-designation').value.trim();
+  const pos          = document.getElementById('m-pos').value.trim();
+  const city         = document.getElementById('m-city').value.trim();
+  const storeCount   = document.getElementById('m-storeCount').value.trim();
+  const intent       = document.getElementById('m-intent').value;
+  const forBrand     = document.getElementById('m-forBrand').value;
+  const comments     = document.getElementById('m-comments').value.trim();
 
-async function saveToSheet(payload) {
+  if (!personName)  return showFieldError('m-personName','Person Name is required');
+  if (!phone)       return showFieldError('m-phone','Phone Number is required');
+  if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone','Must be exactly 10 digits');
+  if (!brandName)   return showFieldError('m-brandName','Brand Name is required');
+  if (!designation) return showFieldError('m-designation','Designation is required');
+  if (!pos)         return showFieldError('m-pos','POS is required');
+  if (!city)        return showFieldError('m-city','City is required');
+  if (!storeCount)  return showFieldError('m-storeCount','Store Count is required');
+  if (!intent)      return showFieldError('m-intent','Intent to Buy is required');
+
+  hideAll();
+  document.getElementById('secSaving').style.display = 'block';
+
+  const fd = new FormData();
+  fd.append('manualOnly',   'true');
+  fd.append('scannerName',  user.name);
+  fd.append('scannerEmail', user.email);
+  fd.append('personName',   personName);
+  fd.append('phone',        phone);
+  fd.append('brandName',    brandName);
+  fd.append('designation',  designation);
+  fd.append('pos',          pos);
+  fd.append('city',         city);
+  fd.append('storeCount',   storeCount);
+  fd.append('intentToBuy',  intent);
+  fd.append('forBrand',     forBrand);
+  fd.append('comments',     comments);
+
   let success = false;
-  // Fix field names to match what Apps Script expects
-  const appsPayload = {
-    ...payload,
-    scannedBy:     payload.scannerName,
-    scannedEmail:  payload.scannerEmail,
-    scannerFolder: payload.scannerName,
-    entryType:     'Manual',   // ← ADD THIS
-    forBrand:      payload.forBrand || '' ,
-    scannedAt:     payload.scannedAt || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-  };
   try {
-    const res  = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(appsPayload) });
+    const res  = await fetch('/api/scan', { method: 'POST', body: fd });
     const data = await res.json();
-    success = data.success === true;
+    success    = data.sheetSuccess === true;
   } catch(e) { success = false; }
 
   if (success) {
-    if (isSQL(payload.pos || '')) { localSqlCount++;  }
-    else                          { localNsqlCount++; }
+    if (isSQL(pos)) { localSqlCount++;  }
+    else            { localNsqlCount++; }
     renderCounts(localSqlCount, localNsqlCount);
   }
 
   document.getElementById('secSaving').style.display = 'none';
 
   const rows = [
-    ['👤 Person',     payload.personName],
-    ['🏢 Brand',      payload.brandName],
-    ['💼 Designation',payload.designation],
-    ['📞 Phone',      payload.phone],
-    ['✉️ Email',      payload.email],
-    ['🏙️ City',       payload.city],
-    ['🌐 Website',    payload.website],
-    ['🏪 POS',        payload.pos],
-    ['🔢 Store Count',payload.storeCount],
-    ['🎯 Intent',     payload.intentToBuy],
-    ['💬 Comments',   payload.comments],
-    ['👤 Scanned By', payload.scannerName]
+    ['👤 Person',      personName],
+    ['🏢 Brand',       brandName],
+    ['💼 Designation', designation],
+    ['📞 Phone',       phone],
+    ['🏙️ City',        city],
+    ['🏪 POS',         pos],
+    ['🔢 Store Count', storeCount],
+    ['🎯 Intent',      intent],
+    ['🏷️ For',         forBrand],
+    ['💬 Comments',    comments],
+    ['👤 Scanned By',  user.name]
   ];
   document.getElementById('resultsGrid').innerHTML = rows
     .filter(([,v]) => v)
@@ -754,8 +757,9 @@ async function saveToSheet(payload) {
   b.innerHTML = success ? '✅ Saved to Google Sheets!' : '⚠️ Could not save — check connection';
 
   document.getElementById('secResults').style.display = 'block';
-  setTimeout(() => showLeadPopup(payload.pos || ''), 400);
+  setTimeout(() => showLeadPopup(pos), 400);
 }
+
 function getTodayKey(name) {
   const date = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
   return 'counts_' + name + '_' + date;
@@ -767,6 +771,18 @@ function renderCounts(sql, nsql) {
   if (user) {
     try { localStorage.setItem(getTodayKey(user.name), JSON.stringify({ sql, nsql })); } catch(e) {}
   }
+}
+async function fetchAndUpdateCounts() {
+  if (!user) return;
+  try {
+    const now=new Date(), date=now.toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'});
+    const url=`${APPS_SCRIPT_URL}?action=counts&scannedBy=${encodeURIComponent(user.name)}&date=${encodeURIComponent(date)}`;
+    const res=await fetch(url); if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    localSqlCount=Math.max(localSqlCount,data.sql??data.SQL??0);
+    localNsqlCount=Math.max(localNsqlCount,data.nsql??data.NSQL??0);
+    renderCounts(localSqlCount,localNsqlCount);
+  } catch(e) { renderCounts(localSqlCount,localNsqlCount); console.warn('Counts fetch failed:',e.message); }
 }
 setInterval(()=>{if(user)fetchAndUpdateCounts();},30000);
 
