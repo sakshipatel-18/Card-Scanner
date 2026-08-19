@@ -32,6 +32,7 @@
   .mode-tab .mt-icon{font-size:28px;margin-bottom:6px;}
   .mode-tab .mt-title{font-size:14px;font-weight:700;color:var(--text);}
   .mode-tab .mt-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .mode-tab.disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
   .iw{position:relative;margin-bottom:10px;}
   .iw:last-child,.iw.nomb{margin-bottom:0;}
@@ -84,6 +85,7 @@
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:13px;}
   .bok{background:#d1fae5;color:var(--success);border:1px solid #6ee7b7;}
   .berr{background:#ffe4e6;color:var(--error);border:1px solid #fda4af;}
+  .bqueued{background:#fef3c7;color:#d97706;border:1px solid #fcd34d;}
   .footer{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;}
   .sql-bar{display:none;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(13,148,136,.07);}
   .sql-bar.show{display:flex;}
@@ -133,6 +135,15 @@
   .pos-use-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:12px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:all .2s;opacity:.35;pointer-events:none;}
   .pos-use-btn.ready{opacity:1;pointer-events:all;box-shadow:0 4px 12px rgba(13,148,136,.3);}
   input[type=file]{display:none;}
+  /* Offline UI */
+  .offline-banner{display:none;align-items:center;gap:10px;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1.5px solid #fcd34d;border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:#b45309;}
+  .offline-banner.show{display:flex;}
+  .offline-banner .ob-icon{font-size:20px;}
+  .sync-badge{display:none;align-items:center;gap:8px;background:linear-gradient(135deg,#ecfeff,#f0fdfa);border:1.5px solid #67e8f9;border-radius:12px;padding:9px 14px;margin-bottom:12px;font-size:12.5px;font-weight:600;color:var(--accent2);}
+  .sync-badge.show{display:flex;}
+  .sync-badge .sb-icon{font-size:16px;}
+  .sync-badge .sb-fill{flex:1;}
+  .sync-badge button{background:none;border:1px solid var(--accent2);color:var(--accent2);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
   @media(max-width:480px){.row2,.eg,.rg,.btn-row,.mode-tabs{grid-template-columns:1fr;}.eg2,.r2{grid-column:span 1;}.card{padding:15px;}}
 </style>
 </head>
@@ -142,6 +153,17 @@
     <div class="logo"><div class="logo-icon">📇</div><span class="logo-text">Card Scanner</span></div>
     <p>Scan business cards &middot; Save to Google Sheets instantly</p>
   </header>
+
+  <div class="offline-banner" id="offlineBanner">
+    <span class="ob-icon">📴</span>
+    <span>You're offline — entries you save will be stored on this device and synced automatically once you're back online.</span>
+  </div>
+
+  <div class="sync-badge" id="syncBadge">
+    <span class="sb-icon">🔄</span>
+    <span class="sb-fill" id="syncBadgeText">0 entries waiting to sync</span>
+    <button onclick="manualSync()" id="syncNowBtn">Sync now</button>
+  </div>
 
   <div class="card" id="secIdentity">
     <div class="card-title">Your Identity</div>
@@ -176,12 +198,12 @@
       <div class="mode-tab" id="tabManual" onclick="setMode('manual')">
         <div class="mt-icon">&#9999;&#65039;</div>
         <div class="mt-title">Enter Manually</div>
-        <div class="mt-sub">Type details directly</div>
+        <div class="mt-sub" id="tabManualSub">Type details directly</div>
       </div>
       <div class="mode-tab" id="tabScan" onclick="setMode('scan')">
         <div class="mt-icon">&#128247;</div>
         <div class="mt-title">Scan a Card</div>
-        <div class="mt-sub">Capture &amp; auto-extract</div>
+        <div class="mt-sub" id="tabScanSub">Capture &amp; auto-extract</div>
       </div>
     </div>
   </div>
@@ -270,7 +292,7 @@
     <div class="prog-wrap">
       <div class="scan-anim"><div class="scan-icon-box">&#128202;</div><div class="scan-line"></div></div>
       <div class="psteps">
-        <div class="ps active pulse">&#128202; Saving to Google Sheets...</div>
+        <div class="ps active pulse" id="savingLabel">&#128202; Saving to Google Sheets...</div>
       </div>
     </div>
   </div>
@@ -365,6 +387,178 @@ let user = null, compressedBase64 = null, compressedDataUrl = null;
 let localSqlCount = 0, localNsqlCount = 0;
 const CARD_FIELDS = ['brandName','personName','designation','department','email','phone','alternatePhone','website','address','city','state','country','pincode','pos','storeCount'];
 
+// ══════════════════════════════════════════════════════════════════════════
+//  OFFLINE QUEUE (IndexedDB) — holds up to MAX_QUEUE submissions locally
+//  and auto-syncs them to /api/scan whenever connectivity returns.
+// ══════════════════════════════════════════════════════════════════════════
+const MAX_QUEUE = 100;
+const DB_NAME = 'cardScannerOfflineDB', DB_STORE = 'pending';
+let isOnline = navigator.onLine;
+let isSyncing = false;
+let _dbPromise = null;
+
+function openQueueDB() {
+  if (_dbPromise) return _dbPromise;
+  _dbPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) {
+        db.createObjectStore(DB_STORE, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  return _dbPromise;
+}
+async function queueAdd(item) {
+  const db = await openQueueDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).add(item);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function queueGetAll() {
+  const db = await openQueueDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function queueDelete(id) {
+  const db = await openQueueDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).delete(id);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function queueCount() {
+  const db = await openQueueDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).count();
+    req.onsuccess = () => resolve(req.result || 0);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function b64toBlob(b64, mime) {
+  const byteString = atob(b64);
+  const ab = new ArrayBuffer(byteString.length), ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+  return new Blob([ab], { type: mime || 'image/jpeg' });
+}
+
+// Active connectivity check — navigator.onLine only reflects the network
+// adapter, not real internet access, so we ping our own /api/health too.
+async function checkConnectivity() {
+  let reachable = false;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    const res = await fetch('/api/health', { cache: 'no-store', signal: ctrl.signal });
+    clearTimeout(t);
+    reachable = res.ok;
+  } catch (e) { reachable = false; }
+  const wasOnline = isOnline;
+  isOnline = reachable;
+  await updateOfflineUI();
+  if (isOnline && !wasOnline) syncQueue();
+  return isOnline;
+}
+
+async function updateOfflineUI() {
+  document.getElementById('offlineBanner').classList.toggle('show', !isOnline);
+  const tabScan = document.getElementById('tabScan');
+  const tabScanSub = document.getElementById('tabScanSub');
+  if (tabScan) {
+    tabScan.classList.toggle('disabled', !isOnline);
+    tabScanSub.textContent = isOnline ? 'Capture & auto-extract' : 'Needs internet for OCR';
+  }
+  const n = await queueCount().catch(() => 0);
+  const sb = document.getElementById('syncBadge');
+  const sbt = document.getElementById('syncBadgeText');
+  if (n > 0) {
+    sb.classList.add('show');
+    sbt.textContent = isSyncing
+      ? `Syncing... ${n} entr${n===1?'y':'ies'} left`
+      : `${n}/${MAX_QUEUE} entr${n===1?'y':'ies'} waiting to sync${isOnline ? '' : ' (offline)'}`;
+    document.getElementById('syncNowBtn').style.display = isOnline && !isSyncing ? 'inline-block' : 'none';
+  } else {
+    sb.classList.remove('show');
+  }
+}
+function manualSync() { checkConnectivity(); }
+
+async function syncQueue() {
+  if (isSyncing) return;
+  isSyncing = true;
+  await updateOfflineUI();
+  try {
+    let items = await queueGetAll();
+    items.sort((a,b) => a.id - b.id);
+    for (const item of items) {
+      if (!isOnline) break;
+      try {
+        const fd = new FormData();
+        if (item.mode === 'manual') {
+          fd.append('manualOnly', 'true');
+        } else {
+          fd.append('saveOnly', 'true');
+          fd.append('editedCard', JSON.stringify(item.fields));
+        }
+        fd.append('scannerName', item.scannerName);
+        fd.append('scannerEmail', item.scannerEmail);
+        fd.append('forBrand', item.fields.forBrand || '');
+        if (item.mode === 'manual') {
+          Object.entries(item.fields).forEach(([k,v]) => { if (k !== 'forBrand') fd.append(k === 'intentToBuy' ? 'intentToBuy' : k, v); });
+        }
+        if (item.imageBase64) fd.append('card', b64toBlob(item.imageBase64, item.imageMime), 'card.jpg');
+
+        const res = await fetch('/api/scan', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (res.ok && data.sheetSuccess) {
+          await queueDelete(item.id);
+        } else {
+          isOnline = false;
+          break;
+        }
+      } catch (e) { isOnline = false; break; }
+      await updateOfflineUI();
+    }
+  } finally {
+    isSyncing = false;
+    await updateOfflineUI();
+  }
+}
+
+// Queue a submission locally. Returns true if queued, false if queue is full.
+async function queueSubmission(mode, fields, imageBase64, imageMime) {
+  const n = await queueCount();
+  if (n >= MAX_QUEUE) return false;
+  await queueAdd({
+    mode, fields,
+    imageBase64: imageBase64 || null,
+    imageMime: imageMime || null,
+    scannerName: user.name,
+    scannerEmail: user.email,
+    createdAt: Date.now()
+  });
+  await updateOfflineUI();
+  return true;
+}
+
+window.addEventListener('online', checkConnectivity);
+window.addEventListener('offline', () => { isOnline = false; updateOfflineUI(); });
+setInterval(() => { if (!isSyncing) checkConnectivity(); }, 15000);
+
 window.addEventListener('DOMContentLoaded', () => {
   try { const s = localStorage.getItem('cardScanUser'); if(s) applyUser(JSON.parse(s)); } catch(e){}
   document.getElementById('inName').addEventListener('input', checkId);
@@ -379,6 +573,7 @@ window.addEventListener('DOMContentLoaded', () => {
   ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
   dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) setFile(f); });
   buildPosAllList();
+  checkConnectivity();
 });
 
 function checkId() { document.getElementById('btnContinue').disabled = !(document.getElementById('inName').value.trim() && document.getElementById('inEmail').value.trim()); }
@@ -407,6 +602,7 @@ function applyUser(u) {
     }
   } catch(e) {}
   fetchAndUpdateCounts();
+  updateOfflineUI();
 }
 function changeIdentity() {
   user = null;
@@ -421,6 +617,7 @@ function changeIdentity() {
   removeImg();
 }
 function setMode(m) {
+  if (m === 'scan' && !isOnline) { alert("You're offline — scanning needs internet to read the card with Claude AI. Use Manual Entry instead; it'll sync automatically once you're back online."); return; }
   document.getElementById('tabManual').classList.toggle('active', m==='manual');
   document.getElementById('tabScan').classList.toggle('active', m==='scan');
   document.getElementById('secManual').style.display = m==='manual' ? 'block' : 'none';
@@ -457,6 +654,7 @@ function removeImg() {
 }
 async function doScan() {
   if (!compressedBase64) return alert('Please select a card photo first');
+  if (!isOnline) { alert("You're offline — scanning needs internet to read the card."); return; }
   hideAll(); document.getElementById('secProgress').style.display = 'block'; setPS(1);
   try {
     setPS(2);
@@ -471,7 +669,7 @@ async function doScan() {
     if (!res.ok || !data.success) throw new Error(data.error || 'Scan failed');
     await new Promise(r => setTimeout(r, 300));
     showReview(data.cardData);
-  } catch(err) { document.getElementById('secProgress').style.display = 'none'; setMode('scan'); alert('Could not read card: ' + err.message); }
+  } catch(err) { document.getElementById('secProgress').style.display = 'none'; setMode('scan'); alert('Could not read card: ' + err.message); checkConnectivity(); }
 }
 function showReview(cardData) {
   CARD_FIELDS.forEach(f => { const el = document.getElementById('e-'+f); if(el) el.value = cardData[f]||''; });
@@ -513,6 +711,14 @@ async function submitScan() {
   editedCard.forBrand    = document.getElementById('e-forBrand').value;
 
   hideAll();
+
+  // ── Offline fallback: queue this reviewed card locally ──────────────────
+  if (!isOnline) {
+    const queued = await queueSubmission('scan', editedCard, compressedBase64, 'image/jpeg');
+    return finishSubmitUI(editedCard, queued, true);
+  }
+
+  document.getElementById('savingLabel').innerHTML = '&#128202; Saving to Google Sheets...';
   document.getElementById('secSaving').style.display = 'block';
 
   // Route through backend so image gets saved to Drive
@@ -524,89 +730,28 @@ async function submitScan() {
   fd.append('forBrand',    document.getElementById('e-forBrand').value || '');
 
   if (compressedBase64) {
-    const byteString = atob(compressedBase64);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-    const blob = new Blob([ab], { type: 'image/jpeg' });
-    fd.append('card', blob, 'card.jpg');
+    fd.append('card', b64toBlob(compressedBase64, 'image/jpeg'), 'card.jpg');
   }
 
-  let success = false, sheetMessage = '';
+  let success = false;
   try {
     const res  = await fetch('/api/scan', { method: 'POST', body: fd });
     const data = await res.json();
-    success      = data.sheetSuccess === true;
-    sheetMessage = data.sheetMessage || '';
+    success = data.sheetSuccess === true;
   } catch(e) { success = false; }
 
-  if (success) {
-    if (isSQL(editedCard.pos || '')) { localSqlCount++;  }
-    else                             { localNsqlCount++; }
-    renderCounts(localSqlCount, localNsqlCount);
+  if (!success) {
+    // Network dropped mid-submit — fall back to the offline queue instead of losing the entry
+    checkConnectivity();
+    const queued = await queueSubmission('scan', editedCard, compressedBase64, 'image/jpeg');
+    document.getElementById('secSaving').style.display = 'none';
+    return finishSubmitUI(editedCard, queued, true);
   }
 
+  if (isSQL(editedCard.pos || '')) { localSqlCount++; } else { localNsqlCount++; }
+  renderCounts(localSqlCount, localNsqlCount);
   document.getElementById('secSaving').style.display = 'none';
-
-  const rows = [
-    ['👤 Person',      editedCard.personName],
-    ['🏢 Brand',       editedCard.brandName],
-    ['💼 Designation', editedCard.designation],
-    ['📞 Phone',       editedCard.phone],
-    ['✉️ Email',       editedCard.email],
-    ['🏙️ City',        editedCard.city],
-    ['🌐 Website',     editedCard.website],
-    ['🏪 POS',         editedCard.pos],
-    ['🔢 Store Count', editedCard.storeCount],
-    ['🎯 Intent',      editedCard.intentToBuy],
-    ['🏷️ For',         editedCard.forBrand],
-    ['💬 Comments',    editedCard.comments],
-    ['👤 Scanned By',  user.name]
-  ];
-  document.getElementById('resultsGrid').innerHTML = rows
-    .filter(([,v]) => v)
-    .map(([l,v]) => `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`)
-    .join('');
-
-  const b = document.getElementById('badge');
-  b.className = success ? 'badge bok' : 'badge berr';
-  b.innerHTML = success ? '✅ Saved to Google Sheets & Drive!' : '⚠️ Could not save — check connection';
-
-  document.getElementById('secResults').style.display = 'block';
-  setTimeout(() => showLeadPopup(editedCard.pos || ''), 400);
-}
-
-// ── SQL POS LIST ──────────────────────────────────────────────────────────────
-const SQL_POS_DISPLAY = [
-  'PetPooja','PP','Posist','Posist (Restroworks)','Restroworks','EzeePos','EezeePos',
-  'GoFrugal','WebSys','Ciferon','Centramation','Posify','tmBill','SparrowPOS',
-  'VasyPOS','Vasy POS','Vasy','SanguinePOS','Sanguine POS','HorecaFox','AllPOS',
-  'Digitory','QuickBill','Binix','Rista by Dotpe','Rista','Dotpe','Lucid',
-  'LucidPOS','Lucid POS','QuintaPOS','Quinta','Quinta POS','CSAT','CSATPOS',
-  'RoyalPOS','Royal','Royal POS','QPOS','HappyOnPOS','Romio','RomioPOS','Dataman',
-  'Billing Fast POS','BillingFastPOS','Billingfast POS','Devourin','Devorin',
-  'Airmenus','Air Menu','Airmenu','ChefDeskPOS','Chef Desk POS','ChefDesk POS',
-  'DevoruinPOS','Devoruin','Devoruin POS','MishiPay','MishiPayPOS','Mishi Pay',
-  'MisiPay','Misi Pay','Abitzu','Sparktech','Sparktech POS'
-];
-function buildPosAllList() {
-  const c = document.getElementById('posAllList'); c.innerHTML = '';
-  SQL_POS_DISPLAY.forEach(name => {
-    const chip = document.createElement('button'); chip.className = 'pos-all-chip'; chip.textContent = name;
-    chip.onclick = () => highlightPOS(name, chip); c.appendChild(chip);
-  });
-}
-function fuzzyMatchPOS(input) {
-  if (!input) return [];
-  const q = input.toLowerCase().replace(/\s+/g,' ').trim(), results = [];
-  SQL_POS_DISPLAY.forEach(name => {
-    const n = name.toLowerCase().replace(/\s+/g,' '); let score = 0;
-    if (n===q) score=100; else if (n.replace(/\s/g,'')=== q.replace(/\s/g,'')) score=95;
-    else if (n.startsWith(q)||q.startsWith(n)) score=80; else if (n.includes(q)||q.includes(n)) score=65;
-    else { function bigrams(s){const b=new Set();for(let i=0;i<s.length-1;i++)b.add(s.slice(i,i+2));return b;} const bq=bigrams(q),bn=bigrams(n); let sh=0; bq.forEach(b=>{if(bn.has(b))sh++;}); score=sh>0?Math.round(sh/Math.max(bq.size,bn.size)*55):0; }
-    if (score>18) results.push({name,score});
-  });
-  return results.sort((a,b)=>b.score-a.score).slice(0,4).map(r=>r.name);
+  finishSubmitUI(editedCard, true, false);
 }
 
 function checkPOSThenSubmit() {
@@ -650,8 +795,6 @@ function openPosPopup(pos) {
   }
   document.getElementById('posPopup').classList.add('show');
 }
-
-// Tap any chip/row — highlights it, updates button label, does NOT submit
 function highlightPOS(name, clickedEl) {
   document.querySelectorAll('.pos-sug-btn,.pos-all-chip').forEach(el=>el.classList.remove('selected'));
   clickedEl.classList.add('selected');
@@ -660,8 +803,6 @@ function highlightPOS(name, clickedEl) {
   useBtn.textContent = 'Use ' + name;
   useBtn.classList.add('ready');
 }
-
-// Bottom button: confirm chosen POS → update field → submit
 function confirmSelectedPOS() {
   if (!_selectedPOS) return;
   const el = document.getElementById(_pendingPosField);
@@ -669,15 +810,12 @@ function confirmSelectedPOS() {
   closePosPopup();
   if (_pendingSubmit) _pendingSubmit();
 }
-
-// Bottom button: ignore POS check, save as NSQL
 function keepAsNSQL() { closePosPopup(); if (_pendingSubmit) _pendingSubmit(); }
-
 function closePosPopup() { document.getElementById('posPopup').classList.remove('show'); _selectedPOS = null; }
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  MANUAL ENTRY — now routed through /api/scan on the server (same as scan)
-//  so Type and For fields are saved correctly.
+//  MANUAL ENTRY — routed through /api/scan when online; queued in IndexedDB
+//  and retried automatically when offline.
 // ══════════════════════════════════════════════════════════════════════════════
 async function submitManual() {
   const personName   = document.getElementById('m-personName').value.trim();
@@ -701,7 +839,17 @@ async function submitManual() {
   if (!storeCount)  return showFieldError('m-storeCount','Store Count is required');
   if (!intent)      return showFieldError('m-intent','Intent to Buy is required');
 
+  const fields = { personName, phone, brandName, designation, pos, city, storeCount, intentToBuy: intent, forBrand, comments };
+
   hideAll();
+
+  // ── Offline fallback: queue locally ──────────────────────────────────────
+  if (!isOnline) {
+    const queued = await queueSubmission('manual', fields, null, null);
+    return finishSubmitUI(fields, queued, true);
+  }
+
+  document.getElementById('savingLabel').innerHTML = '&#128202; Saving to Google Sheets...';
   document.getElementById('secSaving').style.display = 'block';
 
   const fd = new FormData();
@@ -726,25 +874,34 @@ async function submitManual() {
     success    = data.sheetSuccess === true;
   } catch(e) { success = false; }
 
-  if (success) {
-    if (isSQL(pos)) { localSqlCount++;  }
-    else            { localNsqlCount++; }
-    renderCounts(localSqlCount, localNsqlCount);
+  if (!success) {
+    checkConnectivity();
+    const queued = await queueSubmission('manual', fields, null, null);
+    document.getElementById('secSaving').style.display = 'none';
+    return finishSubmitUI(fields, queued, true);
   }
 
+  if (isSQL(pos)) { localSqlCount++; } else { localNsqlCount++; }
+  renderCounts(localSqlCount, localNsqlCount);
   document.getElementById('secSaving').style.display = 'none';
+  finishSubmitUI(fields, true, false);
+}
 
+// Renders the results screen for both online-saved and offline-queued entries
+function finishSubmitUI(fields, success, wasQueued) {
   const rows = [
-    ['👤 Person',      personName],
-    ['🏢 Brand',       brandName],
-    ['💼 Designation', designation],
-    ['📞 Phone',       phone],
-    ['🏙️ City',        city],
-    ['🏪 POS',         pos],
-    ['🔢 Store Count', storeCount],
-    ['🎯 Intent',      intent],
-    ['🏷️ For',         forBrand],
-    ['💬 Comments',    comments],
+    ['👤 Person',      fields.personName],
+    ['🏢 Brand',       fields.brandName],
+    ['💼 Designation', fields.designation],
+    ['📞 Phone',       fields.phone],
+    ['✉️ Email',       fields.email],
+    ['🏙️ City',        fields.city],
+    ['🌐 Website',     fields.website],
+    ['🏪 POS',         fields.pos],
+    ['🔢 Store Count', fields.storeCount],
+    ['🎯 Intent',      fields.intentToBuy],
+    ['🏷️ For',         fields.forBrand],
+    ['💬 Comments',    fields.comments],
     ['👤 Scanned By',  user.name]
   ];
   document.getElementById('resultsGrid').innerHTML = rows
@@ -753,11 +910,19 @@ async function submitManual() {
     .join('');
 
   const b = document.getElementById('badge');
-  b.className = success ? 'badge bok' : 'badge berr';
-  b.innerHTML = success ? '✅ Saved to Google Sheets!' : '⚠️ Could not save — check connection';
+  if (!success && wasQueued) {
+    b.className = 'badge berr';
+    b.innerHTML = '⚠️ Offline storage full (100/100) — connect to internet to sync, then try again';
+  } else if (wasQueued) {
+    b.className = 'badge bqueued';
+    b.innerHTML = '📴 Saved offline — will sync automatically when you\'re back online';
+  } else {
+    b.className = 'badge bok';
+    b.innerHTML = '✅ Saved to Google Sheets!';
+  }
 
   document.getElementById('secResults').style.display = 'block';
-  setTimeout(() => showLeadPopup(pos), 400);
+  if (!wasQueued) setTimeout(() => showLeadPopup(fields.pos || ''), 400);
 }
 
 function getTodayKey(name) {
@@ -786,6 +951,38 @@ async function fetchAndUpdateCounts() {
 }
 setInterval(()=>{if(user)fetchAndUpdateCounts();},30000);
 
+const SQL_POS_DISPLAY = [
+  'PetPooja','PP','Posist','Posist (Restroworks)','Restroworks','EzeePos','EezeePos',
+  'GoFrugal','WebSys','Ciferon','Centramation','Posify','tmBill','SparrowPOS',
+  'VasyPOS','Vasy POS','Vasy','SanguinePOS','Sanguine POS','HorecaFox','AllPOS',
+  'Digitory','QuickBill','Binix','Rista by Dotpe','Rista','Dotpe','Lucid',
+  'LucidPOS','Lucid POS','QuintaPOS','Quinta','Quinta POS','CSAT','CSATPOS',
+  'RoyalPOS','Royal','Royal POS','QPOS','HappyOnPOS','Romio','RomioPOS','Dataman',
+  'Billing Fast POS','BillingFastPOS','Billingfast POS','Devourin','Devorin',
+  'Airmenus','Air Menu','Airmenu','ChefDeskPOS','Chef Desk POS','ChefDesk POS',
+  'DevoruinPOS','Devoruin','Devoruin POS','MishiPay','MishiPayPOS','Mishi Pay',
+  'MisiPay','Misi Pay','Abitzu','Sparktech','Sparktech POS'
+];
+function buildPosAllList() {
+  const c = document.getElementById('posAllList'); c.innerHTML = '';
+  SQL_POS_DISPLAY.forEach(name => {
+    const chip = document.createElement('button'); chip.className = 'pos-all-chip'; chip.textContent = name;
+    chip.onclick = () => highlightPOS(name, chip); c.appendChild(chip);
+  });
+}
+function fuzzyMatchPOS(input) {
+  if (!input) return [];
+  const q = input.toLowerCase().replace(/\s+/g,' ').trim(), results = [];
+  SQL_POS_DISPLAY.forEach(name => {
+    const n = name.toLowerCase().replace(/\s+/g,' '); let score = 0;
+    if (n===q) score=100; else if (n.replace(/\s/g,'')=== q.replace(/\s/g,'')) score=95;
+    else if (n.startsWith(q)||q.startsWith(n)) score=80; else if (n.includes(q)||q.includes(n)) score=65;
+    else { function bigrams(s){const b=new Set();for(let i=0;i<s.length-1;i++)b.add(s.slice(i,i+2));return b;} const bq=bigrams(q),bn=bigrams(n); let sh=0; bq.forEach(b=>{if(bn.has(b))sh++;}); score=sh>0?Math.round(sh/Math.max(bq.size,bn.size)*55):0; }
+    if (score>18) results.push({name,score});
+  });
+  return results.sort((a,b)=>b.score-a.score).slice(0,4).map(r=>r.name);
+}
+
 const SQL_POS = new Set(['petpooja','posist','ezeepos','gofrugal','websys','ciferon','centramation','posify','tmbill','sparrowpos','vasypos','sanguinepos','horecafox','allpos','digitory','quickbill','binix','rista by dotpe','lucid','quintapos','csat','royalpos','dotpe','eezeepos','qpos','happyonpos','csatpos','lucidpos','lucid pos','romio','romiopos','restroworks','sanguine pos','dataman','vasy pos','royal','posist (restroworks)','billing fast pos','billingfastpos','billingfast pos','devourin','devorin','airmenus','air menu','airmenu','chefdeskpos','chef desk pos','chefdesk pos','devoruinpos','devoruin','devoruin pos','mishipay','mishipaypos','mishi pay','misipay','misi pay','rista','quinta','abitzu','sparktech','sparktech pos','quinta pos','royal pos','pp']);
 const SQL_MSGS=["You're on fire!","Another SQL in the bag!","You're crushing it!","That's a winner!","Keep the momentum!","You're making it happen!","Legendary work!","One step closer to the top!"];
 const NSQL_MSGS=["Every conversation counts!","Building relationships one card at a time!","Not every lead is SQL - every effort matters!","Stay consistent, SQLs will follow!","Great networking! Keep scanning!","You're building your pipeline!","Keep hustling!","Every entry brings you closer to a SQL!"];
@@ -812,14 +1009,12 @@ function closeLeadPopup() { document.getElementById('leadPopup').classList.remov
 
 function reset() {
   removeImg();
-  // Clear manual fields
   ['m-personName','m-phone','m-brandName','m-designation','m-pos','m-city',
    'm-storeCount','m-comments','m-forBrand'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   ['m-intent'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
-  // Clear ALL scan review fields
   ['e-brandName','e-personName','e-designation','e-department','e-phone',
    'e-alternatePhone','e-email','e-website','e-address','e-city','e-state',
    'e-country','e-pincode','e-pos','e-storeCount','e-comments','e-forBrand'].forEach(id => {
@@ -833,6 +1028,7 @@ function reset() {
   hideAll();
   document.getElementById('secIdentity').style.display = 'block';
   document.getElementById('secMode').style.display = user ? 'block' : 'none';
+  checkConnectivity();
 }
 function hideAll() { ['secManual','secScanForm','secProgress','secSaving','secReview','secResults'].forEach(id=>document.getElementById(id).style.display='none'); }
 function showFieldError(fieldId,msg) { const el=document.getElementById(fieldId); if(el)el.scrollIntoView({behavior:'smooth',block:'center'}); const e=document.getElementById('err-'+fieldId); if(e){e.textContent='Warning: '+msg;e.style.display='block';} }
