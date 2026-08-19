@@ -210,51 +210,65 @@
 
   <div class="card" id="secManual" style="display:none">
     <div class="card-title">Manual Entry</div>
-    <div class="row2">
-      <div class="iw nomb"><span class="ii">&#128100;</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *"/></div>
-      <div class="iw nomb"><span class="ii">&#128222;</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" maxlength="10"/></div>
+
+    <div class="iw nomb">
+      <span class="ii">&#128101;</span>
+      <select id="m-existingCustomer" onchange="clearErr('m-existingCustomer'); onExistingCustomerChange();">
+        <option value="">Existing Customer? *</option>
+        <option value="No">No — new lead</option>
+        <option value="Yes">Yes — existing customer</option>
+      </select>
     </div>
-    <span class="err-msg" id="err-m-personName"></span>
-    <span class="err-msg" id="err-m-phone"></span>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">&#127970;</span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *"/></div>
-      <div class="iw nomb"><span class="ii">&#128188;</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *"/></div>
-    </div>
+    <span class="err-msg" id="err-m-existingCustomer"></span>
+
+    <div class="iw" style="margin-top:10px"><span class="ii"><span class="ii">&#127970;</span></span><input type="text" id="m-brandName" oninput="clearErr('m-brandName')" placeholder="Brand Name *"/></div>
     <span class="err-msg" id="err-m-brandName"></span>
-    <span class="err-msg" id="err-m-designation"></span>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">&#127978;</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *"/></div>
-      <div class="iw nomb"><span class="ii">&#127961;&#65039;</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *"/></div>
-    </div>
-    <span class="err-msg" id="err-m-pos"></span>
-    <span class="err-msg" id="err-m-city"></span>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb"><span class="ii">&#128290;</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0"/></div>
-      <div class="iw nomb">
-        <span class="ii">&#127919;</span>
-        <select id="m-intent" onchange="clearErr('m-intent')">
-          <option value="">Intent to Buy *</option>
-          <option value="Hot">&#128293; Hot</option>
-          <option value="Warm">&#127780; Warm</option>
-        </select>
+
+    <div id="manualNewLeadFields">
+      <div class="row2" style="margin-top:10px">
+        <div class="iw nomb"><span class="ii">&#128100;</span><input type="text" id="m-personName" oninput="clearErr('m-personName')" placeholder="Person Name *"/></div>
+        <div class="iw nomb"><span class="ii">&#128222;</span><input type="text" id="m-phone" oninput="clearErr('m-phone')" placeholder="Phone Number *" maxlength="10"/></div>
       </div>
-    </div>
-    <span class="err-msg" id="err-m-storeCount"></span>
-    <span class="err-msg" id="err-m-intent"></span>
-    <div class="row2" style="margin-top:10px">
-      <div class="iw nomb">
-        <span class="ii">&#127991;&#65039;</span>
-        <select id="m-forBrand" onchange="clearErr('m-forBrand')">
-          <option value="">For *</option>
-          <option value="Reelo">Reelo</option>
-          <option value="Olly">Olly</option>
-          <option value="Both">Both</option>
-        </select>
+      <span class="err-msg" id="err-m-personName"></span>
+      <span class="err-msg" id="err-m-phone"></span>
+      <div class="row2" style="margin-top:10px">
+        <div class="iw nomb"><span class="ii">&#128188;</span><input type="text" id="m-designation" oninput="clearErr('m-designation')" placeholder="Designation *"/></div>
+        <div class="iw nomb"><span class="ii">&#127978;</span><input type="text" id="m-pos" oninput="clearErr('m-pos')" placeholder="POS *"/></div>
       </div>
+      <span class="err-msg" id="err-m-designation"></span>
+      <span class="err-msg" id="err-m-pos"></span>
+      <div class="row2" style="margin-top:10px">
+        <div class="iw nomb"><span class="ii">&#127961;&#65039;</span><input type="text" id="m-city" oninput="clearErr('m-city')" placeholder="City *"/></div>
+        <div class="iw nomb"><span class="ii">&#128290;</span><input type="number" id="m-storeCount" oninput="clearErr('m-storeCount')" placeholder="Store Count *" min="0"/></div>
+      </div>
+      <span class="err-msg" id="err-m-city"></span>
+      <span class="err-msg" id="err-m-storeCount"></span>
+      <div class="row2" style="margin-top:10px">
+        <div class="iw nomb">
+          <span class="ii">&#127919;</span>
+          <select id="m-intent" onchange="clearErr('m-intent')">
+            <option value="">Intent to Buy *</option>
+            <option value="Hot">&#128293; Hot</option>
+            <option value="Warm">&#127780; Warm</option>
+          </select>
+        </div>
+        <div class="iw nomb">
+          <span class="ii">&#127991;&#65039;</span>
+          <select id="m-forBrand" onchange="clearErr('m-forBrand')">
+            <option value="">For *</option>
+            <option value="Reelo">Reelo</option>
+            <option value="Olly">Olly</option>
+            <option value="Both">Both</option>
+          </select>
+        </div>
+      </div>
+      <span class="err-msg" id="err-m-intent"></span>
+      <span class="err-msg" id="err-m-forBrand"></span>
     </div>
-    <span class="err-msg" id="err-m-forBrand"></span>
-    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">&#128172;</span><textarea id="m-comments" placeholder="Additional comments (optional)..."></textarea></div>
-    <button class="btn btn-p" onclick="checkPOSThenSubmit()" style="margin-top:12px">&#128228; Submit Entry</button>
+
+    <div class="iw" style="margin-top:10px;margin-bottom:0"><span class="ii top">&#128172;</span><textarea id="m-comments" oninput="clearErr('m-comments')" placeholder="Additional comments (optional)..."></textarea></div>
+    <span class="err-msg" id="err-m-comments"></span>
+    <button class="btn btn-p" onclick="handleManualSubmitClick()" style="margin-top:12px">&#128228; Submit Entry</button>
   </div>
 
   <div class="card" id="secScanForm" style="display:none">
@@ -533,6 +547,14 @@ async function syncQueue() {
         const data = await res.json();
         if (res.ok && data.sheetSuccess) {
           await queueDelete(item.id);
+          // Update the SQL/NSQL counter for entries that count as leads.
+          // "Existing Customer" manual notes don't have a POS and aren't
+          // counted, same as when they're saved live (see submitManual()).
+          const isExistingCustomerNote = item.mode === 'manual' && item.fields.existingCustomer === 'Yes';
+          if (!isExistingCustomerNote) {
+            if (isSQL(item.fields.pos || '')) { localSqlCount++; } else { localNsqlCount++; }
+            renderCounts(localSqlCount, localNsqlCount);
+          }
         } else {
           isOnline = false;
           break;
@@ -561,6 +583,7 @@ async function queueSubmission(mode, fields, imageBase64, imageMime) {
   await updateOfflineUI();
   return true;
 }
+
 
 window.addEventListener('online', checkConnectivity);
 window.addEventListener('offline', () => { isOnline = false; updateOfflineUI(); });
@@ -694,7 +717,7 @@ function goRescan() {
 // ── POS POPUP STATE ───────────────────────────────────────────────────────────
 let _pendingSubmit = null, _pendingPosField = 'm-pos', _selectedPOS = null;
 
-function checkPOSThenSubmitScan() {
+async function checkPOSThenSubmitScan() {
   const b=document.getElementById('e-brandName').value.trim(), p=document.getElementById('e-personName').value.trim(),
         d=document.getElementById('e-designation').value.trim(), ph=document.getElementById('e-phone').value.trim(),
         c=document.getElementById('e-city').value.trim(), pos=document.getElementById('e-pos').value.trim(),
@@ -761,6 +784,27 @@ async function submitScan() {
   finishSubmitUI(editedCard, true, false);
 }
 
+// ── Existing Customer toggle ────────────────────────────────────────────────
+function onExistingCustomerChange() {
+  const val = document.getElementById('m-existingCustomer').value;
+  const isExisting = val === 'Yes';
+  document.getElementById('manualNewLeadFields').style.display = isExisting ? 'none' : 'block';
+  document.getElementById('m-comments').placeholder = isExisting
+    ? 'Additional comments *'
+    : 'Additional comments (optional)...';
+}
+
+// Dispatches based on the "Existing Customer?" answer — existing customers
+// skip the full lead form (and the POS/SQL check, since there's no POS to
+// classify) and go straight to submit; new leads go through the normal
+// validation + SQL POS popup flow.
+function handleManualSubmitClick() {
+  const existingCustomer = document.getElementById('m-existingCustomer').value;
+  if (!existingCustomer) return showFieldError('m-existingCustomer', 'Please select Yes or No');
+  if (existingCustomer === 'Yes') { submitManual(); return; }
+  checkPOSThenSubmit();
+}
+
 function checkPOSThenSubmit() {
   const personName=document.getElementById('m-personName').value.trim(), phone=document.getElementById('m-phone').value.trim(),
         brandName=document.getElementById('m-brandName').value.trim(), designation=document.getElementById('m-designation').value.trim(),
@@ -825,28 +869,39 @@ function closePosPopup() { document.getElementById('posPopup').classList.remove(
 //  and retried automatically when offline.
 // ══════════════════════════════════════════════════════════════════════════════
 async function submitManual() {
-  const personName   = document.getElementById('m-personName').value.trim();
-  const phone        = document.getElementById('m-phone').value.trim();
-  const brandName    = document.getElementById('m-brandName').value.trim();
-  const designation  = document.getElementById('m-designation').value.trim();
-  const pos          = document.getElementById('m-pos').value.trim();
-  const city         = document.getElementById('m-city').value.trim();
-  const storeCount   = document.getElementById('m-storeCount').value.trim();
-  const intent       = document.getElementById('m-intent').value;
-  const forBrand     = document.getElementById('m-forBrand').value;
-  const comments     = document.getElementById('m-comments').value.trim();
+  const existingCustomer = document.getElementById('m-existingCustomer').value;
+  let fields;
 
-  if (!personName)  return showFieldError('m-personName','Person Name is required');
-  if (!phone)       return showFieldError('m-phone','Phone Number is required');
-  if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone','Must be exactly 10 digits');
-  if (!brandName)   return showFieldError('m-brandName','Brand Name is required');
-  if (!designation) return showFieldError('m-designation','Designation is required');
-  if (!pos)         return showFieldError('m-pos','POS is required');
-  if (!city)        return showFieldError('m-city','City is required');
-  if (!storeCount)  return showFieldError('m-storeCount','Store Count is required');
-  if (!intent)      return showFieldError('m-intent','Intent to Buy is required');
+  if (existingCustomer === 'Yes') {
+    const brandName = document.getElementById('m-brandName').value.trim();
+    const comments  = document.getElementById('m-comments').value.trim();
+    if (!brandName) return showFieldError('m-brandName', 'Brand Name is required');
+    if (!comments)  return showFieldError('m-comments', 'Comments are required for existing customers');
+    fields = { personName:'', phone:'', brandName, designation:'', pos:'', city:'', storeCount:'', intentToBuy:'', forBrand:'', comments, existingCustomer:'Yes' };
+  } else {
+    const personName   = document.getElementById('m-personName').value.trim();
+    const phone        = document.getElementById('m-phone').value.trim();
+    const brandName    = document.getElementById('m-brandName').value.trim();
+    const designation  = document.getElementById('m-designation').value.trim();
+    const pos          = document.getElementById('m-pos').value.trim();
+    const city         = document.getElementById('m-city').value.trim();
+    const storeCount   = document.getElementById('m-storeCount').value.trim();
+    const intent       = document.getElementById('m-intent').value;
+    const forBrand     = document.getElementById('m-forBrand').value;
+    const comments     = document.getElementById('m-comments').value.trim();
 
-  const fields = { personName, phone, brandName, designation, pos, city, storeCount, intentToBuy: intent, forBrand, comments };
+    if (!personName)  return showFieldError('m-personName','Person Name is required');
+    if (!phone)       return showFieldError('m-phone','Phone Number is required');
+    if (!/^[0-9]{10}$/.test(phone)) return showFieldError('m-phone','Must be exactly 10 digits');
+    if (!brandName)   return showFieldError('m-brandName','Brand Name is required');
+    if (!designation) return showFieldError('m-designation','Designation is required');
+    if (!pos)         return showFieldError('m-pos','POS is required');
+    if (!city)        return showFieldError('m-city','City is required');
+    if (!storeCount)  return showFieldError('m-storeCount','Store Count is required');
+    if (!intent)      return showFieldError('m-intent','Intent to Buy is required');
+
+    fields = { personName, phone, brandName, designation, pos, city, storeCount, intentToBuy: intent, forBrand, comments, existingCustomer:'No' };
+  }
 
   hideAll();
 
@@ -863,16 +918,7 @@ async function submitManual() {
   fd.append('manualOnly',   'true');
   fd.append('scannerName',  user.name);
   fd.append('scannerEmail', user.email);
-  fd.append('personName',   personName);
-  fd.append('phone',        phone);
-  fd.append('brandName',    brandName);
-  fd.append('designation',  designation);
-  fd.append('pos',          pos);
-  fd.append('city',         city);
-  fd.append('storeCount',   storeCount);
-  fd.append('intentToBuy',  intent);
-  fd.append('forBrand',     forBrand);
-  fd.append('comments',     comments);
+  Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
 
   let success = false;
   try {
@@ -888,8 +934,11 @@ async function submitManual() {
     return finishSubmitUI(fields, queued, true);
   }
 
-  if (isSQL(pos)) { localSqlCount++; } else { localNsqlCount++; }
-  renderCounts(localSqlCount, localNsqlCount);
+  // Existing-customer notes don't have a POS and aren't counted toward SQL/NSQL
+  if (fields.existingCustomer !== 'Yes') {
+    if (isSQL(fields.pos)) { localSqlCount++; } else { localNsqlCount++; }
+    renderCounts(localSqlCount, localNsqlCount);
+  }
   document.getElementById('secSaving').style.display = 'none';
   finishSubmitUI(fields, true, false);
 }
@@ -911,6 +960,7 @@ function finishSubmitUI(fields, success, wasQueued) {
     ['💬 Comments',    fields.comments],
     ['👤 Scanned By',  user.name]
   ];
+  if (fields.existingCustomer === 'Yes') rows.unshift(['🔁 Existing Customer', 'Yes']);
   document.getElementById('resultsGrid').innerHTML = rows
     .filter(([,v]) => v)
     .map(([l,v]) => `<div class="r1"><div class="rl">${l}</div><div class="rv">${v}</div></div>`)
@@ -929,7 +979,8 @@ function finishSubmitUI(fields, success, wasQueued) {
   }
 
   document.getElementById('secResults').style.display = 'block';
-  if (!wasQueued) setTimeout(() => showLeadPopup(fields.pos || ''), 400);
+  // Existing-customer notes aren't a lead — skip the SQL/NSQL celebration popup
+  if (!wasQueued && fields.existingCustomer !== 'Yes') setTimeout(() => showLeadPopup(fields.pos || ''), 400);
 }
 
 function getTodayKey(name) {
@@ -1020,7 +1071,8 @@ function reset() {
    'm-storeCount','m-comments','m-forBrand'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
-  ['m-intent'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['m-intent','m-existingCustomer'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  onExistingCustomerChange();
 
   ['e-brandName','e-personName','e-designation','e-department','e-phone',
    'e-alternatePhone','e-email','e-website','e-address','e-city','e-state',
