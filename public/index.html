@@ -495,7 +495,14 @@ async function updateOfflineUI() {
     sb.classList.remove('show');
   }
 }
-function manualSync() { checkConnectivity(); }
+async function manualSync() {
+  const online = await checkConnectivity();
+  if (online) {
+    await syncQueue();
+  } else {
+    alert("Still offline — can't reach the server right now. It'll sync automatically once you're back online.");
+  }
+}
 
 async function syncQueue() {
   if (isSyncing) return;
