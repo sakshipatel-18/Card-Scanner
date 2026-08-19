@@ -39,16 +39,20 @@ app.get('/api/counts', async (req, res) => {
 
 // ── /api/scan — main endpoint: extract card + save to sheet ───────────────────
 app.post('/api/scan', upload.single('card'), async (req, res) => {
-  const scannerName  = req.body.scannerName  || 'Unknown';
-  const scannerEmail = req.body.scannerEmail || '';
-  const manualOnly   = req.body.manualOnly   === 'true';
-  const extractOnly  = req.body.extractOnly  === 'true';
-  const saveOnly     = req.body.saveOnly     === 'true';
-  const editedCard   = req.body.editedCard   ? JSON.parse(req.body.editedCard) : null;
+  const scannerName     = req.body.scannerName  || 'Unknown';
+  const scannerEmail    = req.body.scannerEmail || '';
+  const manualOnly      = req.body.manualOnly   === 'true';
+  const extractOnly     = req.body.extractOnly  === 'true';
+  const saveOnly        = req.body.saveOnly     === 'true';
+  const existingCustomer = req.body.existingCustomer === 'Yes'; // ← ADD
+  const editedCard      = req.body.editedCard   ? JSON.parse(req.body.editedCard) : null;
 
   const pos         = req.body.pos         || '';
   const outletName  = req.body.outletName  || '';
-  const entryType = manualOnly ? 'Manual' : 'Card Scan';
+  // "Existing Customer" notes reuse the existing "Type" column instead of a
+  // new sheet column — no schema change needed, and it won't collide with
+  // any column position your dashboard formulas rely on (e.g. AA).
+  const entryType   = existingCustomer ? 'Existing Customer' : (manualOnly ? 'Manual' : 'Card Scan');
   const storeCount  = req.body.storeCount  || '';
   const comments    = req.body.comments    || '';
   const intentToBuy = req.body.intentToBuy || '';
